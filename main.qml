@@ -27,9 +27,9 @@ Window {
         onPositionChanged: {
             if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
                 console.log("Initial");
-//56.76189983333334
                 startLocation.coordinate = position.coordinate;
                 console.log(startLocation.coordinate.longitude);
+                console.log(startLocation.coordinate.latitude);
             }
         }
     }
@@ -46,6 +46,24 @@ Window {
            plugin: mapPlugin
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
+
+           MapItemView {
+               model: markerModel
+               delegate: MapQuickItem {
+                   coordinate: model.coordinate
+                   sourceItem: Rectangle {
+                       width: 20
+                       height: 20
+                       color: "red"
+                       border.color: "white"
+                       border.width: 2
+                       radius: 10
+                   }
+                   anchorPoint.x: sourceItem.width / 2
+                   anchorPoint.y: sourceItem.height / 2
+              }
+
+           }
 
 //           MouseArea {
 //                anchors.fill: parent
