@@ -6,11 +6,16 @@ import QtQuick.Layouts
 import QtPositioning
 import QtLocation
 
+
+
 Window {
     width: 640
     height: 480
     visible: true
     title: qsTr("SAI-GPS")
+
+    property bool isResizing: false
+
 
     Location {
         id: startLocation
@@ -47,6 +52,8 @@ Window {
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
+
+
            MapItemView {
                model: markerModel
                delegate: MapQuickItem {
@@ -65,35 +72,6 @@ Window {
 
            }
 
-//           MouseArea {
-//                anchors.fill: parent
-//                hoverEnabled: true
-//                onPositionChanged: {
-//                    var coordinate = map.toCoordinate(Qt.point(mouse.x, mouse.y));
-////                    console.log(`x: ${mouse.x}, y: ${mouse.y}`);
-//                    console.log(`Lat: ${coordinate.latitude.toFixed(4)}, Lon: ${coordinate.longitude.toFixed(4)}`);
-//                }
-//           }
-
-           MapQuickItem {
-                       id: mi1
-                       // Initial map coordinates for the center of the rectangle
-                       coordinate: startLocation.coordinate
-//                       anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-                       anchorPoint.x: r1.width / 2
-                       anchorPoint.y: r1.height / 2
-
-                       // The actual QtQuick item to be displayed
-                       sourceItem: Rectangle {
-                           id: r1
-                           width: 350
-                           height: 150
-                           color: "green"
-                           border.width: 2
-                           opacity: 0.5
-                           }
-           }
-
            MapQuickItem {
                        id: mi
                        // Initial map coordinates for the center of the rectangle
@@ -107,40 +85,35 @@ Window {
                            id: r
                            width: 150
                            height: width
-                           color: "blue"
-                           border.width: 2
-                           opacity: 0.5
+                           color: Qt.rgba(255, 255, 255, 0.5)
+                           border.color: "black"
+                           border.width: 1
 
                            GridLayout {
                                id: g
                                anchors.fill: parent
-                               rows: 1    // Define the number of rows
-                               columns: 1 // Define the number of columns
+                               rows: 1
+                               columns: 1
                                rowSpacing: 0
                                columnSpacing: 0
-                               // Create 9 rectangles (3x3 grid)
                                Repeater {
                                    model: g.rows * g.columns
                                    delegate: Rectangle {
                                        Layout.fillWidth: true
                                        Layout.fillHeight: true
-                                       // Assign a random color to differentiate
-//                                       color: Qt.rgba(Math.random(), Math.random(), Math.random(), 1.0)
-                                       color: Qt.transparent
-                                       border.color: "yellow"
+                                       color: Qt.rgba(255, 255, 255, 0.0)
+                                       border.color: "black"
                                        border.width: 1
-
-                                       // Optional: Display the item number
-                                       Text {
-                                           text: index + 1
-                                           anchors.centerIn: parent
-                                       }
+//                                       // Optional: Display the item number
+//                                       Text {
+//                                           text: index + 1
+//                                           anchors.centerIn: parent
+//                                       }
                                    }
                                }
                            }
                            RowLayout{
                                anchors.left: parent.right
-                               anchors.leftMargin: 5;
                                anchors.top: parent.top
                                Button {
                                    id: plusButton
@@ -169,30 +142,37 @@ Window {
                                anchors.fill: parent
                                drag.target: parent
                                onPositionChanged: {
-                                   if (drag.active) {
-                                       console.log(`${r.x} ${mouseArea.mouseX} ${mi.anchorPoint.x} ${mi.coordinate.longitude}`);
                                        var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
                                        mi.coordinate = map.toCoordinate(point);
-                                   }
                                }
                            }
                            Rectangle {
                                width: 15
                                height: 15
-                               color: "red"
-                               anchors.right: parent.right
-                               anchors.rightMargin: -20;
+                               radius: width / 2
+                               color: "white"
+                               border.color: "black"
+                               border.width: 1
+                               anchors.left: parent.right
                                anchors.bottom: parent.bottom
                                MouseArea {
                                    id: mouseAreaResize
                                    anchors.fill: parent
                                    cursorShape: Qt.SizeFDiagCursor // Resizing cursor
+                                   onPressed: {
+                                       isResizing = pressed;
+                                       console.log(`Here: ${isResizing}`);
+                                   }
+                                   onPressedChanged: {
+                                       console.log(pressed);
+                                   }
                                    onPositionChanged: {
                                        if (pressed) {
                                            // Adjust parent width/height based on mouse movement
                                            var s = Math.min(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
                                            r.width += s;
                                        }
+                                       console.log(pressed);
                                    }
                                }
                            }
@@ -245,11 +225,21 @@ Window {
 //               rotationScale: 1/120
 //               property: "zoomLevel"
 //           }
-//           DragHandler {
-//               id: drag
-//               target: null
-//               onTranslationChanged: (delta) => map.pan(-delta.x, -delta.y)
-//           }
+
+
+
+           DragHandler {
+               id: dragHandler
+               target: null
+               onTranslationChanged: (delta) => {
+                                         console.log(delta);
+                                    console.log(`DragHandler: ${isResizing}`);
+//                                         if (isResizing) {
+//                                            return;
+//                                         }
+//                                         map.pan(-delta.x, -delta.y);
+                                     }
+           }
 //           Shortcut {
 //               enabled: map.zoomLevel < map.maximumZoomLevel
 //               sequence: StandardKey.ZoomIn
@@ -261,35 +251,35 @@ Window {
 //               onActivated: map.zoomLevel = Math.round(map.zoomLevel - 1)
 //           }
 
-//           // Initial bearing (0 = North up)
-//           bearing: 0
-//           Behavior on bearing {
-//            enabled: true
-//               RotationAnimation {
-//                   direction: RotationAnimation.Shortest
-//                   duration: 300
-//                   easing.type: Easing.Linear
-//               }
-//           }
-//           // Add button to rotate
-//           GridLayout {
-//               columns: 3
-//               rows: 1
-//               anchors.bottom: parent.bottom
-//               anchors.horizontalCenter: parent.horizontalCenter
+           // Initial bearing (0 = North up)
+           bearing: 0
+           Behavior on bearing {
+            enabled: true
+               RotationAnimation {
+                   direction: RotationAnimation.Shortest
+                   duration: 300
+                   easing.type: Easing.Linear
+               }
+           }
+           // Add button to rotate
+           GridLayout {
+               columns: 3
+               rows: 1
+               anchors.bottom: parent.bottom
+               anchors.horizontalCenter: parent.horizontalCenter
 
-//               Button {
-//                   text: "-5°"
-//                   onClicked: map.bearing = (map.bearing - 5) % 360
-//               }
-//               Button {
-//                   text: "0°"
-//                   onClicked: map.bearing = 0
-//               }
-//               Button {
-//                   text: "+5°"
-//                   onClicked: map.bearing = (map.bearing + 5) % 360
-//               }
-//           }
+               Button {
+                   text: "-5°"
+                   onClicked: map.bearing = (map.bearing - 5) % 360
+               }
+               Button {
+                   text: "0°"
+                   onClicked: map.bearing = 0
+               }
+               Button {
+                   text: "+5°"
+                   onClicked: map.bearing = (map.bearing + 5) % 360
+               }
+           }
        }
 }
