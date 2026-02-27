@@ -70,12 +70,12 @@ Window {
                delegate: MapQuickItem {
                    coordinate: model.coordinate
                    sourceItem: Rectangle {
-                       width: 20
-                       height: 20
+                       width: 10
+                       height: 10
                        color: "red"
                        border.color: "white"
-                       border.width: 2
-                       radius: 10
+                       border.width: 1
+                       radius: 5
                    }
                    anchorPoint.x: sourceItem.width / 2
                    anchorPoint.y: sourceItem.height / 2
@@ -174,7 +174,6 @@ Window {
                                    id: mouseAreaResize
                                    anchors.fill: parent
                                    cursorShape: Qt.SizeFDiagCursor // Resizing cursor
-
                                    onPressedChanged: {
                                        dragHandler.enabled = !pressed;
                                    }

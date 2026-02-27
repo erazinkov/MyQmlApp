@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QStringLiteral>
+#include <QRandomGenerator>
 
 #include <QQmlContext>
 
@@ -40,9 +41,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("markerModel", &markerModel);
     engine.load(url);
 
-    for (auto i{0}; i < 10; ++i) {
-        markerModel.addMarker(QGeoCoordinate(56.76169483333333 + i * 0.0001, 37.221216999999996 + i * 0.0001), QString::number(i));
 
+
+    for (auto i{0}; i < 150; ++i) {
+        markerModel.addMarker(QGeoCoordinate(56.76169483333333 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10), 37.221216999999996 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10)), QString::number(i));
     }
 
     return app.exec();
