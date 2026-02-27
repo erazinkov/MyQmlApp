@@ -19,6 +19,8 @@ Window {
         coordinate: QtPositioning.coordinate(0.0, 0.0)
     }
 
+
+
     PositionSource {
         id: positionSource
         name: "nmea"
@@ -49,7 +51,19 @@ Window {
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
-
+           function distance() {
+               var point_0 = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+               var point_1 = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y);
+               var point_2 = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y);
+               var leftCoord = map.toCoordinate(point_1);
+               var rightCoord = map.toCoordinate(point_2);
+               if (leftCoord && rightCoord) {
+                    var distance = leftCoord.distanceTo(rightCoord);
+                    console.log("Map width in meters:", distance);
+                   return distance;
+               }
+               return -1;
+           }
 
            MapItemView {
                model: markerModel
@@ -107,7 +121,9 @@ Window {
                                    }
                                }
                            }
-                           RowLayout{
+                           GridLayout{
+                               rows: 2
+                               columns: 2
                                anchors.left: parent.right
                                anchors.top: parent.top
                                Button {
@@ -129,7 +145,10 @@ Window {
                                    }
                                }
                                Text {
-                                   text: `${1}`
+                                   text: map.distance().toFixed(0);
+                               }
+                               Text {
+                                   text: (map.distance() / g.rows).toFixed(0);
                                }
                            }
                            // MouseArea for handling drag events
@@ -164,15 +183,6 @@ Window {
                                            // Adjust parent width/height based on mouse movement
                                            var s = Math.min(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
                                            r.width += s;
-                                           var point_0 = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-                                           var point_1 = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y);
-                                           var point_2 = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y);
-                                           var leftCoord = map.toCoordinate(point_1);
-                                           var rightCoord = map.toCoordinate(point_2);
-                                           if (leftCoord && rightCoord) {
-                                                var distance = leftCoord.distanceTo(rightCoord);
-                                                console.log("Map width in meters:", distance);
-                                           }
                                        }
                                    }
                                }
