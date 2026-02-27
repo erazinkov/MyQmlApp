@@ -14,9 +14,6 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    property bool isResizing: false
-
-
     Location {
         id: startLocation
         coordinate: QtPositioning.coordinate(0.0, 0.0)
@@ -86,8 +83,6 @@ Window {
                            width: 150
                            height: width
                            color: Qt.rgba(255, 255, 255, 0.5)
-                           border.color: "black"
-                           border.width: 1
 
                            GridLayout {
                                id: g
@@ -133,9 +128,10 @@ Window {
                                        }
                                    }
                                }
+                               Text {
+                                   text: `${1}`
+                               }
                            }
-
-
                            // MouseArea for handling drag events
                            MouseArea {
                                id: mouseArea
@@ -159,20 +155,25 @@ Window {
                                    id: mouseAreaResize
                                    anchors.fill: parent
                                    cursorShape: Qt.SizeFDiagCursor // Resizing cursor
-                                   onPressed: {
-                                       isResizing = pressed;
-                                       console.log(`Here: ${isResizing}`);
-                                   }
+
                                    onPressedChanged: {
-                                       console.log(pressed);
+                                       dragHandler.enabled = !pressed;
                                    }
                                    onPositionChanged: {
                                        if (pressed) {
                                            // Adjust parent width/height based on mouse movement
                                            var s = Math.min(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
                                            r.width += s;
+                                           var point_0 = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+                                           var point_1 = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y);
+                                           var point_2 = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y);
+                                           var leftCoord = map.toCoordinate(point_1);
+                                           var rightCoord = map.toCoordinate(point_2);
+                                           if (leftCoord && rightCoord) {
+                                                var distance = leftCoord.distanceTo(rightCoord);
+                                                console.log("Map width in meters:", distance);
+                                           }
                                        }
-                                       console.log(pressed);
                                    }
                                }
                            }
@@ -214,31 +215,24 @@ Window {
 //               }
 //               grabPermissions: PointerHandler.TakeOverForbidden
 //           }
-//           WheelHandler {
-//               id: wheel
-//               // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
-//               // Magic Mouse pretends to be a trackpad but doesn't work with PinchHandler
-//               // and we don't yet distinguish mice and trackpads on Wayland either
-//               acceptedDevices: Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland"
-//                                ? PointerDevice.Mouse | PointerDevice.TouchPad
-//                                : PointerDevice.Mouse
-//               rotationScale: 1/120
-//               property: "zoomLevel"
-//           }
+           WheelHandler {
+               id: wheel
+               // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
+               // Magic Mouse pretends to be a trackpad but doesn't work with PinchHandler
+               // and we don't yet distinguish mice and trackpads on Wayland either
+               acceptedDevices: Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland"
+                                ? PointerDevice.Mouse | PointerDevice.TouchPad
+                                : PointerDevice.Mouse
+               rotationScale: 1/120
+               property: "zoomLevel"
+           }
 
 
 
            DragHandler {
                id: dragHandler
                target: null
-               onTranslationChanged: (delta) => {
-                                         console.log(delta);
-                                    console.log(`DragHandler: ${isResizing}`);
-//                                         if (isResizing) {
-//                                            return;
-//                                         }
-//                                         map.pan(-delta.x, -delta.y);
-                                     }
+               onTranslationChanged: (delta) => map.pan(-delta.x, -delta.y);
            }
 //           Shortcut {
 //               enabled: map.zoomLevel < map.maximumZoomLevel
@@ -263,7 +257,7 @@ Window {
            }
            // Add button to rotate
            GridLayout {
-               columns: 3
+               columns: 5
                rows: 1
                anchors.bottom: parent.bottom
                anchors.horizontalCenter: parent.horizontalCenter
@@ -273,8 +267,16 @@ Window {
                    onClicked: map.bearing = (map.bearing - 5) % 360
                }
                Button {
+                   text: "-1°"
+                   onClicked: map.bearing = (map.bearing - 1) % 360
+               }
+               Button {
                    text: "0°"
                    onClicked: map.bearing = 0
+               }
+               Button {
+                   text: "+1°"
+                   onClicked: map.bearing = (map.bearing + 1) % 360
                }
                Button {
                    text: "+5°"
