@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 
 
-    for (auto i{0}; i < 150; ++i) {
+    for (auto i{0}; i < 1200; ++i) {
         markerModel.addMarker(QGeoCoordinate(56.76169483333333 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10), 37.221216999999996 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10)), QString::number(i));
     }
 

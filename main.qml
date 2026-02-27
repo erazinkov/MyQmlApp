@@ -52,14 +52,20 @@ Window {
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
            function distance() {
-               var point_0 = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-               var point_1 = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y);
-               var point_2 = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y);
-               var leftCoord = map.toCoordinate(point_1);
-               var rightCoord = map.toCoordinate(point_2);
-               if (leftCoord && rightCoord) {
-                    var distance = leftCoord.distanceTo(rightCoord);
-                    console.log("Map width in meters:", distance);
+               var point_topLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
+               var point_topRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
+               var point_bottomRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
+               var point_bottomLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
+
+               var coord_topLeft = map.toCoordinate(point_topLeft);
+               var coord_topRight = map.toCoordinate(point_topRight);
+               var coord_bottomRight = map.toCoordinate(point_bottomRight);
+               var coord_bottomLeft = map.toCoordinate(point_bottomLeft);
+
+               var point_center = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+
+               if (coord_topLeft && coord_topRight) {
+                   var distance = coord_topLeft.distanceTo(coord_topRight);
                    return distance;
                }
                return -1;

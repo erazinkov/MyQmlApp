@@ -21,6 +21,11 @@ public:
 
     bool insertRows(int row, int count, const QModelIndex &parent) override;
     void addMarker(const QGeoCoordinate &coord, const QString &name);
+
+    void search(QGeoCoordinate coord) {
+
+    }
+
 protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
