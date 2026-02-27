@@ -105,11 +105,63 @@ Window {
                        // The actual QtQuick item to be displayed
                        sourceItem: Rectangle {
                            id: r
-                           width: 350
-                           height: 150
+                           width: 150
+                           height: width
                            color: "blue"
                            border.width: 2
                            opacity: 0.5
+
+                           GridLayout {
+                               id: g
+                               anchors.fill: parent
+                               rows: 1    // Define the number of rows
+                               columns: 1 // Define the number of columns
+                               rowSpacing: 0
+                               columnSpacing: 0
+                               // Create 9 rectangles (3x3 grid)
+                               Repeater {
+                                   model: g.rows * g.columns
+                                   delegate: Rectangle {
+                                       Layout.fillWidth: true
+                                       Layout.fillHeight: true
+                                       // Assign a random color to differentiate
+//                                       color: Qt.rgba(Math.random(), Math.random(), Math.random(), 1.0)
+                                       color: Qt.transparent
+                                       border.color: "yellow"
+                                       border.width: 1
+
+                                       // Optional: Display the item number
+                                       Text {
+                                           text: index + 1
+                                           anchors.centerIn: parent
+                                       }
+                                   }
+                               }
+                           }
+                           RowLayout{
+                               anchors.left: parent.right
+                               anchors.leftMargin: 5;
+                               anchors.top: parent.top
+                               Button {
+                                   id: plusButton
+                                   text: "+"
+                                   onClicked: {
+                                        g.rows = g.rows + 1;
+                                        g.columns = g.rows;
+                                   }
+                               }
+                               Button {
+                                   id: minusButton
+                                   text: "-"
+                                   onClicked: {
+                                       if (g.rows > 1) {
+                                           g.rows = g.rows - 1;
+                                           g.columns = g.rows;
+                                       }
+                                   }
+                               }
+                           }
+
 
                            // MouseArea for handling drag events
                            MouseArea {
@@ -117,41 +169,33 @@ Window {
                                anchors.fill: parent
                                drag.target: parent
                                onPositionChanged: {
-//                                   if (drag.active) {
+                                   if (drag.active) {
                                        console.log(`${r.x} ${mouseArea.mouseX} ${mi.anchorPoint.x} ${mi.coordinate.longitude}`);
                                        var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-//                                       console.log(`${map.toCoordinate(point).latitude} ${startLocation.coordinate.latitude}`);
                                        mi.coordinate = map.toCoordinate(point);
-//                                       var point = Qt.point(mouse.x + draggableRectangleItem.anchorPoint.x, mouseArea.mouseY + draggableRectangleItem.anchorPoint.y);
-//                                       draggableRectangleItem.coordinate = map.toCoordinate(point);
-                                       // Convert local screen position of the mouse back to map coordinates
-//                                       var coordinate = map.toCoordinate(Qt.point(mouseArea.mouseX + r.x + mi.anchorPoint.x,
-//                                                                       mouseArea.mouseY + r.y + mi.anchorPoint.y));
-
-//                                       mi.coordinate = coordinate;
-//                                   }
+                                   }
                                }
                            }
-//                           Rectangle {
-//                               width: parent.width * 0.1
-//                               height: parent.width * 0.1
-//                               color: "red"
-//                               anchors.right: parent.right
-//                               anchors.bottom: parent.bottom
-//                               MouseArea {
-//                                   id: mouseAreaResize
-//                                   anchors.fill: parent
-//                                   cursorShape: Qt.SizeFDiagCursor // Resizing cursor
-//                                   onPositionChanged: {
-//                                       if (pressed) {
-
-//                                           // Adjust parent width/height based on mouse movement
-//                                           rect.width += mouseAreaResize.mouseX - width / 2;
-//                                           rect.height += mouseAreaResize.mouseY - height / 2;
-//                                       }
-//                                   }
-//                               }
-//                           }
+                           Rectangle {
+                               width: 15
+                               height: 15
+                               color: "red"
+                               anchors.right: parent.right
+                               anchors.rightMargin: -20;
+                               anchors.bottom: parent.bottom
+                               MouseArea {
+                                   id: mouseAreaResize
+                                   anchors.fill: parent
+                                   cursorShape: Qt.SizeFDiagCursor // Resizing cursor
+                                   onPositionChanged: {
+                                       if (pressed) {
+                                           // Adjust parent width/height based on mouse movement
+                                           var s = Math.min(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
+                                           r.width += s;
+                                       }
+                                   }
+                               }
+                           }
 
                        }
                    }

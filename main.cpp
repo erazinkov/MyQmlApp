@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
     }
 
     MarkerModel markerModel;
-    markerModel.addMarker(QGeoCoordinate(56.76169483333333, 37.221216999999996), "0");
+
+
     qDebug() << markerModel.rowCount();
 
     QQmlApplicationEngine engine;
@@ -38,6 +39,11 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.rootContext()->setContextProperty("markerModel", &markerModel);
     engine.load(url);
+
+    for (auto i{0}; i < 10; ++i) {
+        markerModel.addMarker(QGeoCoordinate(56.76169483333333 + i * 0.0001, 37.221216999999996 + i * 0.0001), QString::number(i));
+
+    }
 
     return app.exec();
 }
