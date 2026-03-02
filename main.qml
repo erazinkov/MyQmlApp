@@ -127,11 +127,10 @@ Window {
                                    }
                                }
                            }
-                           GridLayout{
-                               rows: 2
-                               columns: 2
+                           ColumnLayout{
                                anchors.left: parent.right
                                anchors.top: parent.top
+                               RowLayout{
                                Button {
                                    id: plusButton
                                    text: "+"
@@ -150,11 +149,35 @@ Window {
                                        }
                                    }
                                }
-                               Text {
-                                   text: map.distance().toFixed(0);
                                }
-                               Text {
-                                   text: (map.distance() / g.rows).toFixed(0);
+                               RowLayout{
+                               Label {
+                                   padding: 5
+                                   text: `${g.rows}x${g.columns}`
+                                   color: "white"
+                                   background: Rectangle {
+                                       color: "black"
+                                       radius: 5
+                                   }
+                               }
+                               Label {
+                                   padding: 5
+                                   text: map.distance().toFixed(0)
+                                   color: "white"
+                                   background: Rectangle {
+                                       color: "black"
+                                       radius: 5
+                                   }
+                               }
+                               Label {
+                                   padding: 5
+                                   text: (map.distance() / g.rows).toFixed(0)
+                                   color: "white"
+                                   background: Rectangle {
+                                       color: "black"
+                                       radius: 5
+                                   }
+                               }
                                }
                            }
                            // MouseArea for handling drag events
