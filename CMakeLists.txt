@@ -5,11 +5,13 @@ project(MyQmlApp VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick Location Positioning REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql REQUIRED)
 
 qt_add_executable(appMyQmlApp
     main.cpp
     markermodel.h markermodel.cpp
+    databasecontroller.h databasecontroller.cpp
+    databaseworker.h databaseworker.cpp
 )
 
 qt_add_qml_module(appMyQmlApp
@@ -29,4 +31,4 @@ set_target_properties(appMyQmlApp PROPERTIES
 target_compile_definitions(appMyQmlApp
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(appMyQmlApp
-    PRIVATE Qt6::Quick Qt6::Positioning)
+    PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql)

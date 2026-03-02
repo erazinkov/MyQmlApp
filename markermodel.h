@@ -20,11 +20,14 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     bool insertRows(int row, int count, const QModelIndex &parent) override;
-    void addMarker(const QGeoCoordinate &coord, const QString &name);
+    Q_INVOKABLE void addMarker(const QGeoCoordinate &coord, const QString &name);
+    Q_INVOKABLE void addData(QList<QVariantHash> data);
 
     void search(QGeoCoordinate coord) {
 
     }
+
+    Q_INVOKABLE const QList<QPair<QGeoCoordinate, QString> > &markers() const;
 
 protected:
     QHash<int, QByteArray> roleNames() const override;

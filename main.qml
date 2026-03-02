@@ -6,7 +6,8 @@ import QtQuick.Layouts
 import QtPositioning
 import QtLocation
 
-
+import dbController
+import markerModel
 
 Window {
     width: 640
@@ -14,12 +15,23 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    Location {
-        id: startLocation
-        coordinate: QtPositioning.coordinate(0.0, 0.0)
+    function onSelectForTable(data) {
+        markerModel.addData(data);
+        console.log(`Data: ${data.length}`);
+
     }
 
+    function onConnectDb(success, errorText) {
+        console.log(`Database connected: ${success}, Error: ${errorText}`);
+    }
+    DatabaseController { id: dbController}
 
+    MarkerModel { id: markerModel}
+
+    Location {
+        id: startLocation
+        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
+    }
 
     PositionSource {
         id: positionSource
@@ -76,23 +88,20 @@ Window {
                delegate: MapQuickItem {
                    coordinate: model.coordinate
                    sourceItem: Rectangle {
-                       width: 10
-                       height: 10
+                       width: 2
+                       height: 2
                        color: "red"
-                       border.color: "white"
-                       border.width: 1
-                       radius: 5
+                       radius: 1
                    }
                    anchorPoint.x: sourceItem.width / 2
                    anchorPoint.y: sourceItem.height / 2
               }
-
            }
 
            MapQuickItem {
                        id: mi
                        // Initial map coordinates for the center of the rectangle
-                       coordinate: startLocation.coordinate
+                       coordinate: map.center
 //                       anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
                        anchorPoint.x: r.width / 2
                        anchorPoint.y: r.height / 2
@@ -101,9 +110,9 @@ Window {
                        sourceItem: Rectangle {
                            id: r
                            width: 150
-                           height: width
+                           height: 150
                            color: Qt.rgba(255, 255, 255, 0.5)
-
+/*
                            GridLayout {
                                id: g
                                anchors.fill: parent
@@ -181,13 +190,28 @@ Window {
                                }
                            }
                            // MouseArea for handling drag events
+                           */
                            MouseArea {
                                id: mouseArea
                                anchors.fill: parent
-                               drag.target: parent
-                               onPositionChanged: {
-                                       var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-                                       mi.coordinate = map.toCoordinate(point);
+//                               drag.target: parent
+                               DragHandler {
+                                   target: parent
+                                   onActiveChanged: {
+                                       dragHandler.enabled = !active;
+                                   }
+                                   onTranslationChanged: {
+                                                           // Calculate the new coordinate based on the drag translation
+                                                           var newPixelPoint = map.fromCoordinate(mi.coordinate, false);
+                                                           newPixelPoint.x += translation.x;
+                                                           newPixelPoint.y += translation.y;
+                                                           mi.coordinate = map.toCoordinate(newPixelPoint, false);
+
+                                                       }
+//                               onPositionChanged: {
+//                                       var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+//                                       mi.coordinate = map.toCoordinate(point);
+//                               }
                                }
                            }
                            Rectangle {
@@ -209,7 +233,7 @@ Window {
                                    onPositionChanged: {
                                        if (pressed) {
                                            // Adjust parent width/height based on mouse movement
-                                           var s = Math.min(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
+                                           var s = Math.max(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
                                            r.width += s;
                                        }
                                    }
@@ -320,6 +344,24 @@ Window {
                    text: "+5°"
                    onClicked: map.bearing = (map.bearing + 5) % 360
                }
+               Button {
+                   text: "DB"
+                   onClicked: {
+                       dbController.operateSelectForTable("", {});
+                   }
+               }
            }
+       }
+       Component.onCompleted: {
+           dbController.operateConnectDb("Connection 0",
+                                         "QMYSQL",
+                                         "localhost",
+                                         "napdb",
+                                         "testuser",
+                                         "Dubna@123",
+                                         "curr_meas");
+
+           dbController.connectDb.connect(onConnectDb);
+           dbController.selectForTable.connect(onSelectForTable);
        }
 }

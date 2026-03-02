@@ -10,6 +10,8 @@
 
 #include "markermodel.h"
 
+#include "databasecontroller.h"
+
 using namespace Qt::StringLiterals;
 
 int main(int argc, char *argv[])
@@ -28,8 +30,10 @@ int main(int argc, char *argv[])
 
     MarkerModel markerModel;
 
+    DatabaseController dbController;
 
-    qDebug() << markerModel.rowCount();
+//    dbController.operateSelectForTable();
+
 
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/MyQmlApp/main.qml"_s);
@@ -38,14 +42,18 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
-    engine.rootContext()->setContextProperty("markerModel", &markerModel);
+//    engine.rootContext()->setContextProperty("markerModel", &markerModel);
+    qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
+    qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
     engine.load(url);
 
 
 
-    for (auto i{0}; i < 1200; ++i) {
-        markerModel.addMarker(QGeoCoordinate(56.76169483333333 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10), 37.221216999999996 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10)), QString::number(i));
-    }
+
+//    for (auto i{0}; i < 1200; ++i) {
+//        markerModel.addMarker(QGeoCoordinate(56.76169483333333 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10), 37.221216999999996 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10)), QString::number(i));
+//    }
+
 
     return app.exec();
 }

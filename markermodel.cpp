@@ -65,6 +65,18 @@ void MarkerModel::addMarker(const QGeoCoordinate &coord, const QString &name)
     insertRows(row, 1, QModelIndex());
 }
 
+void MarkerModel::addData(QList<QVariantHash> data)
+{
+    for (auto i{0}, j{0}; i < data.count(); ++i) {
+        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+            if (i == 0) {
+                qDebug() << QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>());
+            }
+            addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
+        }
+    }
+}
+
 QHash<int, QByteArray> MarkerModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
@@ -73,4 +85,9 @@ QHash<int, QByteArray> MarkerModel::roleNames() const
     roles[NameRole] = "name";
     roles[CoordinateRole] = "coordinate";
     return roles;
+}
+
+const QList<QPair<QGeoCoordinate, QString> > &MarkerModel::markers() const
+{
+    return m_markers;
 }
