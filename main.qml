@@ -38,6 +38,27 @@ Window {
 //        coordinate: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
     }
 
+    MouseArea {
+        id: mouseAreaWindow
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: {
+            menu.popup(parent, mouseAreaWindow.mouseX, mouseAreaWindow.mouseY)
+        }
+    }
+    Menu {
+        id: menu
+        MenuItem {
+            text: qsTr("Add markers")
+            onTriggered: dbController.operateSelectForTable("", {})
+        }
+        MenuItem {
+            text: qsTr("Delete markers")
+            onTriggered: onDelete()
+        }
+    }
+
+
     PositionSource {
         id: positionSource
         name: "nmea"
@@ -69,6 +90,8 @@ Window {
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
+
+
            function distance() {
                var point_topLeft = Qt.point(mi.x, mi.y);
                var point_topRight = Qt.point(mi.x + r.width, mi.y);
@@ -95,10 +118,10 @@ Window {
                delegate: MapQuickItem {
                    coordinate: model.coordinate
                    sourceItem: Rectangle {
-                       width: 2
-                       height: 2
+                       width: 5
+                       height: 5
                        color: "red"
-                       radius: 1
+                       radius: 2.5
                    }
                    anchorPoint.x: sourceItem.width / 2
                    anchorPoint.y: sourceItem.height / 2
@@ -243,12 +266,12 @@ Window {
 
                        // Customize marker visual (e.g., a simple red dot)
                        sourceItem: Rectangle {
-                           width: 20
-                           height: 20
+                           width: 10
+                           height: 10
                            color: "red"
                            border.color: "white"
-                           border.width: 2
-                           radius: 10
+                           border.width: 1
+                           radius: 5
                        }
                        anchorPoint.x: sourceItem.width / 2
                        anchorPoint.y: sourceItem.height / 2
@@ -281,13 +304,7 @@ Window {
                                 : PointerDevice.Mouse
                rotationScale: 1/120
                property: "zoomLevel"
-//               onActiveChanged: {
-//                   var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-//                   mi.coordinate = map.toCoordinate(point);
-//               }
            }
-
-
 
            DragHandler {
                id: dragHandler
@@ -342,23 +359,13 @@ Window {
                    text: "+5°"
                    onClicked: map.bearing = (map.bearing + 5) % 360
                }
-               Button {
-                   text: "A"
-                   onClicked: {
-                       dbController.operateSelectForTable("", {});
-                   }
-               }
-               Button {
-                   text: "D"
-                   onClicked: onDelete()
-               }
                Switch {
-                           id: miSwitch
-                           checked: false
-                           onCheckedChanged: {
-                               mi.coordinate = map.center;
-                           }
-                       }
+                   id: miSwitch
+                    checked: false
+                    onCheckedChanged: {
+                        mi.coordinate = map.center;
+                    }
+               }
 
            }
        }
