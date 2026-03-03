@@ -10,8 +10,9 @@ import dbController
 import markerModel
 
 Window {
-    width: 640
-    height: 480
+    width: Screen.desktopAvailableWidth * 0.5
+    height: Screen.desktopAvailableHeight * 0.5
+
     visible: true
     title: qsTr("SAI-GPS")
 
@@ -42,6 +43,13 @@ Window {
         id: mouseAreaWindow
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
+//        hoverEnabled: true
+//        onPositionChanged: {
+//            var c = map.toCoordinate(Qt.point(mouseAreaWindow.mouseX, mouseAreaWindow.mouseY));
+
+//            console.log(c.latitude);
+//            console.log(c.longitude);
+//        }
         onClicked: {
             menu.popup(parent, mouseAreaWindow.mouseX, mouseAreaWindow.mouseY)
         }
@@ -55,7 +63,32 @@ Window {
         MenuItem {
             text: qsTr("Delete markers")
             onTriggered: onDelete()
+
         }
+        MenuSeparator {}
+
+        Menu {
+            title: qsTr("Location")
+            MenuItem {
+                text: qsTr("Dubna")
+                onTriggered: {
+                    map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
+                }
+            }
+            MenuItem {
+                text: qsTr("Stavropol_0")
+                onTriggered: {
+                    map.center = QtPositioning.coordinate(44.9778133, 42.012765);
+                }
+            }
+            MenuItem {
+                text: qsTr("Stavropol_1")
+                onTriggered: {
+                    map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
+                }
+            }
+        }
+
     }
 
 

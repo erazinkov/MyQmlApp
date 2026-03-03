@@ -147,7 +147,7 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
         QDate d_0{2025, 06, 15};
         QDate d_1{2025, 06, 20};
         queryString.append(QString("DATE(%1) >= '%2' AND DATE(%1) <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd")).arg(d_1.toString("yyyy-MM-dd")));
-        queryString.append(QString(" LIMIT 10000"));
+//        queryString.append(QString(" LIMIT 15000"));
 
         qDebug() << queryString;
 

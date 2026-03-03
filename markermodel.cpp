@@ -83,8 +83,8 @@ bool MarkerModel::deleteMarker(int row, const QModelIndex &parent)
 void MarkerModel::addData(QList<QVariantHash> data) // TODO ???
 {
 
-    for (auto i{0}, j{0}; i < data.count(); ++i) {
-        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon") && i % 2 == 0) {
+    for (auto i{0}, j{0}; i < data.count(); i = i + 3) {
+        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
             if (i == 0) {
                 qDebug() << QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>());
             }
