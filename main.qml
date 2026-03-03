@@ -65,12 +65,10 @@ Window {
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
            function distance() {
-
-               var point_topLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
-
-               var point_topRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
-               var point_bottomRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
-               var point_bottomLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
+               var point_topLeft = Qt.point(mi.x, mi.y);
+               var point_topRight = Qt.point(mi.x + r.width, mi.y);
+               var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+               var point_bottomLeft = Qt.point(mi.x, mi.y + r.height);
 
                var coord_topLeft = map.toCoordinate(point_topLeft);
                var coord_topRight = map.toCoordinate(point_topRight);
@@ -83,7 +81,19 @@ Window {
                    var distance = coord_topLeft.distanceTo(coord_topRight);
                    return distance;
                }
+
                return -1;
+           }
+
+           MouseArea {
+               id: mouseArea1
+               anchors.fill: parent
+               hoverEnabled: true
+               onPositionChanged: {
+//                   var coordinate1 = map.toCoordinate(mouseArea1.mouseX, mouseArea1.mouseY);
+//                   var c = "Lat: " + coordinate.latitude.toFixed(5) + ", Lon: " + coordinate.longitude.toFixed(5);
+                   console.log(`${mouseArea1.mouseX} ${mouseArea1.mouseY}`);
+               }
            }
 
            MapItemView {
@@ -108,7 +118,7 @@ Window {
 //                       anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
                        anchorPoint.x: r.width / 2
                        anchorPoint.y: r.height / 2
-
+                       visible: miSwitch.checked
                        // The actual QtQuick item to be displayed
                        sourceItem: Rectangle {
                            id: r
@@ -233,22 +243,22 @@ Window {
                        }
                    }
 
-//           MapQuickItem {
-//                       id: userMarker
-//                       coordinate: positionSource.position.coordinate
+           MapQuickItem {
+                       id: userMarker
+                       coordinate: positionSource.position.coordinate
 
-//                       // Customize marker visual (e.g., a simple red dot)
-//                       sourceItem: Rectangle {
-//                           width: 20
-//                           height: 20
-//                           color: "red"
-//                           border.color: "white"
-//                           border.width: 2
-//                           radius: 10
-//                       }
-//                       anchorPoint.x: sourceItem.width / 2
-//                       anchorPoint.y: sourceItem.height / 2
-//                   }
+                       // Customize marker visual (e.g., a simple red dot)
+                       sourceItem: Rectangle {
+                           width: 20
+                           height: 20
+                           color: "red"
+                           border.color: "white"
+                           border.width: 2
+                           radius: 10
+                       }
+                       anchorPoint.x: sourceItem.width / 2
+                       anchorPoint.y: sourceItem.height / 2
+                   }
 
 
 //           PinchHandler {
@@ -313,7 +323,7 @@ Window {
            }
            // Add button to rotate
            GridLayout {
-               columns: 5
+               columns: 7
                rows: 1
                anchors.bottom: parent.bottom
                anchors.horizontalCenter: parent.horizontalCenter
@@ -344,6 +354,11 @@ Window {
                        dbController.operateSelectForTable("", {});
                    }
                }
+               Switch {
+                           id: miSwitch
+                           checked: false
+                       }
+
            }
        }
        Component.onCompleted: {
