@@ -21,6 +21,10 @@ Window {
 
     }
 
+    function onDelete() {
+        markerModel.deleteData();
+    }
+
     function onConnectDb(success, errorText) {
         console.log(`Database connected: ${success}, Error: ${errorText}`);
     }
@@ -313,7 +317,7 @@ Window {
            }
            // Add button to rotate
            GridLayout {
-               columns: 7
+               columns: 8
                rows: 1
                anchors.bottom: parent.bottom
                anchors.horizontalCenter: parent.horizontalCenter
@@ -339,10 +343,14 @@ Window {
                    onClicked: map.bearing = (map.bearing + 5) % 360
                }
                Button {
-                   text: "DB"
+                   text: "A"
                    onClicked: {
                        dbController.operateSelectForTable("", {});
                    }
+               }
+               Button {
+                   text: "D"
+                   onClicked: onDelete()
                }
                Switch {
                            id: miSwitch

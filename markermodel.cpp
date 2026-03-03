@@ -58,6 +58,16 @@ bool MarkerModel::insertRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
+bool MarkerModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    beginRemoveRows(parent, row, row + count - 1);
+    for (auto i{0}; i < count; ++i) {
+        m_markers.removeAt(row);
+    }
+    endRemoveRows();
+    return true;
+}
+
 void MarkerModel::addMarker(const QGeoCoordinate &coord, const QString &name)
 {
     m_new_marker = {coord, name};
@@ -65,16 +75,27 @@ void MarkerModel::addMarker(const QGeoCoordinate &coord, const QString &name)
     insertRows(row, 1, QModelIndex());
 }
 
-void MarkerModel::addData(QList<QVariantHash> data)
+bool MarkerModel::deleteMarker(int row, const QModelIndex &parent)
 {
+    return removeRows(row, 1, parent);
+}
+
+void MarkerModel::addData(QList<QVariantHash> data) // TODO ???
+{
+
     for (auto i{0}, j{0}; i < data.count(); ++i) {
-        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon") && i % 2 == 0) {
             if (i == 0) {
                 qDebug() << QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>());
             }
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
         }
     }
+}
+
+void MarkerModel::deleteData() // TODO ???
+{
+    removeRows(0, rowCount(), QModelIndex());
 }
 
 QHash<int, QByteArray> MarkerModel::roleNames() const

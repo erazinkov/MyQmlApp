@@ -20,8 +20,11 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     bool insertRows(int row, int count, const QModelIndex &parent) override;
+    bool removeRows(int row, int count, const QModelIndex &parent) override;
     Q_INVOKABLE void addMarker(const QGeoCoordinate &coord, const QString &name);
+    Q_INVOKABLE bool deleteMarker(int row, const QModelIndex &parent = QModelIndex());
     Q_INVOKABLE void addData(QList<QVariantHash> data);
+    Q_INVOKABLE void deleteData();
 
     void search(QGeoCoordinate coord) {
 
