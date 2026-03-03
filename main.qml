@@ -30,7 +30,8 @@ Window {
 
     Location {
         id: startLocation
-        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
+//        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
+        coordinate: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
     }
 
     PositionSource {
@@ -60,11 +61,13 @@ Window {
            copyrightsVisible: false
            anchors.fill: parent
            plugin: mapPlugin
-           center: startLocation.coordinate
+           center: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
            function distance() {
+
                var point_topLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
+
                var point_topRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
                var point_bottomRight = Qt.point(mi.x + mi.anchorPoint.x + r.width / 2, mi.y + mi.anchorPoint.y - r.height / 2);
                var point_bottomLeft = Qt.point(mi.x + mi.anchorPoint.x - r.width / 2, mi.y + mi.anchorPoint.y + r.height / 2);
@@ -110,9 +113,9 @@ Window {
                        sourceItem: Rectangle {
                            id: r
                            width: 150
-                           height: 150
+                           height: width
                            color: Qt.rgba(255, 255, 255, 0.5)
-/*
+
                            GridLayout {
                                id: g
                                anchors.fill: parent
@@ -136,6 +139,7 @@ Window {
                                    }
                                }
                            }
+
                            ColumnLayout{
                                anchors.left: parent.right
                                anchors.top: parent.top
@@ -190,28 +194,14 @@ Window {
                                }
                            }
                            // MouseArea for handling drag events
-                           */
+
                            MouseArea {
                                id: mouseArea
                                anchors.fill: parent
-//                               drag.target: parent
-                               DragHandler {
-                                   target: parent
-                                   onActiveChanged: {
-                                       dragHandler.enabled = !active;
-                                   }
-                                   onTranslationChanged: {
-                                                           // Calculate the new coordinate based on the drag translation
-                                                           var newPixelPoint = map.fromCoordinate(mi.coordinate, false);
-                                                           newPixelPoint.x += translation.x;
-                                                           newPixelPoint.y += translation.y;
-                                                           mi.coordinate = map.toCoordinate(newPixelPoint, false);
-
-                                                       }
-//                               onPositionChanged: {
-//                                       var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-//                                       mi.coordinate = map.toCoordinate(point);
-//                               }
+                               drag.target: parent
+                               onPositionChanged: {
+                                    var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+                                    mi.coordinate = map.toCoordinate(point);
                                }
                            }
                            Rectangle {
@@ -287,6 +277,10 @@ Window {
                                 : PointerDevice.Mouse
                rotationScale: 1/120
                property: "zoomLevel"
+//               onActiveChanged: {
+//                   var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+//                   mi.coordinate = map.toCoordinate(point);
+//               }
            }
 
 
