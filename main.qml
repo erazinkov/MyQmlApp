@@ -30,8 +30,8 @@ Window {
 
     Location {
         id: startLocation
-//        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
-        coordinate: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
+        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
+//        coordinate: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
     }
 
     PositionSource {
@@ -61,7 +61,8 @@ Window {
            copyrightsVisible: false
            anchors.fill: parent
            plugin: mapPlugin
-           center: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
+//           center: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
+           center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
            function distance() {
@@ -83,17 +84,6 @@ Window {
                }
 
                return -1;
-           }
-
-           MouseArea {
-               id: mouseArea1
-               anchors.fill: parent
-               hoverEnabled: true
-               onPositionChanged: {
-//                   var coordinate1 = map.toCoordinate(mouseArea1.mouseX, mouseArea1.mouseY);
-//                   var c = "Lat: " + coordinate.latitude.toFixed(5) + ", Lon: " + coordinate.longitude.toFixed(5);
-                   console.log(`${mouseArea1.mouseX} ${mouseArea1.mouseY}`);
-               }
            }
 
            MapItemView {
@@ -357,6 +347,9 @@ Window {
                Switch {
                            id: miSwitch
                            checked: false
+                           onCheckedChanged: {
+                               mi.coordinate = map.center;
+                           }
                        }
 
            }
