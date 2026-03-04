@@ -131,7 +131,6 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
    };
     auto createQueryString = [&keys]()
     {
-
         const QString tableName{"curr_meas"};
         QString queryString;
 
@@ -147,7 +146,7 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
         QDate d_0{2025, 06, 15};
         QDate d_1{2025, 06, 20};
         queryString.append(QString("DATE(%1) >= '%2' AND DATE(%1) <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd")).arg(d_1.toString("yyyy-MM-dd")));
-//        queryString.append(QString(" LIMIT 15000"));
+        queryString.append(QString(" LIMIT 1000"));
 
         qDebug() << queryString;
 
@@ -174,4 +173,68 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
     } else {
         emit errorOccurred(query.lastError().text());
     }
+}
+
+void DatabaseWorker::handleSelectForTableWithCoordinate(const QGeoCoordinate &topLeft,
+                                                         const QGeoCoordinate &bottomRight,
+                                                         const QString &/*queryString*/,
+                                                         const QStringList &/*keysAs*/)
+{
+    const QStringList keys{
+        "dt",
+        "gps_lat",
+        "gps_lon"
+    };
+     auto createQueryString = [&keys, &topLeft, &bottomRight]()
+     {
+         const QString tableName{"curr_meas"};
+         QString queryString;
+
+         queryString.append(QString("SELECT "));
+         QStringList sL_temp;
+         for (auto i{0}; i < keys.count(); ++i) {
+             sL_temp.append(QString("%1").arg(keys.at(i)));
+         }
+         queryString.append(sL_temp.join(", "));
+         sL_temp.clear();
+         queryString.append(QString(" FROM %1").arg(tableName));
+         queryString.append(QString(" WHERE "));
+         QDate d_0{2025, 06, 15};
+         QDate d_1{2025, 06, 20};
+
+         QString tL_latitude = QString::number(topLeft.latitude(), 'g', 17);
+         QString tL_longitude = QString::number(topLeft.longitude(), 'g', 17);
+         QString bR_latitude = QString::number(bottomRight.latitude(), 'g', 17);
+         QString bR_longitude = QString::number(bottomRight.longitude(), 'g', 17);
+
+         queryString.append(QString("DATE(%1) >= '%2' AND DATE(%1) <= '%3'").arg("dt").arg(d_0.toString("yyyy-MM-dd")).arg(d_1.toString("yyyy-MM-dd")));
+         queryString.append(QString(" AND %1 >= %2 AND %1 <= %3").arg("gps_lat").arg(bR_latitude).arg(tL_latitude));
+         queryString.append(QString(" AND %1 >= %2 AND %1 <= %3").arg("gps_lon").arg(tL_longitude).arg(bR_longitude));
+//         queryString.append(QString(" LIMIT 15000"));
+
+         qDebug() << queryString;
+
+         return queryString;
+     };
+
+     const QString queryString = createQueryString();
+
+     QSqlDatabase db = QSqlDatabase::database(m_connectionName);
+     QSqlQuery query(db);
+     if (query.exec(queryString)) {
+         QList<QVariantHash> queryResult;
+         while (query.next()) {
+             QVariantHash row;
+             for (auto i{0}; i < keys.count(); ++i) {
+                 auto fieldNumber{query.record().indexOf(keys.at(i))};
+                 if (fieldNumber != -1) {
+                     row[keys.at(i)] = query.value(fieldNumber);
+                 }
+             }
+             queryResult.append(row);
+         }
+         emit selectForTableWithCoordinate(queryResult);
+     } else {
+         emit errorOccurred(query.lastError().text());
+     }
 }

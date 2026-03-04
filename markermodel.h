@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE bool deleteMarker(int row, const QModelIndex &parent = QModelIndex());
     Q_INVOKABLE void addData(QList<QVariantHash> data);
     Q_INVOKABLE void deleteData();
+    Q_INVOKABLE void processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, QList<QVariantHash> data, int rows, int columns);
 
     void search(QGeoCoordinate coord) {
 

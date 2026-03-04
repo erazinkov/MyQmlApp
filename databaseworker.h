@@ -6,6 +6,7 @@
 #include <QSqlError>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
+#include <QGeoCoordinate>
 
 class DatabaseWorker : public QObject
 {
@@ -23,15 +24,23 @@ public slots:
                            const QString &tableName, bool test = false);
     void handleDisconnectDb();
     void handleSelectTables();
-    void handleSelectForTable(const QString &tableName, const QStringList &keysAs);
+    void handleSelectForTable(const QString &queryString, const QStringList &keysAs);
 
-    void handleSelectForTable1(const QString &tableName, const QStringList &keysAs);
+    void handleSelectForTable1(const QString &queryString, const QStringList &keysAs);
+
+    void handleSelectForTableWithCoordinate(const QGeoCoordinate &topLeft,
+                                            const QGeoCoordinate &bottomRight,
+                                            const QString &queryString,
+                                            const QStringList &keysAs);
 
 signals:
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();
     void selectTables(QList<QVariant> queryResult);
     void selectForTable(QList<QVariantHash> queryResult);
+
+    void selectForTableWithCoordinate(QList<QVariantHash> queryResult);
+
     void errorOccurred(const QString &errorText);
 
 private:

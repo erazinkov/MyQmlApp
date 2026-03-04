@@ -5,6 +5,8 @@
 #include <QThread>
 #include <QVariantHash>
 
+#include <QGeoCoordinate>
+
 #include "databaseworker.h"
 
 class DatabaseController : public QObject
@@ -28,10 +30,18 @@ signals:
 
     void operateSelectTables();
     void operateSelectForTable(const QString &queryString, const QStringList &keysAs);
+
+    void operateSelectForTableWithCoordinate(const QGeoCoordinate &topLeft,
+                                            const QGeoCoordinate &bottomRight,
+                                            const QString &queryString,
+                                            const QStringList &keysAs);
+
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();
     void selectTables(QList<QVariant> data);
     void selectForTable(QList<QVariantHash> data);
+
+    void selectForTableWithCoordinate(QList<QVariantHash> data);
 
     void errorOccured(const QString &errorText);
 

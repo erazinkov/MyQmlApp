@@ -14,10 +14,14 @@ DatabaseController::DatabaseController(QObject *parent) : QObject{parent}
     connect(this, &DatabaseController::operateSelectTables, m_worker, &DatabaseWorker::handleSelectTables);
     connect(this, &DatabaseController::operateSelectForTable, m_worker, &DatabaseWorker::handleSelectForTable1);
 
+    connect(this, &DatabaseController::operateSelectForTableWithCoordinate, m_worker, &DatabaseWorker::handleSelectForTableWithCoordinate);
+
     connect(m_worker, &DatabaseWorker::connectDb, this, &DatabaseController::connectDb);
     connect(m_worker, &DatabaseWorker::disconnectDb, this, &DatabaseController::disconnectDb);
     connect(m_worker, &DatabaseWorker::selectTables, this, &DatabaseController::selectTables);
     connect(m_worker, &DatabaseWorker::selectForTable, this, &DatabaseController::selectForTable);
+
+    connect(m_worker, &DatabaseWorker::selectForTableWithCoordinate, this, &DatabaseController::selectForTableWithCoordinate);
 
     connect(m_worker, &DatabaseWorker::errorOccurred, this, &DatabaseController::errorOccured);
 

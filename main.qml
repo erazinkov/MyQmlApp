@@ -22,6 +22,20 @@ Window {
 
     }
 
+    function onSelectForTableWithCoordinate(data) {
+        var point_topLeft = Qt.point(mi.x, mi.y);
+
+        var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+
+        var coord_topLeft = map.toCoordinate(point_topLeft);
+        var coord_bottomRight = map.toCoordinate(point_bottomRight);
+
+        if (coord_topLeft && coord_bottomRight) {
+
+            markerModel.processData(coord_topLeft, coord_bottomRight, data, g.rows, g.columns);
+        }
+    }
+
     function onDelete() {
         markerModel.deleteData();
     }
@@ -35,25 +49,24 @@ Window {
 
     Location {
         id: startLocation
-        coordinate: QtPositioning.coordinate(44.9778133, 42.012765)
-//        coordinate: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
+        coordinate: QtPositioning.coordinate(0.0, 0.0)
     }
 
     MouseArea {
         id: mouseAreaWindow
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
-//        hoverEnabled: true
+        hoverEnabled: true
 //        onPositionChanged: {
 //            var c = map.toCoordinate(Qt.point(mouseAreaWindow.mouseX, mouseAreaWindow.mouseY));
 
-//            console.log(c.latitude);
-//            console.log(c.longitude);
+//            console.log(`${c.latitude} ${c.longitude}`);
 //        }
         onClicked: {
             menu.popup(parent, mouseAreaWindow.mouseX, mouseAreaWindow.mouseY)
         }
     }
+//    "SELECT dt, gps_lat, gps_lon FROM curr_meas WHERE DATE(dt) >= '2025-06-15' AND DATE(dt) <= '2025-06-20' AND gps_lat >= '44.9806' AND gps_lat <= '44.9797' AND gps_lon >= '42.0068' AND gps_lon <= '42.0075'"
     Menu {
         id: menu
         MenuItem {
@@ -64,6 +77,21 @@ Window {
             text: qsTr("Delete markers")
             onTriggered: onDelete()
 
+        }
+        MenuItem {
+            text: qsTr("Process")
+            onTriggered: {
+                var point_topLeft = Qt.point(mi.x, mi.y);
+
+                var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+
+                var coord_topLeft = map.toCoordinate(point_topLeft);
+                var coord_bottomRight = map.toCoordinate(point_bottomRight);
+
+                if (coord_topLeft && coord_bottomRight) {
+                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
+                }
+            }
         }
         MenuSeparator {}
 
@@ -100,11 +128,9 @@ Window {
         updateInterval: 1000 // Request updates every second
         active: true
         onPositionChanged: {
+            console.log(`${position.coordinate.latitude} ${position.coordinate.longitude}`);
             if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
-                console.log("Initial");
                 startLocation.coordinate = position.coordinate;
-                console.log(startLocation.coordinate.longitude);
-                console.log(startLocation.coordinate.latitude);
             }
         }
     }
@@ -225,6 +251,7 @@ Window {
                                }
                                RowLayout{
                                Label {
+                                   id: labelNumber
                                    padding: 5
                                    text: `${g.rows}x${g.columns}`
                                    color: "white"
@@ -265,12 +292,10 @@ Window {
                                }
                            }
                            Rectangle {
-                               width: 15
-                               height: 15
-                               radius: width / 2
-                               color: "white"
-                               border.color: "black"
-                               border.width: 1
+                               width: labelNumber.height
+                               height: width
+                               radius: 5
+                               color: "black"
                                anchors.left: parent.right
                                anchors.bottom: parent.bottom
                                MouseArea {
@@ -413,5 +438,7 @@ Window {
 
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
+
+           dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
        }
 }

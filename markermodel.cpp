@@ -13,35 +13,6 @@ int MarkerModel::rowCount(const QModelIndex &/*parent*/) const
 }
 
 
-//QVariant MarkerModel::data(const QModelIndex &index, int role) const
-//{
-
-//    if (!index.isValid())
-//            return QVariant();
-
-//        if (index.row() >= m_strings.size() || index.row() < 0)
-//            return QVariant();
-
-//        if (role == Qt::DisplayRole) {
-//            return m_strings.at(index.row());
-//        }
-//        // You can add more roles here (e.g., Qt::UserRole + 1 for custom data)
-
-//        return QVariant();
-//}
-
-//QVariant MarkerModel::headerData(int section, Qt::Orientation orientation, int role) const
-//{
-//    if (role != Qt::DisplayRole)
-//        return QVariant();
-
-//    if (orientation == Qt::Horizontal) {
-//        return QStringLiteral("Column %1").arg(section);
-//    } else {
-//        return QStringLiteral("Row %1").arg(section + 1);
-//    }
-//}
-
 QVariant MarkerModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.row() >= m_markers.size()) return QVariant();
     if (role == CoordinateRole) return QVariant::fromValue(m_markers.at(index.row()).first);
@@ -80,14 +51,11 @@ bool MarkerModel::deleteMarker(int row, const QModelIndex &parent)
     return removeRows(row, 1, parent);
 }
 
-void MarkerModel::addData(QList<QVariantHash> data) // TODO ???
+void MarkerModel::addData(QList<QVariantHash> data)
 {
-
-    for (auto i{0}, j{0}; i < data.count(); i = i + 3) {
+    auto nth{1};
+    for (auto i{nth - 1}, j{0}; i < data.count(); i += nth) {
         if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
-            if (i == 0) {
-                qDebug() << QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>());
-            }
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
         }
     }
@@ -96,6 +64,48 @@ void MarkerModel::addData(QList<QVariantHash> data) // TODO ???
 void MarkerModel::deleteData() // TODO ???
 {
     removeRows(0, rowCount(), QModelIndex());
+}
+
+void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, QList<QVariantHash> data, int rows, int columns)
+{
+    qDebug() << "Total points:" << data.count();
+
+    struct Cell{
+        QGeoCoordinate topLeft;
+        QGeoCoordinate bottomRight;
+    };
+    QList<Cell> cells;
+
+    auto hor{(bottomRight.latitude() - topLeft.latitude()) / rows};
+    auto ver{(bottomRight.longitude() - topLeft.longitude()) / columns};
+
+    for (auto r{0}; r < rows; ++r) {
+        for (auto c{0}; c < columns; ++c) {
+        cells.append({
+                      QGeoCoordinate(topLeft.latitude() + c * hor, topLeft.longitude() + r * ver),
+                      QGeoCoordinate(topLeft.latitude() + (c + 1) * hor, topLeft.longitude() + (r + 1) * ver)}
+                     );
+        }
+    }
+
+    QList<int> pointsInCells;
+    pointsInCells.resize(cells.count());
+
+    for (auto c{0}; c < cells.count(); ++c) {
+        for (auto i{0}; i < data.count(); ++i) {
+            if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+                if (cells.at(c).bottomRight.latitude() <= data.at(i)["gps_lat"].value<double>() && data.at(i)["gps_lat"].value<double>() <= cells.at(c).topLeft.latitude()) {
+                    if (cells.at(c).topLeft.longitude() <= data.at(i)["gps_lon"].value<double>() && data.at(i)["gps_lon"].value<double>() <= cells.at(c).bottomRight.longitude()) {
+                        pointsInCells[c] += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    for (const auto pIc : pointsInCells) {
+        qDebug() << pIc;
+    }
 }
 
 QHash<int, QByteArray> MarkerModel::roleNames() const
