@@ -83,6 +83,7 @@ Window {
                 var coord_bottomRight = map.toCoordinate(point_bottomRight);
                 if (coord_topLeft && coord_bottomRight) {
 
+
                     console.log(`${coord_topLeft.latitude}`);
                     markerModel.processDataTest(coord_topLeft, coord_bottomRight, g.rows, g.columns);
 //                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
@@ -280,7 +281,9 @@ Window {
                                anchors.fill: parent
                                drag.target: parent
                                onPositionChanged: (mouse) => {
-                                   var newCoords = map.toCoordinate(Qt.point(mi.x + r.x + r.width / 2, mi.y + r.y + r.height / 2));
+                                   var xx = mi.x + r.x + r.width / 2;
+                                   var yy = mi.y + r.y + r.height / 2;
+                                   var newCoords = map.toCoordinate(Qt.point(xx, yy));
                                    mi.coordinate = newCoords;
                                    toolTopLeftMarker.coordinate = newCoords;
                                }
@@ -404,7 +407,9 @@ Window {
            }
 
            onBearingChanged: {
-               console.log("Map bearing is now:", map.bearing, mi.rotation)
+               var xx = mi.x + r.x + r.width / 2;
+               var yy = mi.y + r.y + r.height / 2;
+               console.log("Map bearing is now:", map.bearing, xx, yy)
            }
 
            // Add button to rotate
