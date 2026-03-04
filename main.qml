@@ -48,6 +48,12 @@ Window {
         coordinate: QtPositioning.coordinate(0.0, 0.0)
     }
 
+    Location {
+        id: miLocation
+        coordinate: QtPositioning.coordinate(0.0, 0.0)
+    }
+
+
     MouseArea {
         id: mouseAreaWindow
         anchors.fill: parent
@@ -280,12 +286,12 @@ Window {
                                id: mouseArea
                                anchors.fill: parent
                                drag.target: parent
+                               drag.threshold: 0
                                onPositionChanged: (mouse) => {
                                    var xx = mi.x + r.x + r.width / 2;
                                    var yy = mi.y + r.y + r.height / 2;
                                    var newCoords = map.toCoordinate(Qt.point(xx, yy));
                                    mi.coordinate = newCoords;
-                                   toolTopLeftMarker.coordinate = newCoords;
                                }
                            }
                            Rectangle {
@@ -316,22 +322,7 @@ Window {
                    }
 
 
-           MapQuickItem {
-                       id: toolTopLeftMarker
-                       coordinate: mi.coordinate
 
-                       // Customize marker visual (e.g., a simple red dot)
-                       sourceItem: Rectangle {
-                           width: 10
-                           height: 10
-                           color: "blue"
-                           border.color: "white"
-                           border.width: 1
-                           radius: 5
-                       }
-                       anchorPoint.x: sourceItem.width / 2
-                       anchorPoint.y: sourceItem.height / 2
-                   }
 
            MapQuickItem {
                        id: userMarker
@@ -397,19 +388,26 @@ Window {
 
            // Initial bearing (0 = North up)
            bearing: 0
-           Behavior on bearing {
-            enabled: true
-               RotationAnimation {
-                   direction: RotationAnimation.Shortest
-                   duration: 300
-                   easing.type: Easing.Linear
-               }
-           }
+//           Behavior on bearing {
+//            enabled: true
+//               RotationAnimation {
+//                   direction: RotationAnimation.Shortest
+//                   duration: 300
+//                   easing.type: Easing.Linear
+//               }
+//           }
 
            onBearingChanged: {
                var xx = mi.x + r.x + r.width / 2;
                var yy = mi.y + r.y + r.height / 2;
-               console.log("Map bearing is now:", map.bearing, xx, yy)
+               var point_topLeft = Qt.point(mi.x, mi.y);
+               var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+               var coord_topLeft = map.toCoordinate(point_topLeft);
+               var coord_bottomRight = map.toCoordinate(point_bottomRight);
+               if (coord_topLeft && coord_bottomRight) {
+                    console.log("Map bearing is now:", map.bearing, coord_topLeft.latitude, coord_bottomRight.longitude)
+               }
+
            }
 
            // Add button to rotate
