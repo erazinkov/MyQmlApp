@@ -123,8 +123,9 @@ void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomR
     auto hor{(bottomRight.latitude() - topLeft.latitude()) / columns};
     auto ver{(bottomRight.longitude() - topLeft.longitude()) / rows};
 
-    for (auto r{0}; r < rows; ++r) {
+
         for (auto c{0}; c < columns; ++c) {
+            for (auto r{0}; r < rows; ++r) {
         cells.append({
                       QGeoCoordinate(topLeft.latitude() + c * hor, topLeft.longitude() + r * ver),
                       QGeoCoordinate(topLeft.latitude() + (c + 1) * hor, topLeft.longitude() + (r + 1) * ver)}
@@ -139,19 +140,20 @@ void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomR
     pointsInCells.resize(cells.count());
 
     for (auto c{0}; c < cells.count(); ++c) {
-        qDebug() << cells.at(c).topLeft.latitude();
+        qDebug() << cells.at(c).topLeft.latitude() << cells.at(c).bottomRight.longitude();
         for (auto i{0}; i < m_markers.count(); ++i) {
                 if (cells.at(c).bottomRight.latitude() <= m_markers.at(i).first.latitude() && m_markers.at(i).first.latitude() <= cells.at(c).topLeft.latitude()) {
                     if (cells.at(c).topLeft.longitude() <= m_markers.at(i).first.longitude() && m_markers.at(i).first.longitude() <= cells.at(c).bottomRight.longitude()) {
                         pointsInCells[c] += 1;
+                        qDebug() << "found at" << c;
                     }
                 }
             }
     }
 
-    for (const auto pIc : pointsInCells) {
-        qDebug() << pIc;
-    }
+//    for (const auto pIc : pointsInCells) {
+//        qDebug() << pIc;
+//    }
 }
 
 void MarkerModel::populateTest()
