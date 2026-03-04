@@ -133,9 +133,6 @@ void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomR
         }
     }
 
-    qDebug() << rows << columns;
-
-
     QList<int> pointsInCells;
     pointsInCells.resize(cells.count());
 
@@ -145,15 +142,14 @@ void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomR
                 if (cells.at(c).bottomRight.latitude() <= m_markers.at(i).first.latitude() && m_markers.at(i).first.latitude() <= cells.at(c).topLeft.latitude()) {
                     if (cells.at(c).topLeft.longitude() <= m_markers.at(i).first.longitude() && m_markers.at(i).first.longitude() <= cells.at(c).bottomRight.longitude()) {
                         pointsInCells[c] += 1;
-                        qDebug() << "found at" << c;
                     }
                 }
             }
     }
 
-//    for (const auto pIc : pointsInCells) {
-//        qDebug() << pIc;
-//    }
+    for (const auto pIc : pointsInCells) {
+        qDebug() << pIc;
+    }
 }
 
 void MarkerModel::populateTest()

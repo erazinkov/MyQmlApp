@@ -280,7 +280,7 @@ Window {
                                anchors.fill: parent
                                drag.target: parent
                                onPositionChanged: (mouse) => {
-                                   var newCoords = map.toCoordinate(Qt.point(mi.x + parent.x + parent.width / 2, mi.y + parent.y + parent.height / 2));
+                                   var newCoords = map.toCoordinate(Qt.point(mi.x + r.x + r.width / 2, mi.y + r.y + r.height / 2));
                                    mi.coordinate = newCoords;
                                    toolTopLeftMarker.coordinate = newCoords;
                                }
@@ -402,6 +402,11 @@ Window {
                    easing.type: Easing.Linear
                }
            }
+
+           onBearingChanged: {
+               console.log("Map bearing is now:", map.bearing, mi.rotation)
+           }
+
            // Add button to rotate
            GridLayout {
                columns: 8
