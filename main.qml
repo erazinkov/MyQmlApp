@@ -82,8 +82,10 @@ Window {
                 var coord_topLeft = map.toCoordinate(point_topLeft);
                 var coord_bottomRight = map.toCoordinate(point_bottomRight);
                 if (coord_topLeft && coord_bottomRight) {
+
                     console.log(`${coord_topLeft.latitude}`);
-                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
+                    markerModel.processDataTest(coord_topLeft, coord_bottomRight, g.rows, g.columns);
+//                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
                 }
             }
         }
@@ -122,6 +124,7 @@ Window {
         updateInterval: 1000 // Request updates every second
         active: true
         onPositionChanged: {
+
             if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
                 startLocation.coordinate = position.coordinate;
             }
@@ -183,10 +186,8 @@ Window {
            MapQuickItem {
                        id: mi
                        // Initial map coordinates for the center of the rectangle
-                       coordinate: map.center
-//                       anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-                       anchorPoint.x: r.width / 2
-                       anchorPoint.y: r.height / 2
+                       coordinate: startLocation.coordinate
+                       anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
                        visible: miSwitch.checked
                        // The actual QtQuick item to be displayed
                        sourceItem: Rectangle {
@@ -274,18 +275,14 @@ Window {
                                }
                            }
                            // MouseArea for handling drag events
-
                            MouseArea {
                                id: mouseArea
                                anchors.fill: parent
                                drag.target: parent
-                               onPositionChanged: {
-
-//                                   var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-                                   var point = Qt.point(r.x + r.width / 2, r.y + r.height / 2);
-                                    mi.coordinate = map.toCoordinate(point);
-                                   console.log(`${r.x} ${mi.anchorPoint.x} ${r.y} ${mi.anchorPoint.y}`);
-                                    toolTopLeftMarker.coordinate = mi.coordinate;
+                               onPositionChanged: (mouse) => {
+                                   var newCoords = map.toCoordinate(Qt.point(mi.x + parent.x + parent.width / 2, mi.y + parent.y + parent.height / 2));
+                                   mi.coordinate = newCoords;
+                                   toolTopLeftMarker.coordinate = newCoords;
                                }
                            }
                            Rectangle {
@@ -455,5 +452,6 @@ Window {
            dbController.selectForTable.connect(onSelectForTable);
 
            dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
+           markerModel.populateTest();
        }
 }

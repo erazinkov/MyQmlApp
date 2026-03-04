@@ -1,5 +1,6 @@
 #include "markermodel.h"
 
+#include <QRandomGenerator>
 
 MarkerModel::MarkerModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -68,8 +69,6 @@ void MarkerModel::deleteData() // TODO ???
 
 void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, QList<QVariantHash> data, int rows, int columns)
 {
-
-
     struct Cell{
         QGeoCoordinate topLeft;
         QGeoCoordinate bottomRight;
@@ -111,6 +110,56 @@ void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight
     for (const auto pIc : pointsInCells) {
         qDebug() << pIc;
     }
+}
+
+void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, int rows, int columns)
+{
+    struct Cell{
+        QGeoCoordinate topLeft;
+        QGeoCoordinate bottomRight;
+    };
+    QList<Cell> cells;
+
+    auto hor{(bottomRight.latitude() - topLeft.latitude()) / columns};
+    auto ver{(bottomRight.longitude() - topLeft.longitude()) / rows};
+
+    for (auto r{0}; r < rows; ++r) {
+        for (auto c{0}; c < columns; ++c) {
+        cells.append({
+                      QGeoCoordinate(topLeft.latitude() + c * hor, topLeft.longitude() + r * ver),
+                      QGeoCoordinate(topLeft.latitude() + (c + 1) * hor, topLeft.longitude() + (r + 1) * ver)}
+                     );
+        }
+    }
+
+    qDebug() << rows << columns;
+
+
+    QList<int> pointsInCells;
+    pointsInCells.resize(cells.count());
+
+    for (auto c{0}; c < cells.count(); ++c) {
+        qDebug() << cells.at(c).topLeft.latitude();
+        for (auto i{0}; i < m_markers.count(); ++i) {
+                if (cells.at(c).bottomRight.latitude() <= m_markers.at(i).first.latitude() && m_markers.at(i).first.latitude() <= cells.at(c).topLeft.latitude()) {
+                    if (cells.at(c).topLeft.longitude() <= m_markers.at(i).first.longitude() && m_markers.at(i).first.longitude() <= cells.at(c).bottomRight.longitude()) {
+                        pointsInCells[c] += 1;
+                    }
+                }
+            }
+    }
+
+    for (const auto pIc : pointsInCells) {
+        qDebug() << pIc;
+    }
+}
+
+void MarkerModel::populateTest()
+{
+    for (auto i{0}; i < 10; ++i) {
+        addMarker(QGeoCoordinate(56.76176699999999 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10), 37.22133433333334 + 0.0001 * QRandomGenerator::global()->bounded(-10, 10)), QString::number(i));
+    }
+
 }
 
 QHash<int, QByteArray> MarkerModel::roleNames() const

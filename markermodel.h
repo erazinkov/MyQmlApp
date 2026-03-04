@@ -27,6 +27,10 @@ public:
     Q_INVOKABLE void deleteData();
     Q_INVOKABLE void processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, QList<QVariantHash> data, int rows, int columns);
 
+    Q_INVOKABLE void processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, int rows, int columns);
+
+    Q_INVOKABLE void populateTest();
+
     void search(QGeoCoordinate coord) {
 
     }
