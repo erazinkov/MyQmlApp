@@ -68,7 +68,7 @@ void MarkerModel::deleteData() // TODO ???
 
 void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, QList<QVariantHash> data, int rows, int columns)
 {
-    qDebug() << "Total points:" << data.count();
+
 
     struct Cell{
         QGeoCoordinate topLeft;
@@ -76,8 +76,8 @@ void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight
     };
     QList<Cell> cells;
 
-    auto hor{(bottomRight.latitude() - topLeft.latitude()) / rows};
-    auto ver{(bottomRight.longitude() - topLeft.longitude()) / columns};
+    auto hor{(bottomRight.latitude() - topLeft.latitude()) / columns};
+    auto ver{(bottomRight.longitude() - topLeft.longitude()) / rows};
 
     for (auto r{0}; r < rows; ++r) {
         for (auto c{0}; c < columns; ++c) {
@@ -88,12 +88,17 @@ void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight
         }
     }
 
+    qDebug() << rows << columns;
+
+
     QList<int> pointsInCells;
     pointsInCells.resize(cells.count());
 
     for (auto c{0}; c < cells.count(); ++c) {
+        qDebug() << cells.at(c).topLeft.latitude();
         for (auto i{0}; i < data.count(); ++i) {
             if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+
                 if (cells.at(c).bottomRight.latitude() <= data.at(i)["gps_lat"].value<double>() && data.at(i)["gps_lat"].value<double>() <= cells.at(c).topLeft.latitude()) {
                     if (cells.at(c).topLeft.longitude() <= data.at(i)["gps_lon"].value<double>() && data.at(i)["gps_lon"].value<double>() <= cells.at(c).bottomRight.longitude()) {
                         pointsInCells[c] += 1;

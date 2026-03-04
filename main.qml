@@ -24,14 +24,10 @@ Window {
 
     function onSelectForTableWithCoordinate(data) {
         var point_topLeft = Qt.point(mi.x, mi.y);
-
         var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-
         var coord_topLeft = map.toCoordinate(point_topLeft);
         var coord_bottomRight = map.toCoordinate(point_bottomRight);
-
         if (coord_topLeft && coord_bottomRight) {
-
             markerModel.processData(coord_topLeft, coord_bottomRight, data, g.rows, g.columns);
         }
     }
@@ -82,13 +78,11 @@ Window {
             text: qsTr("Process")
             onTriggered: {
                 var point_topLeft = Qt.point(mi.x, mi.y);
-
                 var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-
                 var coord_topLeft = map.toCoordinate(point_topLeft);
                 var coord_bottomRight = map.toCoordinate(point_bottomRight);
-
                 if (coord_topLeft && coord_bottomRight) {
+                    console.log(`${coord_topLeft.latitude}`);
                     dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
                 }
             }
@@ -128,7 +122,6 @@ Window {
         updateInterval: 1000 // Request updates every second
         active: true
         onPositionChanged: {
-            console.log(`${position.coordinate.latitude} ${position.coordinate.longitude}`);
             if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
                 startLocation.coordinate = position.coordinate;
             }
@@ -287,8 +280,12 @@ Window {
                                anchors.fill: parent
                                drag.target: parent
                                onPositionChanged: {
-                                    var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+
+//                                   var point = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
+                                   var point = Qt.point(r.x + r.width / 2, r.y + r.height / 2);
                                     mi.coordinate = map.toCoordinate(point);
+                                   console.log(`${r.x} ${mi.anchorPoint.x} ${r.y} ${mi.anchorPoint.y}`);
+                                    toolTopLeftMarker.coordinate = mi.coordinate;
                                }
                            }
                            Rectangle {
@@ -316,6 +313,24 @@ Window {
                            }
 
                        }
+                   }
+
+
+           MapQuickItem {
+                       id: toolTopLeftMarker
+                       coordinate: mi.coordinate
+
+                       // Customize marker visual (e.g., a simple red dot)
+                       sourceItem: Rectangle {
+                           width: 10
+                           height: 10
+                           color: "blue"
+                           border.color: "white"
+                           border.width: 1
+                           radius: 5
+                       }
+                       anchorPoint.x: sourceItem.width / 2
+                       anchorPoint.y: sourceItem.height / 2
                    }
 
            MapQuickItem {
