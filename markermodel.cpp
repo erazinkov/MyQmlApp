@@ -62,12 +62,16 @@ void MarkerModel::addData(QList<QVariantHash> data)
             m_data.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
         }
     }
-    auto nth{20};
-    for (auto i{nth - 1}, j{0}; i < data.count(); i += nth) {
-        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+    auto nth{10};
+    for (auto i{nth - 1}, j{0}; i < m_data.count(); i += nth) {
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
-        }
     }
+//    auto nth{10};
+//    for (auto i{nth - 1}, j{0}; i < data.count(); i += nth) {
+//        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+//            addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
+//        }
+//    }
 }
 
 void MarkerModel::deleteData() // TODO ???

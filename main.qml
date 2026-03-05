@@ -257,6 +257,8 @@ Window {
                                RowLayout{
                                    Button {
                                        id: plusButton
+                                       implicitWidth: labelNumber.height
+                                       implicitHeight: labelNumber.height
                                        text: "+"
                                        onClicked: {
                                             g.rows = g.rows + 1;
@@ -265,6 +267,8 @@ Window {
                                    }
                                    Button {
                                        id: minusButton
+                                       implicitWidth: labelNumber.height
+                                       implicitHeight: labelNumber.height
                                        text: "-"
                                        onClicked: {
                                            if (g.rows > 1) {
@@ -328,13 +332,12 @@ Window {
                                MouseArea {
                                    id: mouseAreaResize
                                    anchors.fill: parent
-                                   cursorShape: Qt.SizeFDiagCursor // Resizing cursor
+                                   cursorShape: Qt.SizeFDiagCursor
                                    onPressedChanged: {
                                        dragHandler.enabled = !pressed;
                                    }
                                    onPositionChanged: {
                                        if (pressed) {
-                                           // Adjust parent width/height based on mouse movement
                                            var s = Math.max(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
                                            r.width += s;
                                        }
@@ -344,8 +347,6 @@ Window {
 
                        }
                    }
-
-
 
 
            MapQuickItem {
