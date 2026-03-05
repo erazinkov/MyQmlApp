@@ -29,6 +29,8 @@ public:
 
     Q_INVOKABLE void processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomRight, int rows, int columns);
 
+    Q_INVOKABLE void processDataTest1(QList<QVariantList> paths);
+
     Q_INVOKABLE void populateTest();
 
     void search(QGeoCoordinate coord) {
@@ -41,6 +43,7 @@ protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
     QList<QPair<QGeoCoordinate, QString>> m_markers;
+    QList<QPair<QGeoCoordinate, QString>> m_data;
     QPair<QGeoCoordinate, QString> m_new_marker;
 //    QStringList m_strings;
 };

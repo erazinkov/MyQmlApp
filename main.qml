@@ -59,16 +59,17 @@ Window {
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
         hoverEnabled: true
-//        onPositionChanged: {
+        onPositionChanged: (mouse) => {
 //            var c = map.toCoordinate(Qt.point(mouseAreaWindow.mouseX, mouseAreaWindow.mouseY));
-
 //            console.log(`${c.latitude} ${c.longitude}`);
-//        }
+//            var c = map.toCoordinate(Qt.point(mouseAreaWindow.mouseX, mouseAreaWindow.mouseY));
+//            console.log(`${Qt.point(mouse.x, mouse.y)}`);
+        }
         onClicked: {
             menu.popup(parent, mouseAreaWindow.mouseX, mouseAreaWindow.mouseY)
         }
     }
-//    "SELECT dt, gps_lat, gps_lon FROM curr_meas WHERE DATE(dt) >= '2025-06-15' AND DATE(dt) <= '2025-06-20' AND gps_lat >= '44.9806' AND gps_lat <= '44.9797' AND gps_lon >= '42.0068' AND gps_lon <= '42.0075'"
+
     Menu {
         id: menu
         MenuItem {
@@ -83,17 +84,41 @@ Window {
         MenuItem {
             text: qsTr("Process")
             onTriggered: {
+                var polygonsList = [];
+                var point_topLeft = Qt.point(mi.x, mi.y);
+                var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+                var hor = (point_bottomRight.x - point_topLeft.x) / g.columns;
+                var ver = (point_bottomRight.y - point_topLeft.y) / g.rows;
+                for (var row = 0; row < g.rows; ++row) {
+                    for (var column = 0; column < g.columns; ++column) {
+                    polygonsList.push([
+                                          map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
+                                          map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + row * ver)),
+                                          map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + (row + 1) * ver)),
+                                          map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + (row + 1) * ver)),
+                                          map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
+                                      ]
+                                 );
+                    }
+                }
+                markerModel.processDataTest1(polygonsList);
+//                dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
+
+/*
                 var point_topLeft = Qt.point(mi.x, mi.y);
                 var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
                 var coord_topLeft = map.toCoordinate(point_topLeft);
                 var coord_bottomRight = map.toCoordinate(point_bottomRight);
                 if (coord_topLeft && coord_bottomRight) {
 
-
+                console.log(`lat: ${coord_topLeft.latitude}`);
+                    //qml: lat: 56.761023758966125
+                    //qml: lat: 56.761163536364364
                     console.log(`${coord_topLeft.latitude}`);
                     markerModel.processDataTest(coord_topLeft, coord_bottomRight, g.rows, g.columns);
 //                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
-                }
+
+                }*/
             }
         }
         MenuSeparator {}
@@ -152,8 +177,6 @@ Window {
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
-
-
            function distance() {
                var point_topLeft = Qt.point(mi.x, mi.y);
                var point_topRight = Qt.point(mi.x + r.width, mi.y);
@@ -203,6 +226,7 @@ Window {
                            height: width
                            color: Qt.rgba(255, 255, 255, 0.5)
 
+
                            GridLayout {
                                id: g
                                anchors.fill: parent
@@ -231,24 +255,24 @@ Window {
                                anchors.left: parent.right
                                anchors.top: parent.top
                                RowLayout{
-                               Button {
-                                   id: plusButton
-                                   text: "+"
-                                   onClicked: {
-                                        g.rows = g.rows + 1;
-                                        g.columns = g.rows;
-                                   }
-                               }
-                               Button {
-                                   id: minusButton
-                                   text: "-"
-                                   onClicked: {
-                                       if (g.rows > 1) {
-                                           g.rows = g.rows - 1;
-                                           g.columns = g.rows;
+                                   Button {
+                                       id: plusButton
+                                       text: "+"
+                                       onClicked: {
+                                            g.rows = g.rows + 1;
+                                            g.columns = g.rows;
                                        }
                                    }
-                               }
+                                   Button {
+                                       id: minusButton
+                                       text: "-"
+                                       onClicked: {
+                                           if (g.rows > 1) {
+                                               g.rows = g.rows - 1;
+                                               g.columns = g.rows;
+                                           }
+                                       }
+                                   }
                                }
                                RowLayout{
                                Label {
@@ -388,26 +412,13 @@ Window {
 
            // Initial bearing (0 = North up)
            bearing: 0
-//           Behavior on bearing {
-//            enabled: true
-//               RotationAnimation {
-//                   direction: RotationAnimation.Shortest
-//                   duration: 300
-//                   easing.type: Easing.Linear
-//               }
-//           }
-
-           onBearingChanged: {
-               var xx = mi.x + r.x + r.width / 2;
-               var yy = mi.y + r.y + r.height / 2;
-               var point_topLeft = Qt.point(mi.x, mi.y);
-               var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-               var coord_topLeft = map.toCoordinate(point_topLeft);
-               var coord_bottomRight = map.toCoordinate(point_bottomRight);
-               if (coord_topLeft && coord_bottomRight) {
-                    console.log("Map bearing is now:", map.bearing, coord_topLeft.latitude, coord_bottomRight.longitude)
+           Behavior on bearing {
+            enabled: true
+               RotationAnimation {
+                   direction: RotationAnimation.Shortest
+                   duration: 300
+                   easing.type: Easing.Linear
                }
-
            }
 
            // Add button to rotate
@@ -459,7 +470,7 @@ Window {
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
 
-           dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
-           markerModel.populateTest();
+//           dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
+//           markerModel.populateTest();
        }
 }

@@ -2,6 +2,8 @@
 
 #include <QRandomGenerator>
 
+#include <QGeoPolygon>
+
 MarkerModel::MarkerModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -54,7 +56,13 @@ bool MarkerModel::deleteMarker(int row, const QModelIndex &parent)
 
 void MarkerModel::addData(QList<QVariantHash> data)
 {
-    auto nth{1};
+    m_data.clear();
+    for (auto i{0}, j{0}; i < data.count(); i += 1) {
+        if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
+            m_data.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
+        }
+    }
+    auto nth{20};
     for (auto i{nth - 1}, j{0}; i < data.count(); i += nth) {
         if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
@@ -149,6 +157,30 @@ void MarkerModel::processDataTest(QGeoCoordinate topLeft, QGeoCoordinate bottomR
 
     for (const auto pIc : pointsInCells) {
         qDebug() << pIc;
+    }
+}
+
+void MarkerModel::processDataTest1(QList<QVariantList> paths)
+{
+    QList<QGeoPolygon> polygons(paths.count());
+    for (auto pathIdx{0}; pathIdx < paths.count(); ++pathIdx) {
+        for (auto pointIdx{0}; pointIdx < paths.at(pathIdx).count(); ++pointIdx) {
+            QGeoCoordinate c{paths.at(pathIdx).at(pointIdx).value<QGeoCoordinate>()};
+            polygons[pathIdx].addCoordinate(c);
+        }
+    }
+
+    QList<int> pointsInPolygons(polygons.count());
+    for (auto p{0}; p < polygons.count(); ++p) {
+        for (auto i{0}; i < m_data.count(); ++i) {
+            if (polygons.at(p).contains(m_data.at(i).first)) {
+                pointsInPolygons[p] += 1;
+            }
+        }
+    }
+
+    for (auto i{0}; i < pointsInPolygons.count(); ++i) {
+        qDebug() << i << pointsInPolygons.at(i);
     }
 }
 
