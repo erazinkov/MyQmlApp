@@ -12,7 +12,9 @@
 
 #include "databasecontroller.h"
 
-#include "processing.h"
+//#include "processing.h"
+
+#include "processingcontroller.h"
 
 using namespace Qt::StringLiterals;
 
@@ -33,8 +35,9 @@ int main(int argc, char *argv[])
     MarkerModel markerModel;
 
     DatabaseController dbController;
+    ProcessingController pController;
 
-    Processing processing;
+//    Processing processing;
 
 //    dbController.operateSelectForTable();
 
@@ -49,7 +52,8 @@ int main(int argc, char *argv[])
 //    engine.rootContext()->setContextProperty("markerModel", &markerModel);
     qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
     qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
-    qmlRegisterType<Processing>("processing", 1, 0, "Processing");
+    qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
+//    qmlRegisterType<Processing>("processing", 1, 0, "Processing");
     engine.load(url);
 
 

@@ -7,8 +7,8 @@ import QtPositioning
 import QtLocation
 
 import dbController
+import pController
 import markerModel
-import processing
 
 Window {
     id: window
@@ -18,7 +18,7 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    function onProcessingFinished(index, result) {
+    function onProcessData(index, result) {
         var b = toolGridLayout.children[index]?.children[0];
         if (b) {
             b.text = result;
@@ -27,7 +27,7 @@ Window {
 
     function onSelectForTable(data) {
         markerModel.addData(data);
-        processing.addData(data);
+        pController.operateAddData(data);
     }
 
     function onDelete() {
@@ -39,9 +39,9 @@ Window {
     }
     DatabaseController { id: dbController}
 
-    MarkerModel { id: markerModel}
+    ProcessingController { id: pController}
 
-    Processing { id: processing}
+    MarkerModel { id: markerModel}
 
     Location {
         id: startLocation
@@ -101,7 +101,7 @@ Window {
                                  );
                     }
                 }
-                processing.processDataTest1(polygonsList);
+                pController.operateProcessData(polygonsList);
             }
         }
         MenuSeparator {}
@@ -444,7 +444,8 @@ Window {
 
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
-           processing.finished.connect(onProcessingFinished);
+           pController.processData.connect(onProcessData);
+//           processing.finished.connect(onProcessingFinished);
 
 //           markerModel.populateTest();
        }
