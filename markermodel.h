@@ -39,11 +39,13 @@ public:
 
     Q_INVOKABLE const QList<QPair<QGeoCoordinate, QString> > &markers() const;
 
+    Q_INVOKABLE const QList<QPair<QGeoCoordinate, QString> > &gpsData() const;
+
 protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
     QList<QPair<QGeoCoordinate, QString>> m_markers;
-    QList<QPair<QGeoCoordinate, QString>> m_data;
+    QList<QPair<QGeoCoordinate, QString>> m_gpsData;
     QPair<QGeoCoordinate, QString> m_new_marker;
 //    QStringList m_strings;
 };

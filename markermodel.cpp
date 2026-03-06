@@ -56,14 +56,14 @@ bool MarkerModel::deleteMarker(int row, const QModelIndex &parent)
 
 void MarkerModel::addData(QList<QVariantHash> data)
 {
-    m_data.clear();
+    m_gpsData.clear();
     for (auto i{0}, j{0}; i < data.count(); i += 1) {
         if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
-            m_data.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
+            m_gpsData.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
         }
     }
     auto nth{10};
-    for (auto i{nth - 1}, j{0}; i < m_data.count(); i += nth) {
+    for (auto i{nth - 1}, j{0}; i < m_gpsData.count(); i += nth) {
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
     }
 //    auto nth{10};
@@ -176,8 +176,8 @@ void MarkerModel::processDataTest1(QList<QVariantList> paths)
 
     QList<int> pointsInPolygons(polygons.count());
     for (auto p{0}; p < polygons.count(); ++p) {
-        for (auto i{0}; i < m_data.count(); ++i) {
-            if (polygons.at(p).contains(m_data.at(i).first)) {
+        for (auto i{0}; i < m_gpsData.count(); ++i) {
+            if (polygons.at(p).contains(m_gpsData.at(i).first)) {
                 pointsInPolygons[p] += 1;
             }
         }
@@ -204,6 +204,11 @@ QHash<int, QByteArray> MarkerModel::roleNames() const
     roles[NameRole] = "name";
     roles[CoordinateRole] = "coordinate";
     return roles;
+}
+
+const QList<QPair<QGeoCoordinate, QString> > &MarkerModel::gpsData() const
+{
+    return m_gpsData;
 }
 
 const QList<QPair<QGeoCoordinate, QString> > &MarkerModel::markers() const

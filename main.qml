@@ -8,6 +8,7 @@ import QtLocation
 
 import dbController
 import markerModel
+import processing
 
 Window {
     width: Screen.desktopAvailableWidth * 0.5
@@ -16,13 +17,16 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    function onSelectForTable(data) {
-        markerModel.addData(data);
-        console.log(`Data: ${data.length}`);
+    function onProcessingFinished(isFinished) {
 
     }
 
-    function onSelectForTableWithCoordinate(data) {
+    function onSelectForTable(data) {
+        markerModel.addData(data);
+        processing.addData(data);
+    }
+
+    function onSelectForTableWithCoordinate(data) { // TODO - delete ??
         var point_topLeft = Qt.point(mi.x, mi.y);
         var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
         var coord_topLeft = map.toCoordinate(point_topLeft);
@@ -42,6 +46,8 @@ Window {
     DatabaseController { id: dbController}
 
     MarkerModel { id: markerModel}
+
+    Processing { id: processing}
 
     Location {
         id: startLocation
@@ -101,24 +107,7 @@ Window {
                                  );
                     }
                 }
-                markerModel.processDataTest1(polygonsList);
-//                dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
-
-/*
-                var point_topLeft = Qt.point(mi.x, mi.y);
-                var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-                var coord_topLeft = map.toCoordinate(point_topLeft);
-                var coord_bottomRight = map.toCoordinate(point_bottomRight);
-                if (coord_topLeft && coord_bottomRight) {
-
-                console.log(`lat: ${coord_topLeft.latitude}`);
-                    //qml: lat: 56.761023758966125
-                    //qml: lat: 56.761163536364364
-                    console.log(`${coord_topLeft.latitude}`);
-                    markerModel.processDataTest(coord_topLeft, coord_bottomRight, g.rows, g.columns);
-//                    dbController.operateSelectForTableWithCoordinate(coord_topLeft, coord_bottomRight, "", {});
-
-                }*/
+                processing.processDataTest1(polygonsList);
             }
         }
         MenuSeparator {}
@@ -156,7 +145,6 @@ Window {
         updateInterval: 1000 // Request updates every second
         active: true
         onPositionChanged: {
-
             if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
                 startLocation.coordinate = position.coordinate;
             }
@@ -173,28 +161,18 @@ Window {
            copyrightsVisible: false
            anchors.fill: parent
            plugin: mapPlugin
-//           center: QtPositioning.coordinate(56.76176699999999, 37.22133433333334)
            center: startLocation.coordinate
            zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
            function distance() {
                var point_topLeft = Qt.point(mi.x, mi.y);
-               var point_topRight = Qt.point(mi.x + r.width, mi.y);
                var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-               var point_bottomLeft = Qt.point(mi.x, mi.y + r.height);
-
                var coord_topLeft = map.toCoordinate(point_topLeft);
-               var coord_topRight = map.toCoordinate(point_topRight);
                var coord_bottomRight = map.toCoordinate(point_bottomRight);
-               var coord_bottomLeft = map.toCoordinate(point_bottomLeft);
-
-               var point_center = Qt.point(mi.x + mi.anchorPoint.x, mi.y + mi.anchorPoint.y);
-
-               if (coord_topLeft && coord_topRight) {
-                   var distance = coord_topLeft.distanceTo(coord_topRight);
+               if (coord_topLeft && coord_bottomRight) {
+                   var distance = coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0);
                    return distance;
                }
-
                return -1;
            }
 
@@ -242,6 +220,10 @@ Window {
                                        color: Qt.rgba(255, 255, 255, 0.0)
                                        border.color: "black"
                                        border.width: 1
+                                       BusyIndicator {
+                                           anchors.fill: parent
+                                           running: true
+                                       }
 //                                       // Optional: Display the item number
 //                                       Text {
 //                                           text: index + 1
@@ -470,6 +452,8 @@ Window {
 
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
+
+           processing.finished.connect(onProcessingFinished);
 
 //           dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
 //           markerModel.populateTest();

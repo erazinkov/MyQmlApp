@@ -12,6 +12,7 @@ qt_add_executable(appMyQmlApp
     markermodel.h markermodel.cpp
     databasecontroller.h databasecontroller.cpp
     databaseworker.h databaseworker.cpp
+    processing.h processing.cpp
 )
 
 qt_add_qml_module(appMyQmlApp
