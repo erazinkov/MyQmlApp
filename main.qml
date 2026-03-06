@@ -11,6 +11,7 @@ import markerModel
 import processing
 
 Window {
+    id: window
     width: Screen.desktopAvailableWidth * 0.5
     height: Screen.desktopAvailableHeight * 0.5
 
@@ -196,6 +197,7 @@ Window {
                            width: 150
                            height: width
                            color: Qt.rgba(255, 255, 255, 0.5)
+
                            GridLayout {
                                id: toolGridLayout
                                anchors.fill: parent
@@ -285,18 +287,14 @@ Window {
                                }
                                }
                            }
-                           // MouseArea for handling drag events
-                           MouseArea {
-                               id: mouseArea
-                               anchors.fill: parent
-                               drag.target: parent
-                               drag.threshold: 0
-                               onPositionChanged: (mouse) => {
-                                   var xx = mi.x + r.x + r.width / 2;
-                                   var yy = mi.y + r.y + r.height / 2;
-                                   var newCoords = map.toCoordinate(Qt.point(xx, yy));
-                                   mi.coordinate = newCoords;
-                               }
+
+                           DragHandler {
+                               target: mi
+                               xAxis.minimum: 0
+                               xAxis.maximum: window.width - r.width
+                               yAxis.minimum: 0
+                               yAxis.maximum: window.height - r.height
+
                            }
                            Rectangle {
                                width: labelNumber.height * 0.5
