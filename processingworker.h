@@ -15,7 +15,7 @@ public slots:
     void handleProcessData(QList<QVariantList> paths);
 
 signals:
-    void processData(int index, int result);
+    void processData(int index, int result, bool isProcess);
 
 private:
     QList<QPair<QGeoCoordinate, QString>> m_gpsData;

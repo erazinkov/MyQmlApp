@@ -18,6 +18,8 @@ void ProcessingWorker::handleAddData(QList<QVariantHash> data)
     }
 }
 
+#include <QThread>
+
 void ProcessingWorker::handleProcessData(QList<QVariantList> paths)
 {
     QList<QGeoPolygon> polygons(paths.count());
@@ -30,15 +32,17 @@ void ProcessingWorker::handleProcessData(QList<QVariantList> paths)
 
     QList<int> pointsInPolygons(polygons.count());
     for (auto p{0}; p < polygons.count(); ++p) {
+        emit processData(p, pointsInPolygons.at(p), true);
+        QThread::currentThread()->msleep(5'000);
         for (auto i{0}; i < m_gpsData.count(); ++i) {
             if (polygons.at(p).contains(m_gpsData.at(i).first)) {
                 pointsInPolygons[p] += 1;
             }
         }
-        emit processData(p, pointsInPolygons.at(p));
+        emit processData(p, pointsInPolygons.at(p), false);
     }
 
-    for (auto i{0}; i < pointsInPolygons.count(); ++i) {
-        qDebug() << i << pointsInPolygons.at(i);
-    }
+//    for (auto i{0}; i < pointsInPolygons.count(); ++i) {
+//        qDebug() << i << pointsInPolygons.at(i);
+//    }
 }

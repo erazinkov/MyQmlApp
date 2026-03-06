@@ -18,10 +18,14 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    function onProcessData(index, result) {
-        var b = toolGridLayout.children[index]?.children[0];
+    function onProcessData(index, result, isProcess) {
+        var a = toolGridLayout.children[index]?.children[0];
+        var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
         if (b) {
             b.text = result;
+        }
+        if (a) {
+            a.currentIndex = isProcess ? 1 : 0;
         }
     }
 
@@ -37,6 +41,9 @@ Window {
     function onConnectDb(success, errorText) {
         console.log(`Database connected: ${success}, Error: ${errorText}`);
     }
+
+
+
     DatabaseController { id: dbController}
 
     ProcessingController { id: pController}
@@ -48,10 +55,11 @@ Window {
         coordinate: QtPositioning.coordinate(0.0, 0.0)
     }
 
-    Location {
-        id: miLocation
-        coordinate: QtPositioning.coordinate(0.0, 0.0)
+    ListModel {
+        id: mapTypesModel
     }
+
+
 
 
     MouseArea {
@@ -128,9 +136,42 @@ Window {
             }
         }
 
+        MenuSeparator {}
+
+        Menu {
+            id: mapTypeMenu
+            title: qsTr("Map type")
+            Repeater {
+                model: mapTypesModel
+                MenuItem {
+                    text: mapTypeName
+                    onTriggered: {
+//                                     console.log(index);
+                        map.activeMapType = map.supportedMapTypes[index];
+                    }
+
+//                    console.log("Triggered:", actionName)
+                       // Handle actions
+                   }
+               }
+
+        }
+
+//        ComboBox {
+//             id: styleComboBox
+//             model: ListModel { id: styleModel }
+//             onActivated: {
+//                 map.activeMapType = map.supportedMapTypes[index];
+//             }
+//             Component.onCompleted: {
+//                 // Populate the ComboBox model with available layer descriptions
+//                 for (var i = 0; i < map.supportedMapTypes.length; i++) {
+//                     styleModel.append({ text: map.supportedMapTypes[i].description });
+//                 }
+//             }
+//        }
+
     }
-
-
     PositionSource {
         id: positionSource
         name: "nmea"
@@ -214,17 +255,32 @@ Window {
                                        border.color: "black"
                                        border.width: 1
                                        property int index: model.index
-                                       Label {
-                                           anchors.centerIn: parent
-                                           padding: 5
-                                           text: ""
-                                           color: "white"
-                                           background: Rectangle {
-                                               color: "black"
-                                               radius: 5
-                                               visible: parent.text.length
+                                       StackLayout {
+                                           id: toolGridLayoutStackedLayout
+                                           anchors.fill: parent
+                                           currentIndex: 0
+                                           Rectangle {
+                                               Layout.alignment: Qt.AlignCenter
+                                               color: Qt.rgba(255, 255, 255, 0.0)
+                                               Label {
+                                                   anchors.horizontalCenter: parent.horizontalCenter
+                                                   anchors.verticalCenter: parent.verticalCenter
+                                                   padding: 5
+                                                   text: ""
+                                                   color: "white"
+                                                   background: Rectangle {
+                                                       color: "black"
+                                                       radius: 5
+                                                       visible: parent.text.length
+                                                   }
+                                               }
+                                           }
+                                           BusyIndicator {
+                                               Layout.alignment: Qt.AlignHCenter
+                                               running: true
                                            }
                                        }
+
                                    }
                                }
                            }
@@ -385,8 +441,7 @@ Window {
 //               onActivated: map.zoomLevel = Math.round(map.zoomLevel - 1)
 //           }
 
-           // Initial bearing (0 = North up)
-           bearing: 0
+           bearing: 0 // north up
            Behavior on bearing {
             enabled: true
                RotationAnimation {
@@ -445,6 +500,11 @@ Window {
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
            pController.processData.connect(onProcessData);
+
+           for (var i = 0; i < map.supportedMapTypes.length; ++i) {
+                mapTypesModel.append({ index: i, mapTypeName: map.supportedMapTypes[i].description });
+           }
+           //                 }
 //           processing.finished.connect(onProcessingFinished);
 
 //           markerModel.populateTest();
