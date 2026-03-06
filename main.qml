@@ -290,10 +290,10 @@ Window {
 
                            DragHandler {
                                target: mi
-                               xAxis.minimum: 0
-                               xAxis.maximum: window.width - r.width
-                               yAxis.minimum: 0
-                               yAxis.maximum: window.height - r.height
+                               xAxis.minimum: r.border.width
+                               xAxis.maximum: window.width - r.width - r.border.width
+                               yAxis.minimum: r.border.width
+                               yAxis.maximum: window.height - r.height - r.border.width
 
                            }
                            Rectangle {
