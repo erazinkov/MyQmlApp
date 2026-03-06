@@ -29,16 +29,6 @@ Window {
         processing.addData(data);
     }
 
-    function onSelectForTableWithCoordinate(data) { // TODO - delete ??
-        var point_topLeft = Qt.point(mi.x, mi.y);
-        var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-        var coord_topLeft = map.toCoordinate(point_topLeft);
-        var coord_bottomRight = map.toCoordinate(point_bottomRight);
-        if (coord_topLeft && coord_bottomRight) {
-            markerModel.processData(coord_topLeft, coord_bottomRight, data, toolGridLayout.rows, toolGridLayout.columns);
-        }
-    }
-
     function onDelete() {
         markerModel.deleteData();
     }
@@ -233,10 +223,6 @@ Window {
                                                visible: parent.text.length
                                            }
                                        }
-//                                       Text {
-//                                           text: ""
-//                                           anchors.centerIn: parent
-//                                       }
                                    }
                                }
                            }
@@ -281,7 +267,7 @@ Window {
                                }
                                Label {
                                    padding: 5
-                                   text: map.distance().toFixed(0)
+                                   text: map.distance().toFixed(1)
                                    color: "white"
                                    background: Rectangle {
                                        color: "black"
@@ -290,7 +276,7 @@ Window {
                                }
                                Label {
                                    padding: 5
-                                   text: (map.distance() / toolGridLayout.rows).toFixed(0)
+                                   text: (map.distance() / toolGridLayout.rows).toFixed(1)
                                    color: "white"
                                    background: Rectangle {
                                        color: "black"
@@ -460,10 +446,8 @@ Window {
 
            dbController.connectDb.connect(onConnectDb);
            dbController.selectForTable.connect(onSelectForTable);
-
            processing.finished.connect(onProcessingFinished);
 
-//           dbController.selectForTableWithCoordinate.connect(onSelectForTableWithCoordinate);
 //           markerModel.populateTest();
        }
 }
