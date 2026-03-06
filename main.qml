@@ -17,8 +17,11 @@ Window {
     visible: true
     title: qsTr("SAI-GPS")
 
-    function onProcessingFinished(isFinished) {
-
+    function onProcessingFinished(index, result) {
+        var b = toolGridLayout.children[index]?.children[0];
+        if (b) {
+            b.text = result;
+        }
     }
 
     function onSelectForTable(data) {
@@ -32,7 +35,7 @@ Window {
         var coord_topLeft = map.toCoordinate(point_topLeft);
         var coord_bottomRight = map.toCoordinate(point_bottomRight);
         if (coord_topLeft && coord_bottomRight) {
-            markerModel.processData(coord_topLeft, coord_bottomRight, data, g.rows, g.columns);
+            markerModel.processData(coord_topLeft, coord_bottomRight, data, toolGridLayout.rows, toolGridLayout.columns);
         }
     }
 
@@ -93,10 +96,10 @@ Window {
                 var polygonsList = [];
                 var point_topLeft = Qt.point(mi.x, mi.y);
                 var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-                var hor = (point_bottomRight.x - point_topLeft.x) / g.columns;
-                var ver = (point_bottomRight.y - point_topLeft.y) / g.rows;
-                for (var row = 0; row < g.rows; ++row) {
-                    for (var column = 0; column < g.columns; ++column) {
+                var hor = (point_bottomRight.x - point_topLeft.x) / toolGridLayout.columns;
+                var ver = (point_bottomRight.y - point_topLeft.y) / toolGridLayout.rows;
+                for (var row = 0; row < toolGridLayout.rows; ++row) {
+                    for (var column = 0; column < toolGridLayout.columns; ++column) {
                     polygonsList.push([
                                           map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
                                           map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + row * ver)),
@@ -203,30 +206,35 @@ Window {
                            width: 150
                            height: width
                            color: Qt.rgba(255, 255, 255, 0.5)
-
-
                            GridLayout {
-                               id: g
+                               id: toolGridLayout
                                anchors.fill: parent
                                rows: 1
                                columns: 1
                                rowSpacing: 0
                                columnSpacing: 0
                                Repeater {
-                                   model: g.rows * g.columns
+                                   model: toolGridLayout.rows * toolGridLayout.columns
                                    delegate: Rectangle {
                                        Layout.fillWidth: true
                                        Layout.fillHeight: true
                                        color: Qt.rgba(255, 255, 255, 0.0)
                                        border.color: "black"
                                        border.width: 1
-                                       BusyIndicator {
-                                           anchors.fill: parent
-                                           running: true
+                                       property int index: model.index
+                                       Label {
+                                           anchors.centerIn: parent
+                                           padding: 5
+                                           text: ""
+                                           color: "white"
+                                           background: Rectangle {
+                                               color: "black"
+                                               radius: 5
+                                               visible: parent.text.length
+                                           }
                                        }
-//                                       // Optional: Display the item number
 //                                       Text {
-//                                           text: index + 1
+//                                           text: ""
 //                                           anchors.centerIn: parent
 //                                       }
                                    }
@@ -243,8 +251,8 @@ Window {
                                        implicitHeight: labelNumber.height
                                        text: "+"
                                        onClicked: {
-                                            g.rows = g.rows + 1;
-                                            g.columns = g.rows;
+                                            toolGridLayout.rows = toolGridLayout.rows + 1;
+                                            toolGridLayout.columns = toolGridLayout.rows;
                                        }
                                    }
                                    Button {
@@ -253,9 +261,9 @@ Window {
                                        implicitHeight: labelNumber.height
                                        text: "-"
                                        onClicked: {
-                                           if (g.rows > 1) {
-                                               g.rows = g.rows - 1;
-                                               g.columns = g.rows;
+                                           if (toolGridLayout.rows > 1) {
+                                               toolGridLayout.rows = toolGridLayout.rows - 1;
+                                               toolGridLayout.columns = toolGridLayout.rows;
                                            }
                                        }
                                    }
@@ -264,7 +272,7 @@ Window {
                                Label {
                                    id: labelNumber
                                    padding: 5
-                                   text: `${g.rows}x${g.columns}`
+                                   text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
                                    color: "white"
                                    background: Rectangle {
                                        color: "black"
@@ -282,7 +290,7 @@ Window {
                                }
                                Label {
                                    padding: 5
-                                   text: (map.distance() / g.rows).toFixed(0)
+                                   text: (map.distance() / toolGridLayout.rows).toFixed(0)
                                    color: "white"
                                    background: Rectangle {
                                        color: "black"
@@ -305,9 +313,9 @@ Window {
                                }
                            }
                            Rectangle {
-                               width: labelNumber.height
+                               width: labelNumber.height * 0.5
                                height: width
-                               radius: 5
+                               radius: 2.5
                                color: "black"
                                anchors.left: parent.right
                                anchors.bottom: parent.bottom

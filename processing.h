@@ -13,7 +13,7 @@ public:
     Q_INVOKABLE void processDataTest1(const QList<QVariantList> &paths);
     Q_INVOKABLE void addData(const QList<QVariantHash> &data);
 signals:
-    void finished(bool isFinished);
+    Q_INVOKABLE void finished(int index, int result);
 private:
     QList<QPair<QGeoCoordinate, QString>> m_gpsData;
 };

@@ -10,7 +10,7 @@ Processing::Processing(QObject *parent)
 
 void Processing::processDataTest1(const QList<QVariantList> &paths)
 {
-    emit finished(false);
+
     QList<QGeoPolygon> polygons(paths.count());
     for (auto pathIdx{0}; pathIdx < paths.count(); ++pathIdx) {
         for (auto pointIdx{0}; pointIdx < paths.at(pathIdx).count(); ++pointIdx) {
@@ -26,12 +26,12 @@ void Processing::processDataTest1(const QList<QVariantList> &paths)
                 pointsInPolygons[p] += 1;
             }
         }
+        emit finished(p, pointsInPolygons.at(p));
     }
 
     for (auto i{0}; i < pointsInPolygons.count(); ++i) {
         qDebug() << i << pointsInPolygons.at(i);
     }
-    emit finished(true);
 }
 
 void Processing::addData(const QList<QVariantHash> &data)
