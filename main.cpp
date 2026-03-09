@@ -8,15 +8,20 @@
 
 #include <QQmlContext>
 
-#include "markermodel.h"
+// #include "markermodel.h"
 
-#include "databasecontroller.h"
+// #include "databasecontroller.h"
 
 //#include "processing.h"
 
-#include "processingcontroller.h"
+// #include "processingcontroller.h"
 
 using namespace Qt::StringLiterals;
+
+class Test {
+    Test();
+    int v;
+};
 
 int main(int argc, char *argv[])
 {
@@ -32,15 +37,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    MarkerModel markerModel;
+    // MarkerModel markerModel;
 
-    DatabaseController dbController;
-    ProcessingController pController;
+    // DatabaseController dbController;
+    // ProcessingController pController;
 
 //    Processing processing;
 
 //    dbController.operateSelectForTable();
-
 
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/MyQmlApp/main.qml"_s);
@@ -49,11 +53,10 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
-//    engine.rootContext()->setContextProperty("markerModel", &markerModel);
-    qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
-    qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
-    qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
-//    qmlRegisterType<Processing>("processing", 1, 0, "Processing");
+    // qmlRegisterType<Test>("test", 1, 0, "Test");
+    // qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
+    // qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
+    // qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
     engine.load(url);
 
 
