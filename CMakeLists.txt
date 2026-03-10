@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql REQUIRED)
-find_package(Qt6 6.2 COMPONENTS Quick Positioning Sql REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Positioning Sql DataVisualization REQUIRED)
 
 qt_add_executable(appMyQmlApp
     main.cpp
@@ -38,4 +38,4 @@ target_compile_definitions(appMyQmlApp
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(appMyQmlApp
     # PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql)
-    PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql)
+    PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql Qt6::DataVisualization)

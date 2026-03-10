@@ -4,11 +4,14 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import QtPositioning
- import QtLocation
+import QtLocation
+//import QtGraphs
 
- import dbController
- import pController
- import markerModel
+import QtDataVisualization
+
+import dbController
+import pController
+import markerModel
 
 
 ApplicationWindow {
@@ -26,7 +29,7 @@ ApplicationWindow {
         height: parent.height
         currentIndex: bar.currentIndex
         Item {
-            id: mapItem
+            id: mapTab
             width: parent.width
             height: parent.height
             function onProcessData(index, result, isProcess) {
@@ -34,6 +37,10 @@ ApplicationWindow {
                 var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
                 if (b) {
                     b.text = result;
+                    var row    = Math.floor(index / toolGridLayout.rows)
+                    var column = index % toolGridLayout.columns
+                    console.log(`${row.toString()} ${column.toString()} ${result.toString()}`);
+                    dataModel.append({longitude: row.toString(), latitude: column.toString(), density: result.toString() });
                 }
                 if (a) {
                     a.currentIndex = isProcess ? 1 : 0;
@@ -97,12 +104,14 @@ ApplicationWindow {
                 MenuItem {
                     id: deleteMenuItem
                     text: qsTr("Delete markers")
-                    onTriggered: mapItem.onDelete()
+                    onTriggered: mapTab.onDelete()
 
                 }
                 MenuItem {
                     text: qsTr("Process")
                     onTriggered: {
+                        dataModel.clear();
+
                         var polygonsList = [];
                         var point_topLeft = Qt.point(mi.x, mi.y);
                         var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
@@ -511,7 +520,53 @@ ApplicationWindow {
                }
         }
         Item {
-            id: discoverTab
+            id: densityTab
+            Item {
+                width: parent.width
+                height: parent.height
+
+                ColorGradient {
+                            id: surfaceGradient
+                            ColorGradientStop { position: 0.0; color: "darkgreen"}
+                            ColorGradientStop { position: 0.15; color: "darkslategray" }
+                            ColorGradientStop { position: 0.7; color: "peru" }
+                            ColorGradientStop { position: 1.0; color: "white" }
+                        }
+
+                Surface3D {
+                    width: parent.width
+                    height: parent.height
+
+                    theme: Theme3D {
+                                    type: Theme3D.ThemeStoneMoss
+                                    font.family: "STCaiyun"
+                                    font.pointSize: 35
+                                    colorStyle: Theme3D.ColorStyleRangeGradient
+                                    baseGradients: [surfaceGradient] // Use the custom gradient
+                                }
+
+                    Surface3DSeries {
+                        itemLabelFormat: "Density at (@xLabel N, @zLabel E): @yLabel"
+                        ItemModelSurfaceDataProxy {
+                            itemModel: dataModel
+                            // Mapping model roles to surface series rows, columns, and values.
+                            rowRole: "longitude"
+                            columnRole: "latitude"
+                            yPosRole: "density"
+                        }
+                    }
+//                    onTapped: {
+//                        // Disable the default input handler
+////                        unsetDefaultTapHandler()
+//                        // Implement own custom event handler
+//                        console.log("Custom tap event handler")
+//                    }
+                }
+                ListModel {
+                    id: dataModel
+                }
+            }
+
         }
         Item {
             id: activityTab
