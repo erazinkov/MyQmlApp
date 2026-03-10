@@ -137,14 +137,12 @@ ApplicationWindow {
                         for (var rowIdx = 0; rowIdx < toolGridLayout.rows; ++rowIdx) {
                             rowLabels.push(rowIdx.toString());
                         }
-//                        rowLabels.reverse();
                         rowAxis.labels = rowLabels;
 
                         var columnLabels = [];
                         for (var columnIdx = 0; columnIdx < toolGridLayout.columns; ++columnIdx) {
                             columnLabels.push(columnIdx.toString());
                         }
-//                        columnLabels.reverse();
                         columnAxis.labels = columnLabels;
                         valueAxis.max = 100;
                         var polygonsList = [];
