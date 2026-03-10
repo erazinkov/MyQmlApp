@@ -33,7 +33,7 @@ void ProcessingWorker::handleProcessData(QList<QVariantList> paths)
     QList<int> pointsInPolygons(polygons.count());
     for (auto p{0}; p < polygons.count(); ++p) {
         emit processData(p, pointsInPolygons.at(p), true);
-        QThread::currentThread()->msleep(5'000);
+        QThread::currentThread()->msleep(500);
         for (auto i{0}; i < m_gpsData.count(); ++i) {
             if (polygons.at(p).contains(m_gpsData.at(i).first)) {
                 pointsInPolygons[p] += 1;
