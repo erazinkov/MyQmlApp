@@ -5,9 +5,7 @@ import QtQuick.Layouts
 
 import QtPositioning
 import QtLocation
-//import QtGraphs
-
-import QtDataVisualization
+import QtGraphs
 
 import dbController
 import pController
@@ -21,8 +19,6 @@ ApplicationWindow {
 
     visible: true
     title: qsTr("SAI-GPS")
-
-
 
     StackLayout {
         width: parent.width
@@ -40,7 +36,7 @@ ApplicationWindow {
                     var row    = Math.floor(index / toolGridLayout.rows)
                     var column = index % toolGridLayout.columns
                     console.log(`${row.toString()} ${column.toString()} ${result.toString()}`);
-                    dataModel.append({longitude: row.toString(), latitude: column.toString(), density: result.toString() });
+                    dataModel.append({rowIdx: row.toString(), columnIdx: column.toString(), density: result.toString() });
                 }
                 if (a) {
                     a.currentIndex = isProcess ? 1 : 0;
@@ -519,55 +515,58 @@ ApplicationWindow {
         //           markerModel.populateTest();
                }
         }
-        Item {
-            id: densityTab
+
             Item {
+                id: densityTab
                 width: parent.width
                 height: parent.height
-
-                ColorGradient {
-                            id: surfaceGradient
-                            ColorGradientStop { position: 0.0; color: "darkgreen"}
-                            ColorGradientStop { position: 0.15; color: "darkslategray" }
-                            ColorGradientStop { position: 0.7; color: "peru" }
-                            ColorGradientStop { position: 1.0; color: "white" }
+                Bars3D {
+                        width: parent.width
+                        height: parent.height
+                        barSpacing: Qt.size(0.0, 0.0)
+                        barSpacingRelative: true
+                        cameraZoomLevel: 95.0
+                        theme: GraphsTheme {
+                            colorScheme: GraphsTheme.ColorScheme.Dark
+                            labelBorderVisible: true
+                            labelFont.pointSize: 35
+                            labelBackgroundVisible: true
+                            colorStyle: GraphsTheme.ColorStyle.RangeGradient
+                            singleHighlightGradient: customGradient
+                            Gradient {
+                                id: customGradient
+                                GradientStop { position: 0.0; color: "#000000" }
+                                GradientStop { position: 0.5; color: "#FF0000" }
+                                GradientStop { position: 1.0; color: "#0000FF" }
+                            }
                         }
-
-                Surface3D {
-                    width: parent.width
-                    height: parent.height
-
-                    theme: Theme3D {
-                                    type: Theme3D.ThemeStoneMoss
-                                    font.family: "STCaiyun"
-                                    font.pointSize: 35
-                                    colorStyle: Theme3D.ColorStyleRangeGradient
-                                    baseGradients: [surfaceGradient] // Use the custom gradient
-                                }
-
-                    Surface3DSeries {
-                        itemLabelFormat: "Density at (@xLabel N, @zLabel E): @yLabel"
-                        ItemModelSurfaceDataProxy {
-                            itemModel: dataModel
-                            // Mapping model roles to surface series rows, columns, and values.
-                            rowRole: "longitude"
-                            columnRole: "latitude"
-                            yPosRole: "density"
+                        cameraPreset: Graphs3D.CameraPreset.IsometricLeftHigh
+                        Bar3DSeries {
+                            itemLabelFormat: "@colLabel, @rowLabel: @valueLabel"
+                            ItemModelBarDataProxy {
+                                itemModel: dataModel
+                                // Mapping model roles to bar series rows, columns, and values.
+                                rowRole: "rowIdx"
+                                columnRole: "columnIdx"
+                                valueRole: "density"
+                            }
                         }
                     }
-//                    onTapped: {
-//                        // Disable the default input handler
-////                        unsetDefaultTapHandler()
-//                        // Implement own custom event handler
-//                        console.log("Custom tap event handler")
-//                    }
-                }
-                ListModel {
-                    id: dataModel
-                }
+
+                    ListModel {
+                        id: dataModel
+                        ListElement{ rowIdx: "2022"; columnIdx: "Oulu";     density: "4200"; }
+                        ListElement{ rowIdx: "2022"; columnIdx: "Rauma";    density: "2100"; }
+                        ListElement{ rowIdx: "2022"; columnIdx: "Helsinki"; density: "7040"; }
+                        ListElement{ rowIdx: "2022"; columnIdx: "Tampere";  density: "4330"; }
+                        ListElement{ rowIdx: "2023"; columnIdx: "Oulu";     density: "3960"; }
+                        ListElement{ rowIdx: "2023"; columnIdx: "Rauma";    density: "1990"; }
+                        ListElement{ rowIdx: "2023"; columnIdx: "Helsinki"; density: "7230"; }
+                        ListElement{ rowIdx: "2023"; columnIdx: "Tampere";  density: "4650"; }
+                    }
             }
 
-        }
+
         Item {
             id: activityTab
         }
