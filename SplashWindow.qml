@@ -7,7 +7,7 @@ Window {
     title: "Splash Window"
     modality: Qt.ApplicationModal
     flags: Qt.SplashScreen
-    property int timeoutInterval: 5000
+    property int timeoutInterval: 1000
     signal timeout
 
     width: Screen.desktopAvailableWidth * 0.5
