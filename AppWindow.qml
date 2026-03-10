@@ -20,6 +20,23 @@ ApplicationWindow {
     visible: true
     title: qsTr("SAI-GPS")
 
+
+    Category3DAxis {
+        id: rowAxis
+        min: 0
+        max: toolGridLayout.rows
+    }
+    Category3DAxis {
+        id: columnAxis
+        min: 0
+        max: toolGridLayout.columns
+    }
+    Value3DAxis {
+        id: valueAxis
+        min: 0
+        max: 100
+    }
+
     StackLayout {
         width: parent.width
         height: parent.height
@@ -33,10 +50,17 @@ ApplicationWindow {
                 var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
                 if (b) {
                     b.text = result;
-                    var row    = Math.floor(index / toolGridLayout.rows)
-                    var column = index % toolGridLayout.columns
-                    console.log(`${row.toString()} ${column.toString()} ${result.toString()}`);
-                    dataModel.append({rowIdx: row.toString(), columnIdx: column.toString(), density: result.toString() });
+                    if (!isProcess) {
+                        var row    = Math.floor(index / toolGridLayout.rows)
+                        var column = index % toolGridLayout.columns
+                        console.log(`${row.toString()} ${column.toString()} ${result.toString()}`);
+                        var max = valueAxis.max;
+                        if (max < result) {
+                            valueAxis.max = result;
+                        }
+                        dataModel.append({rowIdx: row.toString(), columnIdx: column.toString(), density: result.toString() });
+                    }
+
                 }
                 if (a) {
                     a.currentIndex = isProcess ? 1 : 0;
@@ -107,7 +131,22 @@ ApplicationWindow {
                     text: qsTr("Process")
                     onTriggered: {
                         dataModel.clear();
+                        rowAxis.max = toolGridLayout.rows - 1;
+                        columnAxis.max = toolGridLayout.columns - 1;
+                        var rowLabels = [];
+                        for (var rowIdx = 0; rowIdx < toolGridLayout.rows; ++rowIdx) {
+                            rowLabels.push(rowIdx.toString());
+                        }
+//                        rowLabels.reverse();
+                        rowAxis.labels = rowLabels;
 
+                        var columnLabels = [];
+                        for (var columnIdx = 0; columnIdx < toolGridLayout.columns; ++columnIdx) {
+                            columnLabels.push(columnIdx.toString());
+                        }
+//                        columnLabels.reverse();
+                        columnAxis.labels = columnLabels;
+                        valueAxis.max = 100;
                         var polygonsList = [];
                         var point_topLeft = Qt.point(mi.x, mi.y);
                         var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
@@ -523,21 +562,28 @@ ApplicationWindow {
                 Bars3D {
                         width: parent.width
                         height: parent.height
+
+                        columnAxis: columnAxis
+                        rowAxis: rowAxis
+                        valueAxis: valueAxis
+
                         barSpacing: Qt.size(0.0, 0.0)
                         barSpacingRelative: true
                         cameraZoomLevel: 95.0
                         theme: GraphsTheme {
-                            colorScheme: GraphsTheme.ColorScheme.Dark
+                            colorScheme: GraphsTheme.ColorScheme.Light
                             labelBorderVisible: true
                             labelFont.pointSize: 35
                             labelBackgroundVisible: true
                             colorStyle: GraphsTheme.ColorStyle.RangeGradient
-                            singleHighlightGradient: customGradient
+                            baseGradients: [customGradient]
                             Gradient {
                                 id: customGradient
-                                GradientStop { position: 0.0; color: "#000000" }
-                                GradientStop { position: 0.5; color: "#FF0000" }
-                                GradientStop { position: 1.0; color: "#0000FF" }
+                                GradientStop { position: 0.0; color: "white" }
+                                GradientStop { position: 0.2; color: "blue" }
+                                GradientStop { position: 0.5; color: "green" }
+                                GradientStop { position: 0.8; color: "yellow" }
+                                GradientStop { position: 1.0; color: "red" }
                             }
                         }
                         cameraPreset: Graphs3D.CameraPreset.IsometricLeftHigh
@@ -555,14 +601,17 @@ ApplicationWindow {
 
                     ListModel {
                         id: dataModel
-                        ListElement{ rowIdx: "2022"; columnIdx: "Oulu";     density: "4200"; }
-                        ListElement{ rowIdx: "2022"; columnIdx: "Rauma";    density: "2100"; }
-                        ListElement{ rowIdx: "2022"; columnIdx: "Helsinki"; density: "7040"; }
-                        ListElement{ rowIdx: "2022"; columnIdx: "Tampere";  density: "4330"; }
-                        ListElement{ rowIdx: "2023"; columnIdx: "Oulu";     density: "3960"; }
-                        ListElement{ rowIdx: "2023"; columnIdx: "Rauma";    density: "1990"; }
-                        ListElement{ rowIdx: "2023"; columnIdx: "Helsinki"; density: "7230"; }
-                        ListElement{ rowIdx: "2023"; columnIdx: "Tampere";  density: "4650"; }
+                        onDataChanged: {
+                            console.log(data);
+                        }
+//                        ListElement{ rowIdx: 1; columnIdx: 1;     density: 4200; }
+//                        ListElement{ rowIdx: "2022"; columnIdx: "Rauma";    density: "2100"; }
+//                        ListElement{ rowIdx: "2022"; columnIdx: "Helsinki"; density: "7040"; }
+//                        ListElement{ rowIdx: "2022"; columnIdx: "Tampere";  density: "4330"; }
+//                        ListElement{ rowIdx: "2023"; columnIdx: "Oulu";     density: "3960"; }
+//                        ListElement{ rowIdx: "2023"; columnIdx: "Rauma";    density: "1990"; }
+//                        ListElement{ rowIdx: "2023"; columnIdx: "Helsinki"; density: "7230"; }
+//                        ListElement{ rowIdx: "2023"; columnIdx: "Tampere";  density: "4650"; }
                     }
             }
 
