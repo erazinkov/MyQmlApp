@@ -8,13 +8,13 @@
 
 #include <QQmlContext>
 
-// #include "markermodel.h"
+ #include "markermodel.h"
 
-// #include "databasecontroller.h"
+ #include "databasecontroller.h"
 
 //#include "processing.h"
 
-// #include "processingcontroller.h"
+ #include "processingcontroller.h"
 
 using namespace Qt::StringLiterals;
 
@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    // MarkerModel markerModel;
+     MarkerModel markerModel;
 
-    // DatabaseController dbController;
-    // ProcessingController pController;
+     DatabaseController dbController;
+     ProcessingController pController;
 
 //    Processing processing;
 
@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     // qmlRegisterType<Test>("test", 1, 0, "Test");
-    // qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
-    // qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
-    // qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
+     qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
+     qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
+     qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
     engine.load(url);
 
 
