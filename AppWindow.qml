@@ -21,6 +21,8 @@ ApplicationWindow {
     title: qsTr("SAI-GPS")
 
 
+
+
     Category3DAxis {
         id: rowAxis
         min: 0
@@ -35,6 +37,38 @@ ApplicationWindow {
         id: valueAxis
         min: 0
         max: 100
+    }
+
+
+
+    header: ToolBar {
+        RowLayout {
+            spacing: 20
+            anchors.fill: parent
+            ToolButton {
+                Accessible.name: qsTr("Toggle drawer")
+                text: drawer.opened ? "\u{2715}" : "\u{2630}"
+                onClicked:{
+                        if (drawer.opened) {
+                            drawer.close();
+                        } else {
+                            drawer.open();
+                        }
+                }
+            }
+        }
+    }
+
+    Drawer {
+        id: drawer
+        y: header.height
+        width: Math.min(window.width, window.height) / 3 * 1
+        height: window.height - header.height
+
+        Label {
+            text: "TODO"
+            anchors.centerIn: parent
+        }
     }
 
     StackLayout {
@@ -98,6 +132,10 @@ ApplicationWindow {
             ListModel {
                 id: mapTypesModel
             }
+
+
+
+
 
             MouseArea {
                 id: mouseAreaWindow
@@ -199,12 +237,9 @@ ApplicationWindow {
                         MenuItem {
                             text: mapTypeName
                             onTriggered: {
-        //                                     console.log(index);
                                 map.activeMapType = map.supportedMapTypes[index];
                             }
 
-        //                    console.log("Triggered:", actionName)
-                               // Handle actions
                            }
                        }
 
