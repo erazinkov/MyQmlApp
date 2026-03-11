@@ -42,67 +42,67 @@ ApplicationWindow {
         width: Math.min(window.width, window.height) / 3 * 1
         height: window.height - header.height
 
-        Column {
-            anchors.fill: parent
-            ItemDelegate {
-                text: qsTr("Home")
-                width: parent.width
-                onClicked: {
-                    stackView.pop(null)
-                    drawer.close()
-                }
-            }
-            ItemDelegate {
-                text: qsTr("Map")
-                width: parent.width
-                onClicked: {
-                    stackView.push(mapPage)
-                    drawer.close()
-                }
-            }
-            ItemDelegate {
-                text: qsTr("Density")
-                width: parent.width
-                onClicked: {
-                    stackView.push(densityPage)
-                    drawer.close()
-                }
-            }
-        }
-
-//        ListView {
-//            id: listView
-//            focus: true
-//            currentIndex: -1
+//        Column {
 //            anchors.fill: parent
 
-//            model: ListModel {
-//                ListElement { title: qsTr("Map"); source: "MapPage.qml" }
-//                ListElement { title: qsTr("Density"); source: "DensityPage.qml" }
-//            }
-
-//            delegate: ItemDelegate {
-//                id: delegateItem
-//                width: ListView.view.width
-//                text: title
-//                highlighted: ListView.isCurrentItem
-
-//                required property int index
-//                required property var model
-//                required property string title
-//                required property string source
-
+//            ItemDelegate {
+//                text: qsTr("Map")
+//                width: parent.width
 //                onClicked: {
 //                    console.log(`${stackView.depth}`);
-//                    if (stackView.depth > 1) {
-//                        return;
-//                    }
-//                    listView.currentIndex = index;
-//                    stackView.push(source);
+//                    stackView.replace(mapPage)
+//                    drawer.close()
 //                }
 //            }
-//            ScrollIndicator.vertical: ScrollIndicator { }
+//            ItemDelegate {
+//                text: qsTr("Density")
+//                width: parent.width
+//                onClicked: {
+//                    console.log(`${stackView.depth}`);
+//                    stackView.replace(densityPage)
+//                    drawer.close()
+//                }
+//            }
 //        }
+
+        ListView {
+            id: listView
+            focus: true
+            currentIndex: -1
+            anchors.fill: parent
+
+            model: ListModel {
+                ListElement { title: qsTr("Map"); source: "map" }
+                ListElement { title: qsTr("Density"); source: "density" }
+            }
+
+            delegate: ItemDelegate {
+                id: delegateItem
+                width: ListView.view.width
+                text: title
+                highlighted: ListView.isCurrentItem
+
+                required property int index
+                required property var model
+                required property string title
+                required property string source
+
+                onClicked: {
+                    if (stackView.depth > 1) {
+                        return;
+                    }
+                    listView.currentIndex = index;
+
+                    if (source === "map") {
+                        stackView.replace(mapPage);
+                    }
+                    if (source === "density") {
+                        stackView.replace(densityPage);
+                    }
+                }
+            }
+            ScrollIndicator.vertical: ScrollIndicator { }
+        }
     }
 
     StackView {
@@ -110,7 +110,5 @@ ApplicationWindow {
         anchors.fill: parent
 
         initialItem: {}
-
-
     }
 }
