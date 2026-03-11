@@ -12,10 +12,10 @@ public:
 
 public slots:
     void handleAddData(QList<QVariantHash> data);
-    void handleProcessData(QList<QVariantList> paths);
+    void handleProcessData(QList<QVariantList> paths, int rows, int columns);
 
 signals:
-    void processData(int index, int result, bool isProcess);
+    void processData(int index, int result, bool isProcess, int rows, int columns);
 
 private:
     QList<QPair<QGeoCoordinate, QString>> m_gpsData;

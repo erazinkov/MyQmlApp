@@ -1,0 +1,11 @@
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_automoc_json_extraction.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_qmltyperegistration.dir
+/home/egor/MyQmlApp/CMakeFiles/all_qmltyperegistrations.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_other_files.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_qmllint.dir
+/home/egor/MyQmlApp/CMakeFiles/all_qmllint.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_tooling.dir
+/home/egor/MyQmlApp/CMakeFiles/edit_cache.dir
+/home/egor/MyQmlApp/CMakeFiles/rebuild_cache.dir
+/home/egor/MyQmlApp/CMakeFiles/appMyQmlApp_autogen.dir

@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/MyQmlApp/">
+    <file alias="main.qml">/home/egor/MyQmlApp/main.qml</file>
+    <file alias="SplashWindow.qml">/home/egor/MyQmlApp/SplashWindow.qml</file>
+    <file alias="AppWindow.qml">/home/egor/MyQmlApp/AppWindow.qml</file>
+    <file alias="DensityPage.qml">/home/egor/MyQmlApp/DensityPage.qml</file>
+  </qresource>
+</RCC>
+

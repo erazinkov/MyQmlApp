@@ -16,10 +16,10 @@ public:
 
 signals:
     Q_INVOKABLE void operateAddData(QList<QVariantHash> data);
-    Q_INVOKABLE void operateProcessData(QList<QVariantList> paths);
+    Q_INVOKABLE void operateProcessData(QList<QVariantList> paths, int rows, int columns);
 
 //    Q_INVOKABLE void addData(QList<QVariantHash> data);
-    Q_INVOKABLE void processData(int index, int result, bool isProcess);
+    Q_INVOKABLE void processData(int index, int result, bool isProcess, int rows, int columns);
 private:
     QThread *m_thread;
     ProcessingWorker *m_worker;

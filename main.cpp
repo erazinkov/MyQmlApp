@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
     // qmlRegisterType<Test>("test", 1, 0, "Test");
      qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
      qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
-     qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
+//     qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
+     engine.rootContext()->setContextProperty("pController", &pController);
     engine.load(url);
 
 

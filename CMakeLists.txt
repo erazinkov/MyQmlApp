@@ -24,6 +24,8 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES main.qml
     QML_FILES SplashWindow.qml
     QML_FILES AppWindow.qml
+    QML_FILES MapPage.qml
+    QML_FILES DensityPage.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES
@@ -37,5 +39,4 @@ set_target_properties(appMyQmlApp PROPERTIES
 target_compile_definitions(appMyQmlApp
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(appMyQmlApp
-    # PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql)
     PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql Qt6::Graphs)
