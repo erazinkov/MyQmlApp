@@ -10,7 +10,7 @@ import dbController
 import markerModel
 
 Page {
-            id: mapPage
+            id: page
             width: parent.width
             height: parent.height
             function onProcessData(index, result, isProcess, rows, columns) {

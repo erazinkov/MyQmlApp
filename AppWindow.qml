@@ -29,45 +29,80 @@ ApplicationWindow {
         }
     }
 
+    DensityPage {
+        id: densityPage
+    }
+    MapPage {
+        id: mapPage
+    }
+
     Drawer {
         id: drawer
         y: header.height
         width: Math.min(window.width, window.height) / 3 * 1
         height: window.height - header.height
 
-        ListView {
-            id: listView
-            focus: true
-            currentIndex: -1
+        Column {
             anchors.fill: parent
-
-            model: ListModel {
-                ListElement { title: qsTr("Map"); source: "MapPage.qml" }
-                ListElement { title: qsTr("Density"); source: "DensityPage.qml" }
-            }
-
-            delegate: ItemDelegate {
-                id: delegateItem
-                width: ListView.view.width
-                text: title
-                highlighted: ListView.isCurrentItem
-
-                required property int index
-                required property var model
-                required property string title
-                required property string source
-
+            ItemDelegate {
+                text: qsTr("Home")
+                width: parent.width
                 onClicked: {
-                    console.log(`${stackView.depth}`);
+                    stackView.pop(null)
+                    drawer.close()
+                }
+            }
+            ItemDelegate {
+                text: qsTr("Map")
+                width: parent.width
+                onClicked: {
+                    stackView.push(mapPage)
+                    drawer.close()
+                }
+            }
+            ItemDelegate {
+                text: qsTr("Density")
+                width: parent.width
+                onClicked: {
+                    stackView.push(densityPage)
+                    drawer.close()
+                }
+            }
+        }
+
+//        ListView {
+//            id: listView
+//            focus: true
+//            currentIndex: -1
+//            anchors.fill: parent
+
+//            model: ListModel {
+//                ListElement { title: qsTr("Map"); source: "MapPage.qml" }
+//                ListElement { title: qsTr("Density"); source: "DensityPage.qml" }
+//            }
+
+//            delegate: ItemDelegate {
+//                id: delegateItem
+//                width: ListView.view.width
+//                text: title
+//                highlighted: ListView.isCurrentItem
+
+//                required property int index
+//                required property var model
+//                required property string title
+//                required property string source
+
+//                onClicked: {
+//                    console.log(`${stackView.depth}`);
 //                    if (stackView.depth > 1) {
 //                        return;
 //                    }
-                    listView.currentIndex = index;
-                    stackView.push(source);
-                }
-            }
-            ScrollIndicator.vertical: ScrollIndicator { }
-        }
+//                    listView.currentIndex = index;
+//                    stackView.push(source);
+//                }
+//            }
+//            ScrollIndicator.vertical: ScrollIndicator { }
+//        }
     }
 
     StackView {

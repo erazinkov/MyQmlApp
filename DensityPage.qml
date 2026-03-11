@@ -5,7 +5,7 @@ import QtQuick.Controls
 import QtGraphs
 
 Page {
-    id: densityPage
+    id: page
     width: parent.width
 
     function onProcessData(index, result, isProcess, rows, columns) {
