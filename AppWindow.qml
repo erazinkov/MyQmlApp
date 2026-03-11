@@ -88,16 +88,16 @@ ApplicationWindow {
                 required property string source
 
                 onClicked: {
-                    if (stackView.depth > 1) {
-                        return;
-                    }
+//                    if (stackView.depth > 1) {
+//                        return;
+//                    }
                     listView.currentIndex = index;
 
                     if (source === "map") {
-                        stackView.replace(mapPage);
+                        stackView.pop();
                     }
                     if (source === "density") {
-                        stackView.replace(densityPage);
+                        stackView.push(densityPage);
                     }
                 }
             }
@@ -109,6 +109,6 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
 
-        initialItem: {}
+        initialItem: mapPage
     }
 }
