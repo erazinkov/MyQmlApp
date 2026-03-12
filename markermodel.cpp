@@ -62,7 +62,7 @@ void MarkerModel::addData(QList<QVariantHash> data)
             m_gpsData.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
         }
     }
-    auto nth{10};
+    auto nth{20};
     for (auto i{nth - 1}, j{0}; i < m_gpsData.count(); i += nth) {
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
     }
@@ -100,6 +100,9 @@ void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight
     }
 
     qDebug() << rows << columns;
+
+
+
 
 
     QList<int> pointsInCells;
@@ -173,6 +176,17 @@ void MarkerModel::processDataTest1(QList<QVariantList> paths)
             polygons[pathIdx].addCoordinate(c);
         }
     }
+
+//    auto distance{0.0};
+
+//    for (auto i{0}; i < m_gpsData.count() - 1; ++i) {
+//        auto c0{QGeoCoordinate{m_gpsData.at(i).first.latitude(), m_gpsData.at(i).first.longitude()}};
+//        auto c1{QGeoCoordinate{m_gpsData.at(i + 1).first.latitude(), m_gpsData.at(i).first.longitude()}};
+//        distance += c0.distanceTo(c1);
+//    }
+
+//    qDebug() << "Distance, m:" << distance;
+
 
     QList<int> pointsInPolygons(polygons.count());
     for (auto p{0}; p < polygons.count(); ++p) {

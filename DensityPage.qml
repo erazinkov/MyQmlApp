@@ -15,21 +15,21 @@ Page {
             rowAxis.max = rows - 1;
             columnAxis.max = columns - 1;
             var rowLabels = [];
-            for (var rowIdx = 0; rowIdx < rows - 1; ++rowIdx) {
+            for (var rowIdx = 0; rowIdx < rows; ++rowIdx) {
                 rowLabels.push(rowIdx.toString());
             }
             rowAxis.labels = rowLabels;
 
             var columnLabels = [];
-            for (var columnIdx = 0; columnIdx < columns - 1; ++columnIdx) {
+            for (var columnIdx = 0; columnIdx < columns; ++columnIdx) {
                 columnLabels.push(columnIdx.toString());
             }
             columnAxis.labels = columnLabels;
             valueAxis.max = 100;
         }
         if (!isProcess) {
-            var row    = Math.floor(index / rows)
-            var column = index % columns
+            var column    = Math.floor(index / rows)
+            var row = index % columns
             console.log(`${row.toString()} ${column.toString()} ${result.toString()}`);
             var max = valueAxis.max;
             if (max < result) {

@@ -22,6 +22,17 @@ void ProcessingWorker::handleAddData(QList<QVariantHash> data)
 
 void ProcessingWorker::handleProcessData(QList<QVariantList> paths, int rows, int columns)
 {
+    auto distance{0.0};
+
+    for (auto i{0}; i < m_gpsData.count() - 1; ++i) {
+        auto c0{QGeoCoordinate{m_gpsData.at(i).first.latitude(), m_gpsData.at(i).first.longitude()}};
+        auto c1{QGeoCoordinate{m_gpsData.at(i + 1).first.latitude(), m_gpsData.at(i).first.longitude()}};
+        distance += c0.distanceTo(c1);
+    }
+
+    qDebug() << "Distance, m:" << distance;
+
+
     QList<QGeoPolygon> polygons(paths.count());
     for (auto pathIdx{0}; pathIdx < paths.count(); ++pathIdx) {
         for (auto pointIdx{0}; pointIdx < paths.at(pathIdx).count(); ++pointIdx) {

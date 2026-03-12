@@ -143,8 +143,14 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
         sL_temp.clear();
         queryString.append(QString(" FROM %1").arg(tableName));
         queryString.append(QString(" WHERE "));
+//        QDateTime d_0{QDate{2025, 06, 17}, QTime{13, 25, 0}};
+//        QDateTime d_1{QDate{2025, 06, 17}, QTime{13, 44, 0}};
+
+//        queryString.append(QString("%1 >= '%2' AND %1 <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd HH:mm:ss")).arg(d_1.toString("yyyy-MM-dd HH:mm:ss")));
+
+
         QDate d_0{2025, 06, 15};
-        QDate d_1{2025, 06, 20};
+        QDate d_1{2025, 06, 21};
         queryString.append(QString("DATE(%1) >= '%2' AND DATE(%1) <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd")).arg(d_1.toString("yyyy-MM-dd")));
 //        queryString.append(QString(" LIMIT 1000"));
 
