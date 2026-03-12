@@ -363,6 +363,29 @@ Page {
                                    border.color: "white"
                                    border.width: 1
                                    radius: 5
+
+                                   Label {
+                                       anchors.left: parent.right
+                                       anchors.bottom: parent.top
+                                       padding: 5
+                                       text: positionSource.position.speed.toFixed(1)
+                                       color: "white"
+                                       background: Rectangle {
+                                           color: "black"
+                                           radius: 5
+                                       }
+                                   }
+                                   Rectangle {
+                                       anchors.centerIn: parent
+                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy)
+                                       height: width
+                                       color: Qt.rgba(255, 255, 255, 0.5)
+                                       border.color: "white"
+                                       border.width: 1
+                                       radius: width / 2
+                                       z: -1
+                                   }
+
                                }
                                anchorPoint.x: sourceItem.width / 2
                                anchorPoint.y: sourceItem.height / 2
