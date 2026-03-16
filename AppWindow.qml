@@ -5,8 +5,8 @@ import QtQuick.Layouts
 
 ApplicationWindow {
     id: window
-    width: Screen.desktopAvailableWidth * 0.5
-    height: Screen.desktopAvailableHeight * 0.5
+    width: Screen.desktopAvailableWidth * 0.75
+    height: Screen.desktopAvailableHeight * 0.75
 
     visible: true
     title: qsTr("SAI-GPS")
@@ -39,31 +39,8 @@ ApplicationWindow {
     Drawer {
         id: drawer
         y: header.height
-        width: Math.min(window.width, window.height) / 3 * 1
+        width: Math.min(window.width, window.height) / 3
         height: window.height - header.height
-
-//        Column {
-//            anchors.fill: parent
-
-//            ItemDelegate {
-//                text: qsTr("Map")
-//                width: parent.width
-//                onClicked: {
-//                    console.log(`${stackView.depth}`);
-//                    stackView.replace(mapPage)
-//                    drawer.close()
-//                }
-//            }
-//            ItemDelegate {
-//                text: qsTr("Density")
-//                width: parent.width
-//                onClicked: {
-//                    console.log(`${stackView.depth}`);
-//                    stackView.replace(densityPage)
-//                    drawer.close()
-//                }
-//            }
-//        }
 
         ListView {
             id: listView
@@ -88,15 +65,15 @@ ApplicationWindow {
                 required property string source
 
                 onClicked: {
-//                    if (stackView.depth > 1) {
-//                        return;
-//                    }
                     listView.currentIndex = index;
 
                     if (source === "map") {
                         stackView.pop();
                     }
                     if (source === "density") {
+                        if (stackView.depth > 1) {
+                            return;
+                        }
                         stackView.push(densityPage);
                     }
                 }

@@ -78,7 +78,7 @@ Page {
                 MenuItem {
                     id: deleteMenuItem
                     text: qsTr("Delete markers")
-                    onTriggered: mapTab.onDelete()
+                    onTriggered: onDelete()
 
                 }
                 MenuItem {
@@ -199,13 +199,13 @@ Page {
                            anchorPoint.y: sourceItem.height / 2
                       }
                    }
-
                    MapQuickItem {
                                id: mi
                                // Initial map coordinates for the center of the rectangle
                                coordinate: startLocation.coordinate
                                anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
                                visible: miSwitch.checked
+//                               visible: true
                                // The actual QtQuick item to be displayed
                                sourceItem: Rectangle {
                                    id: r
@@ -239,7 +239,7 @@ Page {
                                                        Label {
                                                            anchors.horizontalCenter: parent.horizontalCenter
                                                            anchors.verticalCenter: parent.verticalCenter
-                                                           padding: 5
+                                                           padding: 1
                                                            text: ""
                                                            color: "white"
                                                            background: Rectangle {
@@ -357,12 +357,12 @@ Page {
 
                                // Customize marker visual (e.g., a simple red dot)
                                sourceItem: Rectangle {
-                                   width: 10
-                                   height: 10
+                                   width: 20
+                                   height: 20
                                    color: "red"
                                    border.color: "white"
                                    border.width: 1
-                                   radius: 5
+                                   radius: 10
 
                                    Label {
                                        anchors.left: parent.right
