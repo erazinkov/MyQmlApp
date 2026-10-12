@@ -8,7 +8,7 @@ ApplicationWindow {
     width: Screen.desktopAvailableWidth * 0.75
     height: Screen.desktopAvailableHeight * 0.75
 
-    visible: true
+    visible: false
     title: qsTr("SAI-GPS")
 
     header: ToolBar {

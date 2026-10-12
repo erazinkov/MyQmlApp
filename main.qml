@@ -8,9 +8,9 @@ QtObject {
 
     property var appWindow: AppWindow {}
 
-//    property var splashWindow: SplashWindow {
-//        visible: true
-//        onTimeout: root.appWindow.visible = true
-//    }
+    property var splashWindow: SplashWindow {
+        visible: true
+        onTimeout: root.appWindow.visible = true
+    }
 }
 

@@ -6,6 +6,8 @@ import QtPositioning
 import QtLocation
 import QtQuick.Layouts
 
+import QtQuick.Shapes
+
 import dbController
 import markerModel
 
@@ -163,7 +165,11 @@ Page {
             Plugin {
                     id: mapPlugin
                     name: "osm"
-                }
+//                    PluginParameter {
+//                        name: "osm.mapping.custom.host"
+//                        value: "https://api.thunderforest.com/cycle/%z/%x/%y.png?apikey=e2d4258d86d743bc861d2a12cc3b67db"
+//                    }
+            }
 
             Map {
                    id: map
@@ -183,6 +189,52 @@ Page {
                            return distance;
                        }
                        return -1;
+                   }
+
+                   Shape {
+                       id: compassArrow
+
+                       // Set the size of the arrow
+                       width: 40
+                       height: 40
+
+                       // Position it where you want (e.g., a corner of the map)
+                       anchors.right: parent.right
+                       anchors.top: parent.top
+                       anchors.margins: 20
+
+                       // This property from Item controls rotation [citation:1][citation:5]
+                       // It rotates clockwise, so you'll often need a negative angle
+                       // to make the arrow point toward a specific bearing.
+                       rotation: -map.bearing
+
+                       // Defines the point around which rotation occurs [citation:12]
+                       // For a compass, you usually want to rotate around the arrow's center
+                       transformOrigin: Item.Center
+
+                       // ShapePath defines the actual geometry of the arrow
+                       ShapePath {
+                           // Fill color for the arrow body
+                           fillColor: "red"
+
+                           // Optional: Stroke for an outline
+                           strokeColor: "white"
+                           strokeWidth: 2
+
+                           // Define the triangle path
+                           // Start at the top point (tip of the arrow)
+                           startX: compassArrow.width / 2
+                           startY: 0
+
+                           // Draw line to bottom-right corner
+                           PathLine { x: compassArrow.width; y: compassArrow.height }
+
+                           // Draw line to bottom-left corner
+                           PathLine { x: 0; y: compassArrow.height }
+
+                           // Draw line back to the start (tip), closing the triangle
+                           PathLine { x: compassArrow.width / 2; y: 0 }
+                       }
                    }
 
                    MapItemView {
@@ -239,7 +291,7 @@ Page {
                                                        Label {
                                                            anchors.horizontalCenter: parent.horizontalCenter
                                                            anchors.verticalCenter: parent.verticalCenter
-                                                           padding: 1
+                                                           padding: 5
                                                            text: ""
                                                            color: "white"
                                                            background: Rectangle {
@@ -286,6 +338,7 @@ Page {
                                                }
                                            }
                                        }
+
                                        RowLayout{
                                        Label {
                                            id: labelNumber
@@ -453,6 +506,18 @@ Page {
                        }
 
                    }
+                   Component.onCompleted: {
+                           console.log("Supported map types:", supportedMapTypes.length)
+                           for (var i = 0; i < supportedMapTypes.length; i++) {
+                               console.log(i, supportedMapTypes[i].name, supportedMapTypes[i].type)
+                           }
+                       }
+                   activeMapType: {
+                           if (supportedMapTypes.length > 0) {
+                               return supportedMapTypes[supportedMapTypes.length - 1]
+                           }
+                           return undefined  // or leave it, will use default
+                       }
                }
                Component.onCompleted: {
                    dbController.operateConnectDb("Connection 0",
