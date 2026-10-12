@@ -20,8 +20,6 @@ Page {
                 var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
                 if (b) {
                     b.text = result;
-
-
                 }
                 if (a) {
                     a.currentIndex = isProcess ? 1 : 0;
