@@ -150,13 +150,36 @@ Page {
                 id: positionSource
                 name: "nmea"
                 PluginParameter { name: "nmea.source"; value: "serial:/dev/ttyACM0" }
-                PluginParameter { name: "nmea.baudrate"; value: 4800 }
+                PluginParameter { name: "nmea.baudrate"; value: 9600 }
                 updateInterval: 1000 // Request updates every second
                 active: true
+
+                property var lastPositionCoordinate: null
+
                 onPositionChanged: {
-                    if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0)) {
-                        startLocation.coordinate = position.coordinate;
+                    if (!positionSource.valid) {
+                        return;
                     }
+                    if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || nearMeButton.checked) {
+                        startLocation.coordinate = Object.assign({}, position.coordinate);
+                    }
+//                    if (lastPosition && Math.abs(lastPosition.coordinate.latitude - position.coordinate.latitude)  < 1e-8 &&
+//                        Math.abs(lastPosition.coordinate.longitude - position.coordinate.longitude) < 1e-8) {
+                    if (lastPositionCoordinate) {
+//                        console.log(lastPositionCoordinate.longitude, lastPositionCoordinate.latitude);
+//                        console.log(position.coordinate.longitude, position.coordinate.latitude);
+                    }
+                    lastPositionCoordinate = { latitude:  position.coordinate.latitude, longitude:  position.coordinate.longitude};
+//                    }
+
+
+//                    if (lastPosition && Math.abs(lastPosition.coordinate.latitude - position.coordinate.latitude)  < 1e-8 &&
+//                            Math.abs(lastPosition.coordinate.longitude - position.coordinate.longitude) < 1e-8) {
+//                        console.log(lastPosition.coordinate.longitude - position.coordinate.longitude, lastPosition.coordinate.latitude - position.coordinate.latitude);
+//                        dbController.operateInsertCoordinate(position.coordinate, position.timestamp)
+//                        return;
+//                    }
+//                    lastPosition = position;
                 }
             }
 
@@ -414,21 +437,33 @@ Page {
                                    border.color: "white"
                                    border.width: 1
                                    radius: 10
-
-                                   Label {
+                                   ColumnLayout{
                                        anchors.left: parent.right
-                                       anchors.bottom: parent.top
+                                       anchors.bottom: parent.bottom
+                                   Label {
                                        padding: 5
-                                       text: positionSource.position.speed.toFixed(1)
+                                       text: positionSource.position.speedValid ? positionSource.position.speed.toFixed(1) : "..."
                                        color: "white"
                                        background: Rectangle {
                                            color: "black"
                                            radius: 5
                                        }
                                    }
+                                   Label {
+                                       padding: 5
+                                       text: positionSource.position.directionValid ? positionSource.position.direction.toFixed(1) : "..."
+                                       color: "white"
+                                       background: Rectangle {
+                                           color: "black"
+                                           radius: 5
+                                       }
+                                   }
+                                   }
                                    Rectangle {
+                                       id: accuracyMarker
+                                       visible: positionSource.position.horizontalAccuracyValid
                                        anchors.centerIn: parent
-                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy)
+                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy).toFixed(1)
                                        height: width
                                        color: Qt.rgba(255, 255, 255, 0.5)
                                        border.color: "white"
@@ -436,6 +471,27 @@ Page {
                                        radius: width / 2
                                        z: -1
                                    }
+//                                   Label {
+//                                       anchors.left: parent.right
+//                                       anchors.bottom: parent.top
+//                                       padding: 5
+//                                       text: positionSource.position.speed.toFixed(1)
+//                                       color: "white"
+//                                       background: Rectangle {
+//                                           color: "black"
+//                                           radius: 5
+//                                       }
+//                                   }
+//                                   Rectangle {
+//                                       anchors.centerIn: parent
+//                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy)
+//                                       height: width
+//                                       color: Qt.rgba(255, 255, 255, 0.5)
+//                                       border.color: "white"
+//                                       border.width: 1
+//                                       radius: width / 2
+//                                       z: -1
+//                                   }
 
                                }
                                anchorPoint.x: sourceItem.width / 2
@@ -466,6 +522,43 @@ Page {
                            duration: 300
                            easing.type: Easing.Linear
                        }
+                   }
+
+                   GridLayout {
+                       columns: 1
+                       rows: 2
+                       anchors.right: parent.right
+                       anchors.verticalCenter: parent.verticalCenter
+
+                       Button {
+                           id: nearMeButton
+                           checkable: true
+                           checked: false
+                           icon.source: checked ? "qrc:/assets/icons/near_me.png" : "qrc:/assets/icons/near_me_disabled.png"
+                           icon.color: "black"
+                           icon.width: 32
+                           icon.height: 32
+                           display: AbstractButton.IconOnly
+                           implicitWidth: 32
+                           implicitHeight: 32
+                           padding: 0
+                       }
+                       Button {
+                           id: myLocationButton
+                           icon.source: "qrc:/assets/icons/my_location.png"
+                           icon.color: "black"
+                           icon.width: 32
+                           icon.height: 32
+                           display: AbstractButton.IconOnly
+                           implicitWidth: 32
+                           implicitHeight: 32
+                           padding: 0
+
+                           onClicked: {
+                                startLocation.coordinate = Object.assign({}, positionSource.position.coordinate);
+                           }
+                       }
+
                    }
 
                    // Add button to rotate
@@ -506,9 +599,9 @@ Page {
                    }
                    Component.onCompleted: {
                            console.log("Supported map types:", supportedMapTypes.length)
-                           for (var i = 0; i < supportedMapTypes.length; i++) {
-                               console.log(i, supportedMapTypes[i].name, supportedMapTypes[i].type)
-                           }
+//                           for (var i = 0; i < supportedMapTypes.length; i++) {
+//                               console.log(i, supportedMapTypes[i].name, supportedMapTypes[i].type)
+//                           }
                        }
                    activeMapType: {
                            if (supportedMapTypes.length > 0) {
@@ -518,6 +611,11 @@ Page {
                        }
                }
                Component.onCompleted: {
+
+                   console.log(Qt.resolvedUrl("qrc:/"))
+
+//                   console.log("Resource exists:", Qt.resolvedUrl("qrc:/MyQmlApp/assets/icons/near_me.png"))
+
                    dbController.operateConnectDb("Connection 0",
                                                  "QMYSQL",
                                                  "localhost",

@@ -36,6 +36,8 @@ signals:
                                             const QString &queryString,
                                             const QStringList &keysAs);
 
+    void operateInsertCoordinate(const QVariant &data, const QDateTime &time);
+
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();
     void selectTables(QList<QVariant> data);

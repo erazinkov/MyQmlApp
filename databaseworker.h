@@ -33,6 +33,8 @@ public slots:
                                             const QString &queryString,
                                             const QStringList &keysAs);
 
+    void handleInsertCoordinate(const QVariant &data, const QDateTime &time);
+
 signals:
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();

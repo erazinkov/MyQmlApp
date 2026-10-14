@@ -4,11 +4,13 @@ project(MyQmlApp VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
 
 # find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql REQUIRED)
 find_package(Qt6 6.2 COMPONENTS Quick Positioning Sql Graphs REQUIRED)
 
 qt_add_executable(appMyQmlApp
+    application.qrc
     main.cpp
     markermodel.h markermodel.cpp
     databasecontroller.h databasecontroller.cpp
@@ -26,6 +28,7 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES AppWindow.qml
     QML_FILES MapPage.qml
     QML_FILES DensityPage.qml
+    QML_FILES NavigationButton.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES

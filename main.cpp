@@ -18,10 +18,6 @@
 
 using namespace Qt::StringLiterals;
 
-class Test {
-    Test();
-    int v;
-};
 
 int main(int argc, char *argv[])
 {

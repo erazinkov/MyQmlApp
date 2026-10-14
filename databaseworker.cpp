@@ -244,3 +244,24 @@ void DatabaseWorker::handleSelectForTableWithCoordinate(const QGeoCoordinate &to
          emit errorOccurred(query.lastError().text());
      }
 }
+
+void DatabaseWorker::handleInsertCoordinate(const QVariant &data, const QDateTime &time)
+{
+    QGeoCoordinate c;
+
+    if (data.canConvert<QGeoCoordinate>()) {
+        c = data.value<QGeoCoordinate>();
+    } else if (data.canConvert<QVariantMap>()) {
+        QVariantMap m = data.toMap();
+        c = QGeoCoordinate(
+            m.value("latitude").toDouble(),
+            m.value("longitude").toDouble(),
+            m.value("altitude", 0.0).toDouble()
+        );
+    } else {
+        qWarning() << "Invalid coordinate!";
+        return;
+    }
+    qDebug() << c << time;
+
+}

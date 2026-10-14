@@ -16,6 +16,8 @@ DatabaseController::DatabaseController(QObject *parent) : QObject{parent}
 
     connect(this, &DatabaseController::operateSelectForTableWithCoordinate, m_worker, &DatabaseWorker::handleSelectForTableWithCoordinate);
 
+    connect(this, &DatabaseController::operateInsertCoordinate, m_worker, &DatabaseWorker::handleInsertCoordinate);
+
     connect(m_worker, &DatabaseWorker::connectDb, this, &DatabaseController::connectDb);
     connect(m_worker, &DatabaseWorker::disconnectDb, this, &DatabaseController::disconnectDb);
     connect(m_worker, &DatabaseWorker::selectTables, this, &DatabaseController::selectTables);

@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/icons/map.png</file>
+        <file>assets/icons/my_location.png</file>
+        <file>assets/icons/navigation.png</file>
+        <file>assets/icons/near_me.png</file>
+        <file>assets/icons/near_me_disabled.png</file>
+    </qresource>
+</RCC>
