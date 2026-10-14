@@ -5,5 +5,8 @@
         <file>assets/icons/navigation.png</file>
         <file>assets/icons/near_me.png</file>
         <file>assets/icons/near_me_disabled.png</file>
+        <file>assets/icons/north.png</file>
+        <file>assets/icons/rotate_left.png</file>
+        <file>assets/icons/rotate_right.png</file>
     </qresource>
 </RCC>

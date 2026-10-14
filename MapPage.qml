@@ -140,7 +140,6 @@ Page {
                             onTriggered: {
                                 map.activeMapType = map.supportedMapTypes[index];
                             }
-
                            }
                        }
 
@@ -171,15 +170,6 @@ Page {
                     }
                     lastPositionCoordinate = { latitude:  position.coordinate.latitude, longitude:  position.coordinate.longitude};
 //                    }
-
-
-//                    if (lastPosition && Math.abs(lastPosition.coordinate.latitude - position.coordinate.latitude)  < 1e-8 &&
-//                            Math.abs(lastPosition.coordinate.longitude - position.coordinate.longitude) < 1e-8) {
-//                        console.log(lastPosition.coordinate.longitude - position.coordinate.longitude, lastPosition.coordinate.latitude - position.coordinate.latitude);
-//                        dbController.operateInsertCoordinate(position.coordinate, position.timestamp)
-//                        return;
-//                    }
-//                    lastPosition = position;
                 }
             }
 
@@ -210,52 +200,6 @@ Page {
                            return distance;
                        }
                        return -1;
-                   }
-
-                   Shape {
-                       id: compassArrow
-
-                       // Set the size of the arrow
-                       width: 40
-                       height: 40
-
-                       // Position it where you want (e.g., a corner of the map)
-                       anchors.right: parent.right
-                       anchors.top: parent.top
-                       anchors.margins: 20
-
-                       // This property from Item controls rotation [citation:1][citation:5]
-                       // It rotates clockwise, so you'll often need a negative angle
-                       // to make the arrow point toward a specific bearing.
-                       rotation: -map.bearing
-
-                       // Defines the point around which rotation occurs [citation:12]
-                       // For a compass, you usually want to rotate around the arrow's center
-                       transformOrigin: Item.Center
-
-                       // ShapePath defines the actual geometry of the arrow
-                       ShapePath {
-                           // Fill color for the arrow body
-                           fillColor: "red"
-
-                           // Optional: Stroke for an outline
-                           strokeColor: "white"
-                           strokeWidth: 2
-
-                           // Define the triangle path
-                           // Start at the top point (tip of the arrow)
-                           startX: compassArrow.width / 2
-                           startY: 0
-
-                           // Draw line to bottom-right corner
-                           PathLine { x: compassArrow.width; y: compassArrow.height }
-
-                           // Draw line to bottom-left corner
-                           PathLine { x: 0; y: compassArrow.height }
-
-                           // Draw line back to the start (tip), closing the triangle
-                           PathLine { x: compassArrow.width / 2; y: 0 }
-                       }
                    }
 
                    MapItemView {
@@ -335,6 +279,8 @@ Page {
                                    ColumnLayout{
                                        anchors.left: parent.right
                                        anchors.top: parent.top
+                                       anchors.leftMargin: 5
+                                       spacing: 5
                                        RowLayout{
                                            Button {
                                                id: plusButton
@@ -407,6 +353,7 @@ Page {
                                        color: "black"
                                        anchors.left: parent.right
                                        anchors.bottom: parent.bottom
+                                       anchors.leftMargin: 2.5
                                        MouseArea {
                                            id: mouseAreaResize
                                            anchors.fill: parent
@@ -428,8 +375,6 @@ Page {
                    MapQuickItem {
                                id: userMarker
                                coordinate: positionSource.position.coordinate
-
-                               // Customize marker visual (e.g., a simple red dot)
                                sourceItem: Rectangle {
                                    width: 20
                                    height: 20
@@ -439,7 +384,7 @@ Page {
                                    radius: 10
                                    ColumnLayout{
                                        anchors.left: parent.right
-                                       anchors.bottom: parent.bottom
+                                       anchors.bottom: parent.top
                                    Label {
                                        padding: 5
                                        text: positionSource.position.speedValid ? positionSource.position.speed.toFixed(1) : "..."
@@ -449,15 +394,15 @@ Page {
                                            radius: 5
                                        }
                                    }
-                                   Label {
-                                       padding: 5
-                                       text: positionSource.position.directionValid ? positionSource.position.direction.toFixed(1) : "..."
-                                       color: "white"
-                                       background: Rectangle {
-                                           color: "black"
-                                           radius: 5
-                                       }
-                                   }
+//                                   Label {
+//                                       padding: 5
+//                                       text: positionSource.position.directionValid ? positionSource.position.direction.toFixed(1) : "..."
+//                                       color: "white"
+//                                       background: Rectangle {
+//                                           color: "black"
+//                                           radius: 5
+//                                       }
+//                                   }
                                    }
                                    Rectangle {
                                        id: accuracyMarker
@@ -471,28 +416,6 @@ Page {
                                        radius: width / 2
                                        z: -1
                                    }
-//                                   Label {
-//                                       anchors.left: parent.right
-//                                       anchors.bottom: parent.top
-//                                       padding: 5
-//                                       text: positionSource.position.speed.toFixed(1)
-//                                       color: "white"
-//                                       background: Rectangle {
-//                                           color: "black"
-//                                           radius: 5
-//                                       }
-//                                   }
-//                                   Rectangle {
-//                                       anchors.centerIn: parent
-//                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy)
-//                                       height: width
-//                                       color: Qt.rgba(255, 255, 255, 0.5)
-//                                       border.color: "white"
-//                                       border.width: 1
-//                                       radius: width / 2
-//                                       z: -1
-//                                   }
-
                                }
                                anchorPoint.x: sourceItem.width / 2
                                anchorPoint.y: sourceItem.height / 2
@@ -524,14 +447,89 @@ Page {
                        }
                    }
 
-                   GridLayout {
-                       columns: 1
-                       rows: 2
+                   ColumnLayout {
                        anchors.right: parent.right
                        anchors.verticalCenter: parent.verticalCenter
+                       anchors.rightMargin: 5
+                       spacing: 5
+                       Button {
+                           id: mapTypeButton
+                           Layout.alignment: Qt.AlignRight
+                           icon.source: "qrc:/assets/icons/map.png"
+                           icon.color: "black"
+                           icon.width: 32
+                           icon.height: 32
+                           display: AbstractButton.IconOnly
+                           implicitWidth: 32
+                           implicitHeight: 32
+                           padding: 0
 
+                           onClicked:{
+                                   if (mapTypeDrawer.opened) {
+                                       mapTypeDrawer.close();
+                                   } else {
+                                       mapTypeDrawer.open();
+                                   }
+                           }
+                       }
+                       RowLayout {
+                           Button {
+                               id: rightRotationButton
+                               icon.source: "qrc:/assets/icons/rotate_right.png"
+                               icon.color: "black"
+                               icon.width: 32
+                               icon.height: 32
+                               display: AbstractButton.IconOnly
+                               implicitWidth: 32
+                               implicitHeight: 32
+                               padding: 0
+
+                               autoRepeat: true
+                               autoRepeatDelay: 500
+                               autoRepeatInterval: 100
+
+                               onClicked: map.bearing = (map.bearing + 1) % 360
+                           }
+                           Button {
+                               id: leftRotationButton
+                               icon.source: "qrc:/assets/icons/rotate_left.png"
+                               icon.color: "black"
+                               icon.width: 32
+                               icon.height: 32
+                               display: AbstractButton.IconOnly
+                               implicitWidth: 32
+                               implicitHeight: 32
+                               padding: 0
+
+                               autoRepeat: true
+                               autoRepeatDelay: 500
+                               autoRepeatInterval: 100
+
+                               onClicked: map.bearing = (map.bearing - 1) % 360
+
+                           }
+                           Button {
+                               id: northButton
+                               implicitWidth: 32
+                               implicitHeight: 32
+
+                               contentItem: Image {
+                                    source: "qrc:/assets/icons/north.png"
+                                    sourceSize.width: 24
+                                    sourceSize.height: 24
+                                    fillMode: Image.PreserveAspectFit
+                                    rotation: -map.bearing
+                                    transformOrigin: Item.Center
+                               }
+
+                               onClicked: {
+                                    map.bearing = 0
+                               }
+                           }
+                       }
                        Button {
                            id: nearMeButton
+                           Layout.alignment: Qt.AlignRight
                            checkable: true
                            checked: false
                            icon.source: checked ? "qrc:/assets/icons/near_me.png" : "qrc:/assets/icons/near_me_disabled.png"
@@ -545,6 +543,7 @@ Page {
                        }
                        Button {
                            id: myLocationButton
+                           Layout.alignment: Qt.AlignRight
                            icon.source: "qrc:/assets/icons/my_location.png"
                            icon.color: "black"
                            icon.width: 32
@@ -558,36 +557,14 @@ Page {
                                 startLocation.coordinate = Object.assign({}, positionSource.position.coordinate);
                            }
                        }
-
                    }
 
-                   // Add button to rotate
                    GridLayout {
-                       columns: 8
+                       columns: 1
                        rows: 1
                        anchors.bottom: parent.bottom
                        anchors.horizontalCenter: parent.horizontalCenter
 
-                       Button {
-                           text: "-5°"
-                           onClicked: map.bearing = (map.bearing - 5) % 360
-                       }
-                       Button {
-                           text: "-1°"
-                           onClicked: map.bearing = (map.bearing - 1) % 360
-                       }
-                       Button {
-                           text: "0°"
-                           onClicked: map.bearing = 0
-                       }
-                       Button {
-                           text: "+1°"
-                           onClicked: map.bearing = (map.bearing + 1) % 360
-                       }
-                       Button {
-                           text: "+5°"
-                           onClicked: map.bearing = (map.bearing + 5) % 360
-                       }
                        Switch {
                            id: miSwitch
                             checked: false
@@ -609,6 +586,51 @@ Page {
                            }
                            return undefined  // or leave it, will use default
                        }
+                   Drawer {
+                       id: mapTypeDrawer
+                       y: map.height / 2
+                       width: Math.min(window.width, window.height) / 3
+                       height: (window.height - map.height) / 2
+
+                       ListView {
+                           id: listView
+                           focus: true
+                           currentIndex: 0
+                           anchors.fill: parent
+
+                           model: ListModel {
+                               ListElement { title: qsTr("Map"); source: "map" }
+                               ListElement { title: qsTr("Density"); source: "density" }
+                           }
+
+                           delegate: ItemDelegate {
+                               id: delegateItem
+                               width: ListView.view.width
+                               text: title
+                               highlighted: ListView.isCurrentItem
+
+                               required property int index
+                               required property var model
+                               required property string title
+                               required property string source
+
+//                               onClicked: {
+//                                   listView.currentIndex = index;
+
+//                                   if (source === "map") {
+//                                       stackView.pop();
+//                                   }
+//                                   if (source === "density") {
+//                                       if (stackView.depth > 1) {
+//                                           return;
+//                                       }
+//                                       stackView.push(densityPage);
+//                                   }
+//                               }
+                           }
+                           ScrollIndicator.vertical: ScrollIndicator { }
+                       }
+                   }
                }
                Component.onCompleted: {
 

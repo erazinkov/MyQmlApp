@@ -45,7 +45,7 @@ ApplicationWindow {
         ListView {
             id: listView
             focus: true
-            currentIndex: -1
+            currentIndex: 0
             anchors.fill: parent
 
             model: ListModel {
