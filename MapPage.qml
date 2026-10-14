@@ -13,8 +13,6 @@ import markerModel
 
 Page {
             id: page
-            width: parent.width
-            height: parent.height
             function onProcessData(index, result, isProcess, rows, columns) {
                 var a = toolGridLayout.children[index]?.children[0];
                 var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
@@ -130,20 +128,20 @@ Page {
 
                 MenuSeparator {}
 
-                Menu {
-                    id: mapTypeMenu
-                    title: qsTr("Map type")
-                    Repeater {
-                        model: mapTypesModel
-                        MenuItem {
-                            text: mapTypeName
-                            onTriggered: {
-                                map.activeMapType = map.supportedMapTypes[index];
-                            }
-                           }
-                       }
+//                Menu {
+//                    id: mapTypeMenu
+//                    title: qsTr("Map type")
+//                    Repeater {
+//                        model: mapTypesModel
+//                        MenuItem {
+//                            text: mapTypeName
+//                            onTriggered: {
+//                                map.activeMapType = map.supportedMapTypes[index];
+//                            }
+//                           }
+//                       }
 
-                }
+//                }
             }
             PositionSource {
                 id: positionSource
@@ -464,6 +462,7 @@ Page {
                            implicitHeight: 32
                            padding: 0
 
+
                            onClicked:{
                                    if (mapTypeDrawer.opened) {
                                        mapTypeDrawer.close();
@@ -588,48 +587,27 @@ Page {
                        }
                    Drawer {
                        id: mapTypeDrawer
-                       y: map.height / 2
-                       width: Math.min(window.width, window.height) / 3
-                       height: (window.height - map.height) / 2
+                           edge: Qt.BottomEdge
+                           height: parent.height / 3
+                           width: parent.width
+//                           height: window.height / 3 - 100
 
-                       ListView {
-                           id: listView
-                           focus: true
-                           currentIndex: 0
-                           anchors.fill: parent
+                           onPositionChanged: {
+                                   // y is animated by the drawer; clamp it to the map bounds
+                                   // (only needed if height could exceed map.height)
+                                   if (y < 0) y = 0
+                               }
 
-                           model: ListModel {
-                               ListElement { title: qsTr("Map"); source: "map" }
-                               ListElement { title: qsTr("Density"); source: "density" }
+                           // content...
+                           ColumnLayout {
+                               anchors.fill: parent
+                               anchors.margins: 10
+
+                               Label { text: "Map type" }
+                               Button { text: "Standard"; onClicked: mapTypeDrawer.close() }
+                               Button { text: "Satellite"; onClicked: mapTypeDrawer.close() }
+                               Button { text: "Terrain"; onClicked: mapTypeDrawer.close() }
                            }
-
-                           delegate: ItemDelegate {
-                               id: delegateItem
-                               width: ListView.view.width
-                               text: title
-                               highlighted: ListView.isCurrentItem
-
-                               required property int index
-                               required property var model
-                               required property string title
-                               required property string source
-
-//                               onClicked: {
-//                                   listView.currentIndex = index;
-
-//                                   if (source === "map") {
-//                                       stackView.pop();
-//                                   }
-//                                   if (source === "density") {
-//                                       if (stackView.depth > 1) {
-//                                           return;
-//                                       }
-//                                       stackView.push(densityPage);
-//                                   }
-//                               }
-                           }
-                           ScrollIndicator.vertical: ScrollIndicator { }
-                       }
                    }
                }
                Component.onCompleted: {
