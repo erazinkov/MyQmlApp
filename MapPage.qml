@@ -42,7 +42,7 @@ Page {
 
 
             DatabaseController { id: dbController}
-
+            property bool nearMeEnabled: false
 
             MarkerModel { id: markerModel}
 
@@ -104,44 +104,28 @@ Page {
                 }
                 MenuSeparator {}
 
-                Menu {
-                    title: qsTr("Location")
-                    MenuItem {
-                        text: qsTr("Dubna")
-                        onTriggered: {
-                            map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
-                        }
-                    }
-                    MenuItem {
-                        text: qsTr("Stavropol_0")
-                        onTriggered: {
-                            map.center = QtPositioning.coordinate(44.9778133, 42.012765);
-                        }
-                    }
-                    MenuItem {
-                        text: qsTr("Stavropol_1")
-                        onTriggered: {
-                            map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
-                        }
-                    }
-                }
-
-                MenuSeparator {}
-
 //                Menu {
-//                    id: mapTypeMenu
-//                    title: qsTr("Map type")
-//                    Repeater {
-//                        model: mapTypesModel
-//                        MenuItem {
-//                            text: mapTypeName
-//                            onTriggered: {
-//                                map.activeMapType = map.supportedMapTypes[index];
-//                            }
-//                           }
-//                       }
-
+//                    title: qsTr("Location")
+//                    MenuItem {
+//                        text: qsTr("Dubna")
+//                        onTriggered: {
+//                            map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
+//                        }
+//                    }
+//                    MenuItem {
+//                        text: qsTr("Stavropol_0")
+//                        onTriggered: {
+//                            map.center = QtPositioning.coordinate(44.9778133, 42.012765);
+//                        }
+//                    }
+//                    MenuItem {
+//                        text: qsTr("Stavropol_1")
+//                        onTriggered: {
+//                            map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
+//                        }
+//                    }
 //                }
+
             }
             PositionSource {
                 id: positionSource
@@ -157,7 +141,8 @@ Page {
                     if (!positionSource.valid) {
                         return;
                     }
-                    if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || nearMeButton.checked) {
+                    console.log(mapControls.nearMeChecked);
+                    if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
                         startLocation.coordinate = Object.assign({}, position.coordinate);
                     }
 //                    if (lastPosition && Math.abs(lastPosition.coordinate.latitude - position.coordinate.latitude)  < 1e-8 &&
@@ -171,15 +156,47 @@ Page {
                 }
             }
 
-            Plugin {
-                    id: mapPlugin
+            MapView {
+                id: mapView
+                anchors.fill: parent
+                map.copyrightsVisible: true
+                map.plugin: Plugin {
                     name: "osm"
 //                    PluginParameter {
 //                        name: "osm.mapping.custom.host"
 //                        value: "https://api.thunderforest.com/cycle/%z/%x/%y.png?apikey=e2d4258d86d743bc861d2a12cc3b67db"
 //                    }
+                }
+                map.center: startLocation.coordinate
+                map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
+            }
+            CurrentLocationMarker {
+                id: userMarker
+                parent: mapView.map
+                positionSource: positionSource
+            }
+            MapControls {
+                id: mapControls
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: 5
+
+                map: mapView.map
+
+                onMapTypeClicked: {
+                   dialog.open()
+//                    if (mapTypeDrawer.opened) {
+//                        mapTypeDrawer.close()
+//                    } else {
+//                        mapTypeDrawer.open()
+//                    }
+                }
+                onMyLocationClicked: {
+                    startLocation.coordinate = Object.assign({}, positionSource.position.coordinate)
+                }
             }
 
+/*
             Map {
                    id: map
                    copyrightsVisible: false
@@ -203,363 +220,12 @@ Page {
                        return -1;
                    }
 
-                   MapItemView {
-                       model: markerModel
-                       delegate: MapQuickItem {
-                           coordinate: model.coordinate
-                           sourceItem: Rectangle {
-                               width: 5
-                               height: 5
-                               color: "red"
-                               radius: 2.5
-                           }
-                           anchorPoint.x: sourceItem.width / 2
-                           anchorPoint.y: sourceItem.height / 2
-                      }
-                   }
-                   MapQuickItem {
-                               id: mi
-                               // Initial map coordinates for the center of the rectangle
-                               coordinate: startLocation.coordinate
-                               anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-                               visible: miSwitch.checked
-//                               visible: true
-                               // The actual QtQuick item to be displayed
-                               sourceItem: Rectangle {
-                                   id: r
-                                   width: 150
-                                   height: width
-                                   color: Qt.rgba(255, 255, 255, 0.5)
-
-                                   GridLayout {
-                                       id: toolGridLayout
-                                       anchors.fill: parent
-                                       rows: 1
-                                       columns: 1
-                                       rowSpacing: 0
-                                       columnSpacing: 0
-                                       Repeater {
-                                           model: toolGridLayout.rows * toolGridLayout.columns
-                                           delegate: Rectangle {
-                                               Layout.fillWidth: true
-                                               Layout.fillHeight: true
-                                               color: Qt.rgba(255, 255, 255, 0.0)
-                                               border.color: "black"
-                                               border.width: 1
-                                               property int index: model.index
-                                               StackLayout {
-                                                   id: toolGridLayoutStackedLayout
-                                                   anchors.fill: parent
-                                                   currentIndex: 0
-                                                   Rectangle {
-                                                       Layout.alignment: Qt.AlignCenter
-                                                       color: Qt.rgba(255, 255, 255, 0.0)
-                                                       Label {
-                                                           anchors.horizontalCenter: parent.horizontalCenter
-                                                           anchors.verticalCenter: parent.verticalCenter
-                                                           padding: 5
-                                                           text: ""
-                                                           color: "white"
-                                                           background: Rectangle {
-                                                               color: "black"
-                                                               radius: 5
-                                                               visible: parent.text.length
-                                                           }
-                                                       }
-                                                   }
-                                                   BusyIndicator {
-                                                       Layout.alignment: Qt.AlignHCenter
-                                                       running: true
-                                                   }
-                                               }
-
-                                           }
-                                       }
-                                   }
-
-                                   ColumnLayout{
-                                       anchors.left: parent.right
-                                       anchors.top: parent.top
-                                       anchors.leftMargin: 5
-                                       spacing: 5
-                                       RowLayout{
-                                           Button {
-                                               id: plusButton
-                                               implicitWidth: labelNumber.height
-                                               implicitHeight: labelNumber.height
-                                               text: "+"
-                                               onClicked: {
-                                                    toolGridLayout.rows = toolGridLayout.rows + 1;
-                                                    toolGridLayout.columns = toolGridLayout.rows;
-                                               }
-                                           }
-                                           Button {
-                                               id: minusButton
-                                               implicitWidth: labelNumber.height
-                                               implicitHeight: labelNumber.height
-                                               text: "-"
-                                               onClicked: {
-                                                   if (toolGridLayout.rows > 1) {
-                                                       toolGridLayout.rows = toolGridLayout.rows - 1;
-                                                       toolGridLayout.columns = toolGridLayout.rows;
-                                                   }
-                                               }
-                                           }
-                                       }
-
-                                       RowLayout{
-                                       Label {
-                                           id: labelNumber
-                                           padding: 5
-                                           text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
-                                           color: "white"
-                                           background: Rectangle {
-                                               color: "black"
-                                               radius: 5
-                                           }
-                                       }
-                                       Label {
-                                           padding: 5
-                                           text: map.distance().toFixed(1)
-                                           color: "white"
-                                           background: Rectangle {
-                                               color: "black"
-                                               radius: 5
-                                           }
-                                       }
-                                       Label {
-                                           padding: 5
-                                           text: (map.distance() / toolGridLayout.rows).toFixed(1)
-                                           color: "white"
-                                           background: Rectangle {
-                                               color: "black"
-                                               radius: 5
-                                           }
-                                       }
-                                       }
-                                   }
-
-                                   DragHandler {
-                                       target: mi
-                                       xAxis.minimum: r.border.width
-                                       xAxis.maximum: window.width - r.width - r.border.width
-                                       yAxis.minimum: r.border.width
-                                       yAxis.maximum: window.height - r.height - r.border.width
-
-                                   }
-                                   Rectangle {
-                                       width: labelNumber.height * 0.5
-                                       height: width
-                                       radius: 2.5
-                                       color: "black"
-                                       anchors.left: parent.right
-                                       anchors.bottom: parent.bottom
-                                       anchors.leftMargin: 2.5
-                                       MouseArea {
-                                           id: mouseAreaResize
-                                           anchors.fill: parent
-                                           cursorShape: Qt.SizeFDiagCursor
-                                           onPressedChanged: {
-                                               dragHandler.enabled = !pressed;
-                                           }
-                                           onPositionChanged: {
-                                               if (pressed) {
-                                                   var s = Math.max(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
-                                                   r.width += s;
-                                               }
-                                           }
-                                       }
-                                   }
-
-                               }
-                           }
-                   MapQuickItem {
-                               id: userMarker
-                               coordinate: positionSource.position.coordinate
-                               sourceItem: Rectangle {
-                                   width: 20
-                                   height: 20
-                                   color: "red"
-                                   border.color: "white"
-                                   border.width: 1
-                                   radius: 10
-                                   ColumnLayout{
-                                       anchors.left: parent.right
-                                       anchors.bottom: parent.top
-                                   Label {
-                                       padding: 5
-                                       text: positionSource.position.speedValid ? positionSource.position.speed.toFixed(1) : "..."
-                                       color: "white"
-                                       background: Rectangle {
-                                           color: "black"
-                                           radius: 5
-                                       }
-                                   }
-//                                   Label {
-//                                       padding: 5
-//                                       text: positionSource.position.directionValid ? positionSource.position.direction.toFixed(1) : "..."
-//                                       color: "white"
-//                                       background: Rectangle {
-//                                           color: "black"
-//                                           radius: 5
-//                                       }
-//                                   }
-                                   }
-                                   Rectangle {
-                                       id: accuracyMarker
-                                       visible: positionSource.position.horizontalAccuracyValid
-                                       anchors.centerIn: parent
-                                       width: Math.max(positionSource.position.horizontalAccuracy, positionSource.position.verticalAccuracy).toFixed(1)
-                                       height: width
-                                       color: Qt.rgba(255, 255, 255, 0.5)
-                                       border.color: "white"
-                                       border.width: 1
-                                       radius: width / 2
-                                       z: -1
-                                   }
-                               }
-                               anchorPoint.x: sourceItem.width / 2
-                               anchorPoint.y: sourceItem.height / 2
-                           }
-                   WheelHandler {
-                       id: wheel
-                       // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
-                       // Magic Mouse pretends to be a trackpad but doesn't work with PinchHandler
-                       // and we don't yet distinguish mice and trackpads on Wayland either
-                       acceptedDevices: Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland"
-                                        ? PointerDevice.Mouse | PointerDevice.TouchPad
-                                        : PointerDevice.Mouse
-                       rotationScale: 1/120
-                       property: "zoomLevel"
-                   }
-
-                   DragHandler {
-                       id: dragHandler
-                       target: null
-                       onTranslationChanged: (delta) => map.pan(-delta.x, -delta.y);
-                   }
-                   bearing: 0 // north up
-                   Behavior on bearing {
-                    enabled: true
-                       RotationAnimation {
-                           direction: RotationAnimation.Shortest
-                           duration: 300
-                           easing.type: Easing.Linear
-                       }
-                   }
-
-                   ColumnLayout {
-                       anchors.right: parent.right
-                       anchors.verticalCenter: parent.verticalCenter
-                       anchors.rightMargin: 5
-                       spacing: 5
-                       Button {
-                           id: mapTypeButton
-                           Layout.alignment: Qt.AlignRight
-                           icon.source: "qrc:/assets/icons/map.png"
-                           icon.color: "black"
-                           icon.width: 32
-                           icon.height: 32
-                           display: AbstractButton.IconOnly
-                           implicitWidth: 32
-                           implicitHeight: 32
-                           padding: 0
 
 
-                           onClicked:{
-                                   if (mapTypeDrawer.opened) {
-                                       mapTypeDrawer.close();
-                                   } else {
-                                       mapTypeDrawer.open();
-                                   }
-                           }
-                       }
-                       RowLayout {
-                           Button {
-                               id: rightRotationButton
-                               icon.source: "qrc:/assets/icons/rotate_right.png"
-                               icon.color: "black"
-                               icon.width: 32
-                               icon.height: 32
-                               display: AbstractButton.IconOnly
-                               implicitWidth: 32
-                               implicitHeight: 32
-                               padding: 0
 
-                               autoRepeat: true
-                               autoRepeatDelay: 500
-                               autoRepeatInterval: 100
 
-                               onClicked: map.bearing = (map.bearing + 1) % 360
-                           }
-                           Button {
-                               id: leftRotationButton
-                               icon.source: "qrc:/assets/icons/rotate_left.png"
-                               icon.color: "black"
-                               icon.width: 32
-                               icon.height: 32
-                               display: AbstractButton.IconOnly
-                               implicitWidth: 32
-                               implicitHeight: 32
-                               padding: 0
 
-                               autoRepeat: true
-                               autoRepeatDelay: 500
-                               autoRepeatInterval: 100
 
-                               onClicked: map.bearing = (map.bearing - 1) % 360
-
-                           }
-                           Button {
-                               id: northButton
-                               implicitWidth: 32
-                               implicitHeight: 32
-
-                               contentItem: Image {
-                                    source: "qrc:/assets/icons/north.png"
-                                    sourceSize.width: 24
-                                    sourceSize.height: 24
-                                    fillMode: Image.PreserveAspectFit
-                                    rotation: -map.bearing
-                                    transformOrigin: Item.Center
-                               }
-
-                               onClicked: {
-                                    map.bearing = 0
-                               }
-                           }
-                       }
-                       Button {
-                           id: nearMeButton
-                           Layout.alignment: Qt.AlignRight
-                           checkable: true
-                           checked: false
-                           icon.source: checked ? "qrc:/assets/icons/near_me.png" : "qrc:/assets/icons/near_me_disabled.png"
-                           icon.color: "black"
-                           icon.width: 32
-                           icon.height: 32
-                           display: AbstractButton.IconOnly
-                           implicitWidth: 32
-                           implicitHeight: 32
-                           padding: 0
-                       }
-                       Button {
-                           id: myLocationButton
-                           Layout.alignment: Qt.AlignRight
-                           icon.source: "qrc:/assets/icons/my_location.png"
-                           icon.color: "black"
-                           icon.width: 32
-                           icon.height: 32
-                           display: AbstractButton.IconOnly
-                           implicitWidth: 32
-                           implicitHeight: 32
-                           padding: 0
-
-                           onClicked: {
-                                startLocation.coordinate = Object.assign({}, positionSource.position.coordinate);
-                           }
-                       }
-                   }
 
                    GridLayout {
                        columns: 1
@@ -632,6 +298,7 @@ Page {
 //                           }
                    }
                }
+            */
                Component.onCompleted: {
 
                    console.log(Qt.resolvedUrl("qrc:/"))
@@ -649,8 +316,201 @@ Page {
                    dbController.connectDb.connect(onConnectDb);
                    dbController.selectForTable.connect(onSelectForTable);
                    pController.processData.connect(onProcessData);
-                   for (var i = 0; i < map.supportedMapTypes.length; ++i) {
-                        mapTypesModel.append({ index: i, mapTypeName: map.supportedMapTypes[i].description });
+                   for (var i = 0; i < mapView.map.supportedMapTypes.length; ++i) {
+                        mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
                    }
                }
+
+               Popup {
+                   id: dialog
+                   modal: true          // blocks input to items below
+                   focus: true          // grabs keyboard focus
+                   closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+                   width: 300
+                   height: 200
+
+
+                   Flow {
+                       anchors.left: parent.left
+                       anchors.right: parent.right
+                       anchors.top: parent.top
+                       anchors.margins: 10
+                       spacing: 10
+
+                       Repeater {
+                           model: mapTypesModel
+                           Button {
+                               text: mapTypeName
+                               padding: 10
+                               onClicked: {
+                                   mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
+                               }
+                           }
+                       }
+                     }
+
+//                   Rectangle {
+//                       anchors.fill: parent
+//                       color: "#f0f0f0"
+//                       Text { anchors.centerIn: parent; text: "Modal Popup" }
+//                   }
+               }
         }
+
+//MapQuickItem {
+//            id: mi
+//            // Initial map coordinates for the center of the rectangle
+//            coordinate: startLocation.coordinate
+//            anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
+//            visible: miSwitch.checked
+////                               visible: true
+//            // The actual QtQuick item to be displayed
+//            sourceItem: Rectangle {
+//                id: r
+//                width: 150
+//                height: width
+//                color: Qt.rgba(255, 255, 255, 0.5)
+
+//                GridLayout {
+//                    id: toolGridLayout
+//                    anchors.fill: parent
+//                    rows: 1
+//                    columns: 1
+//                    rowSpacing: 0
+//                    columnSpacing: 0
+//                    Repeater {
+//                        model: toolGridLayout.rows * toolGridLayout.columns
+//                        delegate: Rectangle {
+//                            Layout.fillWidth: true
+//                            Layout.fillHeight: true
+//                            color: Qt.rgba(255, 255, 255, 0.0)
+//                            border.color: "black"
+//                            border.width: 1
+//                            property int index: model.index
+//                            StackLayout {
+//                                id: toolGridLayoutStackedLayout
+//                                anchors.fill: parent
+//                                currentIndex: 0
+//                                Rectangle {
+//                                    Layout.alignment: Qt.AlignCenter
+//                                    color: Qt.rgba(255, 255, 255, 0.0)
+//                                    Label {
+//                                        anchors.horizontalCenter: parent.horizontalCenter
+//                                        anchors.verticalCenter: parent.verticalCenter
+//                                        padding: 5
+//                                        text: ""
+//                                        color: "white"
+//                                        background: Rectangle {
+//                                            color: "black"
+//                                            radius: 5
+//                                            visible: parent.text.length
+//                                        }
+//                                    }
+//                                }
+//                                BusyIndicator {
+//                                    Layout.alignment: Qt.AlignHCenter
+//                                    running: true
+//                                }
+//                            }
+
+//                        }
+//                    }
+//                }
+
+//                ColumnLayout{
+//                    anchors.left: parent.right
+//                    anchors.top: parent.top
+//                    anchors.leftMargin: 5
+//                    spacing: 5
+//                    RowLayout{
+//                        Button {
+//                            id: plusButton
+//                            implicitWidth: labelNumber.height
+//                            implicitHeight: labelNumber.height
+//                            text: "+"
+//                            onClicked: {
+//                                 toolGridLayout.rows = toolGridLayout.rows + 1;
+//                                 toolGridLayout.columns = toolGridLayout.rows;
+//                            }
+//                        }
+//                        Button {
+//                            id: minusButton
+//                            implicitWidth: labelNumber.height
+//                            implicitHeight: labelNumber.height
+//                            text: "-"
+//                            onClicked: {
+//                                if (toolGridLayout.rows > 1) {
+//                                    toolGridLayout.rows = toolGridLayout.rows - 1;
+//                                    toolGridLayout.columns = toolGridLayout.rows;
+//                                }
+//                            }
+//                        }
+//                    }
+
+//                    RowLayout{
+//                    Label {
+//                        id: labelNumber
+//                        padding: 5
+//                        text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
+//                        color: "white"
+//                        background: Rectangle {
+//                            color: "black"
+//                            radius: 5
+//                        }
+//                    }
+//                    Label {
+//                        padding: 5
+//                        text: map.distance().toFixed(1)
+//                        color: "white"
+//                        background: Rectangle {
+//                            color: "black"
+//                            radius: 5
+//                        }
+//                    }
+//                    Label {
+//                        padding: 5
+//                        text: (map.distance() / toolGridLayout.rows).toFixed(1)
+//                        color: "white"
+//                        background: Rectangle {
+//                            color: "black"
+//                            radius: 5
+//                        }
+//                    }
+//                    }
+//                }
+
+//                DragHandler {
+//                    target: mi
+//                    xAxis.minimum: r.border.width
+//                    xAxis.maximum: window.width - r.width - r.border.width
+//                    yAxis.minimum: r.border.width
+//                    yAxis.maximum: window.height - r.height - r.border.width
+
+//                }
+//                Rectangle {
+//                    width: labelNumber.height * 0.5
+//                    height: width
+//                    radius: 2.5
+//                    color: "black"
+//                    anchors.left: parent.right
+//                    anchors.bottom: parent.bottom
+//                    anchors.leftMargin: 2.5
+//                    MouseArea {
+//                        id: mouseAreaResize
+//                        anchors.fill: parent
+//                        cursorShape: Qt.SizeFDiagCursor
+//                        onPressedChanged: {
+//                            dragHandler.enabled = !pressed;
+//                        }
+//                        onPositionChanged: {
+//                            if (pressed) {
+//                                var s = Math.max(mouseAreaResize.mouseX - width / 2, mouseAreaResize.mouseY - height / 2)
+//                                r.width += s;
+//                            }
+//                        }
+//                    }
+//                }
+
+//            }
+//        }

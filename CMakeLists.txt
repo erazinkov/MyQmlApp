@@ -29,6 +29,8 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES MapPage.qml
     QML_FILES DensityPage.qml
     QML_FILES NavigationButton.qml
+    QML_FILES CurrentLocationMarker.qml
+    QML_FILES MapControls.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES
