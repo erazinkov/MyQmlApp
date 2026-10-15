@@ -88,4 +88,33 @@ ApplicationWindow {
 
         initialItem: mapPage
     }
+
+    footer: Rectangle {
+        implicitHeight: 28
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+
+            Label {
+                text: "..."
+                elide: Label.ElideRight
+                Layout.fillWidth: true
+            }
+
+            Label {
+                id: clockLabel
+                text: Qt.formatDateTime(new Date(), "hh:mm:ss")
+            }
+        }
+    }
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: clockLabel.text = Qt.formatDateTime(new Date(), "hh:mm:ss")
+    }
 }

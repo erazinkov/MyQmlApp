@@ -323,38 +323,25 @@ Page {
 
                Popup {
                    id: dialog
-                   modal: true          // blocks input to items below
-                   focus: true          // grabs keyboard focus
+                   modal: true
+                   focus: true
                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                   parent: parent.contentItem
+                   anchors.centerIn: parent
 
-                   width: 300
-                   height: 200
 
-
-                   Flow {
-                       anchors.left: parent.left
-                       anchors.right: parent.right
-                       anchors.top: parent.top
-                       anchors.margins: 10
-                       spacing: 10
-
+                   ColumnLayout {
+                       anchors.fill: parent
                        Repeater {
                            model: mapTypesModel
                            Button {
                                text: mapTypeName
-                               padding: 10
                                onClicked: {
                                    mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
                                }
                            }
                        }
-                     }
-
-//                   Rectangle {
-//                       anchors.fill: parent
-//                       color: "#f0f0f0"
-//                       Text { anchors.centerIn: parent; text: "Modal Popup" }
-//                   }
+                   }
                }
         }
 
