@@ -188,6 +188,9 @@ Page {
                    center: startLocation.coordinate
                    zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
 
+
+
+
                    function distance() {
                        var point_topLeft = Qt.point(mi.x, mi.y);
                        var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
@@ -588,26 +591,45 @@ Page {
                    Drawer {
                        id: mapTypeDrawer
                            edge: Qt.BottomEdge
-                           height: parent.height / 3
+//                           height: parent.height / 3
+                           height: Math.min(parent.height, mapTypeFlow.childrenRect.height + 20)
                            width: parent.width
-//                           height: window.height / 3 - 100
 
-                           onPositionChanged: {
-                                   // y is animated by the drawer; clamp it to the map bounds
-                                   // (only needed if height could exceed map.height)
-                                   if (y < 0) y = 0
-                               }
 
-                           // content...
-                           ColumnLayout {
-                               anchors.fill: parent
+                           Flow {
+                               id: mapTypeFlow
+                               anchors.left: parent.left
+                               anchors.right: parent.right
+                               anchors.top: parent.top
                                anchors.margins: 10
+                               spacing: 10
 
-                               Label { text: "Map type" }
-                               Button { text: "Standard"; onClicked: mapTypeDrawer.close() }
-                               Button { text: "Satellite"; onClicked: mapTypeDrawer.close() }
-                               Button { text: "Terrain"; onClicked: mapTypeDrawer.close() }
-                           }
+                               Repeater {
+                                   model: mapTypesModel
+
+                                   Button {
+                                       text: mapTypeName
+                                       padding: 10
+                                       onClicked: {
+                                           map.activeMapType = map.supportedMapTypes[index]
+                                       }
+                                   }
+                               }
+                             }
+
+//                           ColumnLayout {
+//                               anchors.fill: parent
+//                               anchors.margins: 10
+//                               Repeater {
+//                                   model: mapTypesModel
+//                                   Button {
+//                                       text: mapTypeName
+//                                       onClicked: {
+//                                           map.activeMapType = map.supportedMapTypes[index];
+//                                       }
+//                                   }
+//                                }
+//                           }
                    }
                }
                Component.onCompleted: {
