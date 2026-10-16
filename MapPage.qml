@@ -33,8 +33,6 @@ Page {
                 console.log(`Database connected: ${success}, Error: ${errorText}`);
             }
 
-
-
             DatabaseController { id: dbController}
             property bool nearMeEnabled: false
 
@@ -210,351 +208,45 @@ Page {
                  checked: false
              }
 
-//            MapQuickItem {
-//                id: mapGridOverlay
-//                // Initial map coordinates for the center of the rectangle
-//                coordinate: startLocation.coordinate
-//                anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-//                visible: true
-//                parent: mapView.map
+             Component.onCompleted: {
+                 dbController.operateConnectDb("Connection 0",
+                                               "QMYSQL",
+                                               "localhost",
+                                               "napdb",
+                                               "testuser",
+                                               "Dubna@123",
+                                               "curr_meas");
 
-//                function distance() {
-//                    var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
-//                    var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
-//                    var coord_topLeft = mapView.map.toCoordinate(point_topLeft);
-//                    var coord_bottomRight = mapView.map.toCoordinate(point_bottomRight);
-//                    if (coord_topLeft && coord_bottomRight) {
-//                        var distance = coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0);
-//                        return distance;
-//                    }
-//                    return -1;
-//                }
+                 dbController.connectDb.connect(onConnectDb);
+                 dbController.selectForTable.connect(onSelectForTable);
+                 pController.processData.connect(onProcessData);
+                 for (var i = 0; i < mapView.map.supportedMapTypes.length; ++i) {
+                      mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
+                 }
+             }
 
-//                MouseArea {
-//                    id: mouseAreaDrag
-//                    anchors.fill: parent
-//                    preventStealing: true
-//                    cursorShape: Qt.SizeAllCursor
-
-//                    property point pressScreenPoint
-//                    property var   pressCoordinate
-//                    property bool  dragging: false
-
-//                    onPressed: function(mouse) {
-//                        // Absolute reference in mapView space — unaffected by mi moving
-//                        pressScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-//                        pressCoordinate  = mapGridOverlay.coordinate
-//                        dragging = true
-//                        mouse.accepted = true
-//                    }
-
-//                    onPositionChanged: function(mouse) {
-//                        if (!dragging) return
-//                        var curScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-//                        var pressMapPt = mapToItem(mapView.map,
-//                                                   pressScreenPoint.x, pressScreenPoint.y)
-//                        var curMapPt   = mapToItem(mapView.map,
-//                                                   curScreenPoint.x, curScreenPoint.y)
-
-//                        var cPress = mapView.map.toCoordinate(pressMapPt, false)
-//                        var cCur   = mapView.map.toCoordinate(curMapPt,   false)
-
-//                        if (cPress && cCur) {
-//                            var dLon = cCur.longitude - cPress.longitude
-//                            var dLat = cCur.latitude  - cPress.latitude
-//                            mapGridOverlay.coordinate = QtPositioning.coordinate(
-//                                pressCoordinate.latitude  + dLat,
-//                                pressCoordinate.longitude + dLon)
-//                        }
-//                    }
-
-//                    onReleased: dragging = false
-//                    onCanceled: dragging = false
-//                }
-
-//                sourceItem: Rectangle {
-//                    id: toolRectangle
-//                    width: 150
-//                    height: width
-//                    color: Qt.rgba(255, 255, 255, 0.5)
-
-//                    GridLayout {
-//                        id: toolGridLayout
-//                        anchors.fill: parent
-//                        rows: 1
-//                        columns: 1
-//                        rowSpacing: 0
-//                        columnSpacing: 0
-//                        Repeater {
-//                            model: toolGridLayout.rows * toolGridLayout.columns
-//                            delegate: Rectangle {
-//                                Layout.fillWidth: true
-//                                Layout.fillHeight: true
-//                                color: Qt.rgba(255, 255, 255, 0.0)
-//                                border.color: "black"
-//                                border.width: 1
-//                                property int index: model.index
-//                                StackLayout {
-//                                    id: toolGridLayoutStackedLayout
-//                                    anchors.fill: parent
-//                                    currentIndex: 0
-//                                    Rectangle {
-//                                        Layout.alignment: Qt.AlignCenter
-//                                        color: Qt.rgba(255, 255, 255, 0.0)
-//                                        Label {
-//                                            anchors.horizontalCenter: parent.horizontalCenter
-//                                            anchors.verticalCenter: parent.verticalCenter
-//                                            padding: 5
-//                                            text: ""
-//                                            color: "white"
-//                                            background: Rectangle {
-//                                                color: "black"
-//                                                radius: 5
-//                                                visible: parent.text.length
-//                                            }
-//                                        }
-//                                    }
-//                                    BusyIndicator {
-//                                        Layout.alignment: Qt.AlignHCenter
-//                                        running: true
-//                                    }
-//                                }
-
-//                            }
-//                        }
-//                    }
-
-//                    ColumnLayout{
-//                        anchors.left: parent.right
-//                        anchors.top: parent.top
-//                        anchors.leftMargin: 5
-//                        spacing: 5
-//                        RowLayout{
-//                            Button {
-//                                id: plusButton
-//                                implicitWidth: labelNumber.height
-//                                implicitHeight: labelNumber.height
-//                                text: "+"
-//                                onClicked: {
-//                                     toolGridLayout.rows = toolGridLayout.rows + 1;
-//                                     toolGridLayout.columns = toolGridLayout.rows;
-//                                }
-//                            }
-//                            Button {
-//                                id: minusButton
-//                                implicitWidth: labelNumber.height
-//                                implicitHeight: labelNumber.height
-//                                text: "-"
-//                                onClicked: {
-//                                    if (toolGridLayout.rows > 1) {
-//                                        toolGridLayout.rows = toolGridLayout.rows - 1;
-//                                        toolGridLayout.columns = toolGridLayout.rows;
-//                                    }
-//                                }
-//                            }
-//                        }
-
-//                        RowLayout{
-//                        Label {
-//                            id: labelNumber
-//                            padding: 5
-//                            text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
-//                            color: "white"
-//                            background: Rectangle {
-//                                color: "black"
-//                                radius: 5
-//                            }
-//                        }
-//                        Label {
-//                            padding: 5
-//                            text: mapGridOverlay.distance().toFixed(1)
-//                            color: "white"
-//                            background: Rectangle {
-//                                color: "black"
-//                                radius: 5
-//                            }
-//                        }
-//                        Label {
-//                            padding: 5
-//                            text: (mapGridOverlay.distance() / toolGridLayout.rows).toFixed(1)
-//                            color: "white"
-//                            background: Rectangle {
-//                                color: "black"
-//                                radius: 5
-//                            }
-//                        }
-//                        }
-//                    }
+             Popup {
+                 id: dialog
+                 modal: true
+                 focus: true
+                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                 parent: parent.contentItem
+                 anchors.centerIn: parent
 
 
-//                    Rectangle {
-//                        width: labelNumber.height * 0.5
-//                        height: width
-//                        radius: 2.5
-//                        color: "black"
-//                        anchors.left: parent.right
-//                        anchors.bottom: parent.bottom
-//                        anchors.leftMargin: 2.5
-//                        MouseArea {
-//                            id: resizeMouseArea
-//                            preventStealing: true
-//                            anchors.fill: parent
-//                            cursorShape: Qt.SizeFDiagCursor
-//                            onPositionChanged: {
-//                                if (pressed) {
-//                                    var s = Math.max(resizeMouseArea.mouseX - width / 2, resizeMouseArea.mouseY - height / 2)
-//                                    toolRectangle.width += s;
-//                                }
-//                            }
-//                        }
-//                    }
-
-//                }
-//            }
-
-
-/*
-            Map {
-                   id: map
-                   copyrightsVisible: false
-                   anchors.fill: parent
-                   plugin: mapPlugin
-                   center: startLocation.coordinate
-                   zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
-
-
-
-
-                   function distance() {
-                       var point_topLeft = Qt.point(mi.x, mi.y);
-                       var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
-                       var coord_topLeft = map.toCoordinate(point_topLeft);
-                       var coord_bottomRight = map.toCoordinate(point_bottomRight);
-                       if (coord_topLeft && coord_bottomRight) {
-                           var distance = coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0);
-                           return distance;
-                       }
-                       return -1;
-                   }
-
-
-
-
-
-
-
-
-                   GridLayout {
-                       columns: 1
-                       rows: 1
-                       anchors.bottom: parent.bottom
-                       anchors.horizontalCenter: parent.horizontalCenter
-
-                       Switch {
-                           id: miSwitch
-                            checked: false
-                            onCheckedChanged: {
-                                mi.coordinate = map.center;
-                            }
-                       }
-
-                   }
-                   Component.onCompleted: {
-                           console.log("Supported map types:", supportedMapTypes.length)
-//                           for (var i = 0; i < supportedMapTypes.length; i++) {
-//                               console.log(i, supportedMapTypes[i].name, supportedMapTypes[i].type)
-//                           }
-                       }
-                   activeMapType: {
-                           if (supportedMapTypes.length > 0) {
-                               return supportedMapTypes[supportedMapTypes.length - 1]
-                           }
-                           return undefined  // or leave it, will use default
-                       }
-                   Drawer {
-                       id: mapTypeDrawer
-                           edge: Qt.BottomEdge
-//                           height: parent.height / 3
-                           height: Math.min(parent.height, mapTypeFlow.childrenRect.height + 20)
-                           width: parent.width
-
-
-                           Flow {
-                               id: mapTypeFlow
-                               anchors.left: parent.left
-                               anchors.right: parent.right
-                               anchors.top: parent.top
-                               anchors.margins: 10
-                               spacing: 10
-
-                               Repeater {
-                                   model: mapTypesModel
-
-                                   Button {
-                                       text: mapTypeName
-                                       padding: 10
-                                       onClicked: {
-                                           map.activeMapType = map.supportedMapTypes[index]
-                                       }
-                                   }
-                               }
+                 ColumnLayout {
+                     anchors.fill: parent
+                     Repeater {
+                         model: mapTypesModel
+                         Button {
+                             text: mapTypeName
+                             onClicked: {
+                                 mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
                              }
-
-//                           ColumnLayout {
-//                               anchors.fill: parent
-//                               anchors.margins: 10
-//                               Repeater {
-//                                   model: mapTypesModel
-//                                   Button {
-//                                       text: mapTypeName
-//                                       onClicked: {
-//                                           map.activeMapType = map.supportedMapTypes[index];
-//                                       }
-//                                   }
-//                                }
-//                           }
-                   }
-               }
-            */
-               Component.onCompleted: {
-                   dbController.operateConnectDb("Connection 0",
-                                                 "QMYSQL",
-                                                 "localhost",
-                                                 "napdb",
-                                                 "testuser",
-                                                 "Dubna@123",
-                                                 "curr_meas");
-
-                   dbController.connectDb.connect(onConnectDb);
-                   dbController.selectForTable.connect(onSelectForTable);
-                   pController.processData.connect(onProcessData);
-                   for (var i = 0; i < mapView.map.supportedMapTypes.length; ++i) {
-                        mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
-                   }
-               }
-
-               Popup {
-                   id: dialog
-                   modal: true
-                   focus: true
-                   closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                   parent: parent.contentItem
-                   anchors.centerIn: parent
-
-
-                   ColumnLayout {
-                       anchors.fill: parent
-                       Repeater {
-                           model: mapTypesModel
-                           Button {
-                               text: mapTypeName
-                               onClicked: {
-                                   mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
-                               }
-                           }
-                       }
-                   }
-               }
+                         }
+                     }
+                 }
+             }
 
         }
 
