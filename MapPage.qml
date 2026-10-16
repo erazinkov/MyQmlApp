@@ -41,6 +41,12 @@ Page {
             }
 
             ListModel { id: mapTypesModel }
+            ListModel {
+                id: placesModel
+                ListElement { placeId: "dubna";       title: qsTr("Dubna");       latitude: 56.761767; longitude: 37.221334 }
+                ListElement { placeId: "stavropol_0"; title: qsTr("Stavropol 0"); latitude: 44.977813; longitude: 42.012765 }
+                ListElement { placeId: "stavropol_1"; title: qsTr("Stavropol 1"); latitude: 45.379757; longitude: 42.450428 }
+            }
 
             MouseArea {
                 id: mouseAreaWindow
@@ -77,19 +83,19 @@ Page {
                     MenuItem {
                         text: qsTr("Dubna")
                         onTriggered: {
-                            startLocation.coordinate = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
+                            mapView.map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
                         }
                     }
                     MenuItem {
                         text: qsTr("Stavropol_0")
                         onTriggered: {
-                            startLocation.coordinate = QtPositioning.coordinate(44.9778133, 42.012765);
+                            mapView.map.center = QtPositioning.coordinate(44.9778133, 42.012765);
                         }
                     }
                     MenuItem {
                         text: qsTr("Stavropol_1")
                         onTriggered: {
-                            startLocation.coordinate = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
+                            mapView.map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
                         }
                     }
                 }
@@ -163,10 +169,13 @@ Page {
                 map: mapView.map
 
                 onMapTypeClicked: {
-                   dialog.open()
+                   dialogMapTypes.open()
                 }
                 onMyLocationClicked: {
-                    startLocation.coordinate = Object.assign({}, positionSource.position.coordinate)
+                    mapView.map.center = QtPositioning.coordinate(positionSource.position.coordinate.latitude, positionSource.position.coordinate.longitude)
+                }
+                onPlacesClicked: {
+                    dialogPlaces.open()
                 }
             }
             PathControls {
@@ -241,7 +250,7 @@ Page {
              }
 
              Popup {
-                 id: dialog
+                 id: dialogMapTypes
                  modal: true
                  focus: true
                  closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -257,6 +266,30 @@ Page {
                              text: mapTypeName
                              onClicked: {
                                  mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
+                             }
+                         }
+                     }
+                 }
+             }
+
+             Popup {
+                 id: dialogPlaces
+                 modal: true
+                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                 anchors.centerIn: parent
+
+                 ColumnLayout {
+                     anchors.fill: parent
+                     Repeater {
+                         model: placesModel
+                         delegate: Button {
+                             required property string title
+                             required property real   latitude
+                             required property real   longitude
+                             text: title
+                             onClicked: {
+                                 mapView.map.center = QtPositioning.coordinate(latitude, longitude);
+                                 dialogPlaces.close()
                              }
                          }
                      }

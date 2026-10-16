@@ -10,6 +10,7 @@ ColumnLayout {
     readonly property alias nearMeChecked: nearMeButton.checked
 
     signal mapTypeClicked()
+    signal placesClicked()
     signal myLocationClicked()
 
     spacing: 5
@@ -27,6 +28,21 @@ ColumnLayout {
         padding: 0
 
         onClicked: root.mapTypeClicked()
+    }
+
+    Button {
+        id: placesButton
+        Layout.alignment: Qt.AlignRight
+        icon.source: "qrc:/assets/icons/places.png"
+        icon.color: "black"
+        icon.width: 32
+        icon.height: 32
+        display: AbstractButton.IconOnly
+        implicitWidth: 32
+        implicitHeight: 32
+        padding: 0
+
+        onClicked: root.placesClicked()
     }
 
     RowLayout {
