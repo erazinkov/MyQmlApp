@@ -35,11 +35,6 @@ Page {
 
             MarkerModel { id: markerModel}
 
-            Location {
-                id: startLocation
-                coordinate: QtPositioning.coordinate(0.0, 0.0)
-            }
-
             ListModel { id: mapTypesModel }
             ListModel {
                 id: placesModel
@@ -76,30 +71,6 @@ Page {
                     text: qsTr("Process")
                     onTriggered: mapGridOverlay.requestProcess()
                 }
-                MenuSeparator {}
-
-                Menu {
-                    title: qsTr("Location")
-                    MenuItem {
-                        text: qsTr("Dubna")
-                        onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
-                        }
-                    }
-                    MenuItem {
-                        text: qsTr("Stavropol_0")
-                        onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(44.9778133, 42.012765);
-                        }
-                    }
-                    MenuItem {
-                        text: qsTr("Stavropol_1")
-                        onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
-                        }
-                    }
-                }
-
             }
             PositionSource {
                 id: positionSource
@@ -117,16 +88,14 @@ Page {
                     }
                     var p = position.coordinate
                     if (pathControls.updatePathChecked) {
-                    var pts = pathMapPolyLine.path
+                        var pts = pathMapPolyLine.path
                         pts.push(QtPositioning.coordinate(p.latitude, p.longitude))
                         pathMapPolyLine.path = pts
                     }
 
-                    if (mapControls.nearMeChecked) {
+                    var c = mapView.map.center
+                    if (!c.isValid || mapControls.nearMeChecked) {
                         mapView.map.center = p
-                    }
-                    if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
-                        startLocation.coordinate = QtPositioning.coordinate(p.latitude, p.longitude)
                     }
                 }
             }
@@ -142,7 +111,7 @@ Page {
 //                        value: "https://api.thunderforest.com/cycle/%z/%x/%y.png?apikey=e2d4258d86d743bc861d2a12cc3b67db"
 //                    }
                 }
-                map.center: startLocation.coordinate
+//                map.center: QtPositioning.coordinate(0.0, 0.0)
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
             }
             MapPolyline {
@@ -211,7 +180,7 @@ Page {
                 id: mapGridOverlay
                 map: mapView.map
                 mapView: mapView
-                initialCoordinate: startLocation.coordinate
+                initialCoordinate: mapView.map.center
                 gridSize: 150
                 gridRows: 1
                 gridColumns: 1
