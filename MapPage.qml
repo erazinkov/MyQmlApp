@@ -109,19 +109,19 @@ Page {
                     MenuItem {
                         text: qsTr("Dubna")
                         onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
+                            startLocation.coordinate = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
                         }
                     }
                     MenuItem {
                         text: qsTr("Stavropol_0")
                         onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(44.9778133, 42.012765);
+                            startLocation.coordinate = QtPositioning.coordinate(44.9778133, 42.012765);
                         }
                     }
                     MenuItem {
                         text: qsTr("Stavropol_1")
                         onTriggered: {
-                            mapView.map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
+                            startLocation.coordinate = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
                         }
                     }
                 }
@@ -141,6 +141,7 @@ Page {
                     if (!positionSource.valid) {
                         return;
                     }
+                    console.log(mapControls.nearMeChecked)
                     if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
                         startLocation.coordinate = Object.assign({}, position.coordinate);
                     }
@@ -195,6 +196,21 @@ Page {
                 }
             }
 
+            MapItemView {
+                model: markerModel
+                parent: mapView.map
+                delegate: MapQuickItem {
+                    coordinate: model.coordinate
+                    sourceItem: Rectangle {
+                        width: 5
+                        height: 5
+                        color: "red"
+                        radius: 2.5
+                    }
+                    anchorPoint.x: sourceItem.width / 2
+                    anchorPoint.y: sourceItem.height / 2
+               }
+            }
 
 
             MapQuickItem {
