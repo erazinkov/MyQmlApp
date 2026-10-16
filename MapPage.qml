@@ -84,7 +84,7 @@ Page {
                     onTriggered: {
                         var polygonsList = [];
                         var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
-                        var point_bottomRight = Qt.point(mapGridOverlay.x + r.width, mapGridOverlay.y + r.height);
+                        var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
                         var hor = (point_bottomRight.x - point_topLeft.x) / toolGridLayout.columns;
                         var ver = (point_bottomRight.y - point_topLeft.y) / toolGridLayout.rows;
                         for (var row = 0; row < toolGridLayout.rows; ++row) {
@@ -141,7 +141,6 @@ Page {
                     if (!positionSource.valid) {
                         return;
                     }
-                    console.log(mapControls.nearMeChecked)
                     if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
                         startLocation.coordinate = Object.assign({}, position.coordinate);
                     }
@@ -223,7 +222,7 @@ Page {
 
                 function distance() {
                     var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
-                    var point_bottomRight = Qt.point(mapGridOverlay.x + r.width, mapGridOverlay.y + r.height);
+                    var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
                     var coord_topLeft = mapView.map.toCoordinate(point_topLeft);
                     var coord_bottomRight = mapView.map.toCoordinate(point_bottomRight);
                     if (coord_topLeft && coord_bottomRight) {
@@ -276,12 +275,10 @@ Page {
                 }
 
                 sourceItem: Rectangle {
-                    id: r
+                    id: toolRectangle
                     width: 150
                     height: width
                     color: Qt.rgba(255, 255, 255, 0.5)
-
-
 
                     GridLayout {
                         id: toolGridLayout
@@ -408,7 +405,7 @@ Page {
                             onPositionChanged: {
                                 if (pressed) {
                                     var s = Math.max(resizeMouseArea.mouseX - width / 2, resizeMouseArea.mouseY - height / 2)
-                                    r.width += s;
+                                    toolRectangle.width += s;
                                 }
                             }
                         }
