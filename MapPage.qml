@@ -17,7 +17,6 @@ Page {
                 mapGridOverlay.setCellResult(index, result, isProcess)
             }
 
-
             function onDelete() {
                 markerModel.deleteData();
             }
@@ -26,8 +25,6 @@ Page {
                 markerModel.addData(data);
                 pController.operateAddData(data);
             }
-
-            function f1() {}
 
             function onConnectDb(success, errorText) {
                 console.log(`Database connected: ${success}, Error: ${errorText}`);
@@ -43,9 +40,7 @@ Page {
                 coordinate: QtPositioning.coordinate(0.0, 0.0)
             }
 
-            ListModel {
-                id: mapTypesModel
-            }
+            ListModel { id: mapTypesModel }
 
             MouseArea {
                 id: mouseAreaWindow
@@ -112,19 +107,21 @@ Page {
 
                 onPositionChanged: {
                     if (!positionSource.valid) {
-                        return;
+                        return
+                    }
+                    var p = position.coordinate
+                    if (pathControls.updatePathChecked) {
+                    var pts = pathMapPolyLine.path
+                        pts.push(QtPositioning.coordinate(p.latitude, p.longitude))
+                        pathMapPolyLine.path = pts
+                    }
+
+                    if (mapControls.nearMeChecked) {
+                        mapView.map.center = p
                     }
                     if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
-                        startLocation.coordinate = Object.assign({}, position.coordinate);
+                        startLocation.coordinate = QtPositioning.coordinate(p.latitude, p.longitude)
                     }
-//                    if (lastPosition && Math.abs(lastPosition.coordinate.latitude - position.coordinate.latitude)  < 1e-8 &&
-//                        Math.abs(lastPosition.coordinate.longitude - position.coordinate.longitude) < 1e-8) {
-                    if (lastPositionCoordinate) {
-//                        console.log(lastPositionCoordinate.longitude, lastPositionCoordinate.latitude);
-//                        console.log(position.coordinate.longitude, position.coordinate.latitude);
-                    }
-                    lastPositionCoordinate = { latitude:  position.coordinate.latitude, longitude:  position.coordinate.longitude};
-//                    }
                 }
             }
 
@@ -142,11 +139,21 @@ Page {
                 map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
             }
+            MapPolyline {
+                id: pathMapPolyLine
+                parent: mapView.map
+                line.width: 3
+                line.color: "green"
+                path: []
+            }
+
             CurrentLocationMarker {
-                id: userMarker
+                id: currentLocationMarker
                 parent: mapView.map
                 positionSource: positionSource
             }
+
+
             MapControls {
                 id: mapControls
                 anchors.right: parent.right
@@ -157,16 +164,24 @@ Page {
 
                 onMapTypeClicked: {
                    dialog.open()
-//                    if (mapTypeDrawer.opened) {
-//                        mapTypeDrawer.close()
-//                    } else {
-//                        mapTypeDrawer.open()
-//                    }
                 }
                 onMyLocationClicked: {
                     startLocation.coordinate = Object.assign({}, positionSource.position.coordinate)
                 }
             }
+            PathControls {
+                id: pathControls
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: 5
+
+                onResetPathClicked: {
+                    pathMapPolyLine.path = []
+                }
+            }
+
+
 
             MapItemView {
                 model: markerModel

@@ -10,5 +10,7 @@
         <file>assets/icons/rotate_right.png</file>
         <file>assets/icons/overlay_decrease.png</file>
         <file>assets/icons/overlay_increase.png</file>
+        <file>assets/icons/conversion_path_off.png</file>
+        <file>assets/icons/conversion_path_on.png</file>
     </qresource>
 </RCC>

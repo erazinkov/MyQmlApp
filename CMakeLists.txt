@@ -31,6 +31,7 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES CurrentLocationMarker.qml
     QML_FILES MapControls.qml
     QML_FILES MapGridOverlay.qml
+    QML_FILES PathControls.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES
