@@ -81,26 +81,7 @@ Page {
                 }
                 MenuItem {
                     text: qsTr("Process")
-                    onTriggered: {
-                        var polygonsList = [];
-                        var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
-                        var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
-                        var hor = (point_bottomRight.x - point_topLeft.x) / toolGridLayout.columns;
-                        var ver = (point_bottomRight.y - point_topLeft.y) / toolGridLayout.rows;
-                        for (var row = 0; row < toolGridLayout.rows; ++row) {
-                            for (var column = 0; column < toolGridLayout.columns; ++column) {
-                            polygonsList.push([
-                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
-                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + row * ver)),
-                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + (row + 1) * ver)),
-                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + (row + 1) * ver)),
-                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
-                                              ]
-                                         );
-                            }
-                        }
-                        pController.operateProcessData(polygonsList, toolGridLayout.rows, toolGridLayout.columns);
-                    }
+                    onTriggered: mapGridOverlay.requestProcess()
                 }
                 MenuSeparator {}
 
@@ -210,209 +191,232 @@ Page {
                     anchorPoint.y: sourceItem.height / 2
                }
             }
-
-
-            MapQuickItem {
+            MapGridOverlay {
                 id: mapGridOverlay
-                // Initial map coordinates for the center of the rectangle
-                coordinate: startLocation.coordinate
-                anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-                visible: true
+                map: mapView.map
+                mapView: mapView
+                initialCoordinate: startLocation.coordinate
+                gridSize: 150
+                gridRows: 1
+                gridColumns: 1
                 parent: mapView.map
+                overlayEnabled: mapGridOverlaySwitch.checked
 
-                function distance() {
-                    var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
-                    var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
-                    var coord_topLeft = mapView.map.toCoordinate(point_topLeft);
-                    var coord_bottomRight = mapView.map.toCoordinate(point_bottomRight);
-                    if (coord_topLeft && coord_bottomRight) {
-                        var distance = coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0);
-                        return distance;
-                    }
-                    return -1;
+                onCoordinateChanged: function(newCoordinate) {
+                    console.log("Grid moved to:", coordinate.latitude,
+                                        coordinate.longitude)
                 }
-
-                MouseArea {
-                    id: mouseAreaDrag
-                    anchors.fill: parent
-                    preventStealing: true
-                    cursorShape: Qt.SizeAllCursor
-
-                    property point pressScreenPoint
-                    property var   pressCoordinate
-                    property bool  dragging: false
-
-                    onPressed: function(mouse) {
-                        // Absolute reference in mapView space — unaffected by mi moving
-                        pressScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-                        pressCoordinate  = mapGridOverlay.coordinate
-                        dragging = true
-                        mouse.accepted = true
-                    }
-
-                    onPositionChanged: function(mouse) {
-                        if (!dragging) return
-                        var curScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-                        var pressMapPt = mapToItem(mapView.map,
-                                                   pressScreenPoint.x, pressScreenPoint.y)
-                        var curMapPt   = mapToItem(mapView.map,
-                                                   curScreenPoint.x, curScreenPoint.y)
-
-                        var cPress = mapView.map.toCoordinate(pressMapPt, false)
-                        var cCur   = mapView.map.toCoordinate(curMapPt,   false)
-
-                        if (cPress && cCur) {
-                            var dLon = cCur.longitude - cPress.longitude
-                            var dLat = cCur.latitude  - cPress.latitude
-                            mapGridOverlay.coordinate = QtPositioning.coordinate(
-                                pressCoordinate.latitude  + dLat,
-                                pressCoordinate.longitude + dLon)
-                        }
-                    }
-
-                    onReleased: dragging = false
-                    onCanceled: dragging = false
+                onProcessRequested: function(polygons, rows, columns) {
+                    pController.operateProcessData(polygons, rows, columns)
                 }
+             }
 
-                sourceItem: Rectangle {
-                    id: toolRectangle
-                    width: 150
-                    height: width
-                    color: Qt.rgba(255, 255, 255, 0.5)
+             Switch {
+                 id: mapGridOverlaySwitch
+                 checked: false
+             }
 
-                    GridLayout {
-                        id: toolGridLayout
-                        anchors.fill: parent
-                        rows: 1
-                        columns: 1
-                        rowSpacing: 0
-                        columnSpacing: 0
-                        Repeater {
-                            model: toolGridLayout.rows * toolGridLayout.columns
-                            delegate: Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                color: Qt.rgba(255, 255, 255, 0.0)
-                                border.color: "black"
-                                border.width: 1
-                                property int index: model.index
-                                StackLayout {
-                                    id: toolGridLayoutStackedLayout
-                                    anchors.fill: parent
-                                    currentIndex: 0
-                                    Rectangle {
-                                        Layout.alignment: Qt.AlignCenter
-                                        color: Qt.rgba(255, 255, 255, 0.0)
-                                        Label {
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            padding: 5
-                                            text: ""
-                                            color: "white"
-                                            background: Rectangle {
-                                                color: "black"
-                                                radius: 5
-                                                visible: parent.text.length
-                                            }
-                                        }
-                                    }
-                                    BusyIndicator {
-                                        Layout.alignment: Qt.AlignHCenter
-                                        running: true
-                                    }
-                                }
+//            MapQuickItem {
+//                id: mapGridOverlay
+//                // Initial map coordinates for the center of the rectangle
+//                coordinate: startLocation.coordinate
+//                anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
+//                visible: true
+//                parent: mapView.map
 
-                            }
-                        }
-                    }
+//                function distance() {
+//                    var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
+//                    var point_bottomRight = Qt.point(mapGridOverlay.x + toolRectangle.width, mapGridOverlay.y + toolRectangle.height);
+//                    var coord_topLeft = mapView.map.toCoordinate(point_topLeft);
+//                    var coord_bottomRight = mapView.map.toCoordinate(point_bottomRight);
+//                    if (coord_topLeft && coord_bottomRight) {
+//                        var distance = coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0);
+//                        return distance;
+//                    }
+//                    return -1;
+//                }
 
-                    ColumnLayout{
-                        anchors.left: parent.right
-                        anchors.top: parent.top
-                        anchors.leftMargin: 5
-                        spacing: 5
-                        RowLayout{
-                            Button {
-                                id: plusButton
-                                implicitWidth: labelNumber.height
-                                implicitHeight: labelNumber.height
-                                text: "+"
-                                onClicked: {
-                                     toolGridLayout.rows = toolGridLayout.rows + 1;
-                                     toolGridLayout.columns = toolGridLayout.rows;
-                                }
-                            }
-                            Button {
-                                id: minusButton
-                                implicitWidth: labelNumber.height
-                                implicitHeight: labelNumber.height
-                                text: "-"
-                                onClicked: {
-                                    if (toolGridLayout.rows > 1) {
-                                        toolGridLayout.rows = toolGridLayout.rows - 1;
-                                        toolGridLayout.columns = toolGridLayout.rows;
-                                    }
-                                }
-                            }
-                        }
+//                MouseArea {
+//                    id: mouseAreaDrag
+//                    anchors.fill: parent
+//                    preventStealing: true
+//                    cursorShape: Qt.SizeAllCursor
 
-                        RowLayout{
-                        Label {
-                            id: labelNumber
-                            padding: 5
-                            text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
-                            color: "white"
-                            background: Rectangle {
-                                color: "black"
-                                radius: 5
-                            }
-                        }
-                        Label {
-                            padding: 5
-                            text: mapGridOverlay.distance().toFixed(1)
-                            color: "white"
-                            background: Rectangle {
-                                color: "black"
-                                radius: 5
-                            }
-                        }
-                        Label {
-                            padding: 5
-                            text: (mapGridOverlay.distance() / toolGridLayout.rows).toFixed(1)
-                            color: "white"
-                            background: Rectangle {
-                                color: "black"
-                                radius: 5
-                            }
-                        }
-                        }
-                    }
+//                    property point pressScreenPoint
+//                    property var   pressCoordinate
+//                    property bool  dragging: false
+
+//                    onPressed: function(mouse) {
+//                        // Absolute reference in mapView space — unaffected by mi moving
+//                        pressScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
+//                        pressCoordinate  = mapGridOverlay.coordinate
+//                        dragging = true
+//                        mouse.accepted = true
+//                    }
+
+//                    onPositionChanged: function(mouse) {
+//                        if (!dragging) return
+//                        var curScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
+//                        var pressMapPt = mapToItem(mapView.map,
+//                                                   pressScreenPoint.x, pressScreenPoint.y)
+//                        var curMapPt   = mapToItem(mapView.map,
+//                                                   curScreenPoint.x, curScreenPoint.y)
+
+//                        var cPress = mapView.map.toCoordinate(pressMapPt, false)
+//                        var cCur   = mapView.map.toCoordinate(curMapPt,   false)
+
+//                        if (cPress && cCur) {
+//                            var dLon = cCur.longitude - cPress.longitude
+//                            var dLat = cCur.latitude  - cPress.latitude
+//                            mapGridOverlay.coordinate = QtPositioning.coordinate(
+//                                pressCoordinate.latitude  + dLat,
+//                                pressCoordinate.longitude + dLon)
+//                        }
+//                    }
+
+//                    onReleased: dragging = false
+//                    onCanceled: dragging = false
+//                }
+
+//                sourceItem: Rectangle {
+//                    id: toolRectangle
+//                    width: 150
+//                    height: width
+//                    color: Qt.rgba(255, 255, 255, 0.5)
+
+//                    GridLayout {
+//                        id: toolGridLayout
+//                        anchors.fill: parent
+//                        rows: 1
+//                        columns: 1
+//                        rowSpacing: 0
+//                        columnSpacing: 0
+//                        Repeater {
+//                            model: toolGridLayout.rows * toolGridLayout.columns
+//                            delegate: Rectangle {
+//                                Layout.fillWidth: true
+//                                Layout.fillHeight: true
+//                                color: Qt.rgba(255, 255, 255, 0.0)
+//                                border.color: "black"
+//                                border.width: 1
+//                                property int index: model.index
+//                                StackLayout {
+//                                    id: toolGridLayoutStackedLayout
+//                                    anchors.fill: parent
+//                                    currentIndex: 0
+//                                    Rectangle {
+//                                        Layout.alignment: Qt.AlignCenter
+//                                        color: Qt.rgba(255, 255, 255, 0.0)
+//                                        Label {
+//                                            anchors.horizontalCenter: parent.horizontalCenter
+//                                            anchors.verticalCenter: parent.verticalCenter
+//                                            padding: 5
+//                                            text: ""
+//                                            color: "white"
+//                                            background: Rectangle {
+//                                                color: "black"
+//                                                radius: 5
+//                                                visible: parent.text.length
+//                                            }
+//                                        }
+//                                    }
+//                                    BusyIndicator {
+//                                        Layout.alignment: Qt.AlignHCenter
+//                                        running: true
+//                                    }
+//                                }
+
+//                            }
+//                        }
+//                    }
+
+//                    ColumnLayout{
+//                        anchors.left: parent.right
+//                        anchors.top: parent.top
+//                        anchors.leftMargin: 5
+//                        spacing: 5
+//                        RowLayout{
+//                            Button {
+//                                id: plusButton
+//                                implicitWidth: labelNumber.height
+//                                implicitHeight: labelNumber.height
+//                                text: "+"
+//                                onClicked: {
+//                                     toolGridLayout.rows = toolGridLayout.rows + 1;
+//                                     toolGridLayout.columns = toolGridLayout.rows;
+//                                }
+//                            }
+//                            Button {
+//                                id: minusButton
+//                                implicitWidth: labelNumber.height
+//                                implicitHeight: labelNumber.height
+//                                text: "-"
+//                                onClicked: {
+//                                    if (toolGridLayout.rows > 1) {
+//                                        toolGridLayout.rows = toolGridLayout.rows - 1;
+//                                        toolGridLayout.columns = toolGridLayout.rows;
+//                                    }
+//                                }
+//                            }
+//                        }
+
+//                        RowLayout{
+//                        Label {
+//                            id: labelNumber
+//                            padding: 5
+//                            text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
+//                            color: "white"
+//                            background: Rectangle {
+//                                color: "black"
+//                                radius: 5
+//                            }
+//                        }
+//                        Label {
+//                            padding: 5
+//                            text: mapGridOverlay.distance().toFixed(1)
+//                            color: "white"
+//                            background: Rectangle {
+//                                color: "black"
+//                                radius: 5
+//                            }
+//                        }
+//                        Label {
+//                            padding: 5
+//                            text: (mapGridOverlay.distance() / toolGridLayout.rows).toFixed(1)
+//                            color: "white"
+//                            background: Rectangle {
+//                                color: "black"
+//                                radius: 5
+//                            }
+//                        }
+//                        }
+//                    }
 
 
-                    Rectangle {
-                        width: labelNumber.height * 0.5
-                        height: width
-                        radius: 2.5
-                        color: "black"
-                        anchors.left: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin: 2.5
-                        MouseArea {
-                            id: resizeMouseArea
-                            preventStealing: true
-                            anchors.fill: parent
-                            cursorShape: Qt.SizeFDiagCursor
-                            onPositionChanged: {
-                                if (pressed) {
-                                    var s = Math.max(resizeMouseArea.mouseX - width / 2, resizeMouseArea.mouseY - height / 2)
-                                    toolRectangle.width += s;
-                                }
-                            }
-                        }
-                    }
+//                    Rectangle {
+//                        width: labelNumber.height * 0.5
+//                        height: width
+//                        radius: 2.5
+//                        color: "black"
+//                        anchors.left: parent.right
+//                        anchors.bottom: parent.bottom
+//                        anchors.leftMargin: 2.5
+//                        MouseArea {
+//                            id: resizeMouseArea
+//                            preventStealing: true
+//                            anchors.fill: parent
+//                            cursorShape: Qt.SizeFDiagCursor
+//                            onPositionChanged: {
+//                                if (pressed) {
+//                                    var s = Math.max(resizeMouseArea.mouseX - width / 2, resizeMouseArea.mouseY - height / 2)
+//                                    toolRectangle.width += s;
+//                                }
+//                            }
+//                        }
+//                    }
 
-                }
-            }
+//                }
+//            }
 
 
 /*

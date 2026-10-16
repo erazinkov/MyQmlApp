@@ -2,57 +2,202 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtLocation
+import QtPositioning
 
 MapQuickItem {
     id: root
 
-    property Map map
-    property var startLocation
-    property bool checked: true
+    // Public API ---------------------------------------------------------
+    // Map reference (required for coordinate conversions).
+    // Set this from outside, e.g. `map: mapView.map`
+    property var map: null
 
-    property Item dragArea: parent
-    readonly property real cellDistance: distance() >= 0 && toolGridLayout.rows > 0
-                                         ? distance() / toolGridLayout.rows
-                                         : -1
+    // Map view reference (used for screen-space conversions during drag).
+    // Set this from outside, e.g. `mapView: mapView`
+    property var mapView: null
 
-    coordinate: startLocation.coordinate
+    // Initial coordinate for the overlay center.
+    property var initialCoordinate: null
+
+    // Grid / rectangle size in pixels.
+    property real gridSize: 150
+
+    // Current grid dimensions.
+    property int gridRows: 1
+    property int gridColumns: 1
+
+    // Read-only computed distance across the rectangle diagonal (meters).
+    readonly property real diagonalDistance: distance()
+
+    property bool overlayEnabled: true
+    onOverlayEnabledChanged: {
+        if (overlayEnabled) {
+            recenter()
+        }
+    }
+
+    // Signals ------------------------------------------------------------
+    signal processRequested(var polygonsList, int rows, int columns)
+
+    // Internal state -----------------------------------------------------
     anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-    visible: root.checked
+    visible: overlayEnabled
 
+    coordinate: initialCoordinate !== null
+               ? initialCoordinate
+               : (map ? map.center : QtPositioning.coordinate(0, 0))
+
+
+
+    // Distance calculation -------------------------------------------------
+    function distance() {
+        if (!map) return -1
+
+        var point_topLeft     = Qt.point(root.x, root.y)
+        var point_bottomRight = Qt.point(root.x + sourceItem.width,
+                                         root.y + sourceItem.height)
+
+        var coord_topLeft     = map.toCoordinate(point_topLeft)
+        var coord_bottomRight = map.toCoordinate(point_bottomRight)
+
+        if (coord_topLeft && coord_bottomRight) {
+            return coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0)
+        }
+        return -1
+    }
+
+    function recenter() {
+        if (map && map.center) {
+            coordinate = map.center
+        }
+    }
+
+    function requestProcess() {
+        processRequested(polygonList(), gridRows, gridColumns)
+    }
+
+    function polygonList() {
+        if (!map) {
+            return []
+        }
+
+        var polygonsList = []
+        var point_topLeft     = Qt.point(root.x, root.y)
+        var point_bottomRight = Qt.point(root.x + sourceItem.width,
+                                         root.y + sourceItem.height)
+
+        var hor = (point_bottomRight.x - point_topLeft.x) / root.gridColumns
+        var ver = (point_bottomRight.y - point_topLeft.y) / root.gridRows
+
+        for (var row = 0; row < root.gridRows; ++row) {
+            for (var column = 0; column < root.gridColumns; ++column) {
+                var tl = map.toCoordinate(Qt.point(
+                    point_topLeft.x +  column      * hor,
+                    point_topLeft.y +  row         * ver))
+                var tr = map.toCoordinate(Qt.point(
+                    point_topLeft.x + (column + 1) * hor,
+                    point_topLeft.y +  row         * ver))
+                var br = map.toCoordinate(Qt.point(
+                    point_topLeft.x + (column + 1) * hor,
+                    point_topLeft.y + (row + 1)    * ver))
+                var bl = map.toCoordinate(Qt.point(
+                    point_topLeft.x +  column      * hor,
+                    point_topLeft.y + (row + 1)    * ver))
+
+                polygonsList.push([tl, tr, br, bl, tl])
+            }
+        }
+        return polygonsList
+    }
+
+    // Drag handling --------------------------------------------------------
+    MouseArea {
+        id: mouseAreaDrag
+        anchors.fill: parent
+        preventStealing: true
+        cursorShape: Qt.SizeAllCursor
+
+        enabled: root.overlayEnabled
+
+        property point pressScreenPoint
+        property var   pressCoordinate
+        property bool  dragging: false
+
+        onPressed: function(mouse) {
+            if (!root.mapView || !root.map) return
+
+            pressScreenPoint = mapToItem(root.mapView, mouse.x, mouse.y)
+            pressCoordinate  = root.coordinate
+            dragging = true
+            mouse.accepted = true
+        }
+
+        onPositionChanged: function(mouse) {
+            if (!dragging || !root.mapView || !root.map) return
+
+            var curScreenPoint = mapToItem(root.mapView, mouse.x, mouse.y)
+            var pressMapPt     = mapToItem(root.map, pressScreenPoint.x, pressScreenPoint.y)
+            var curMapPt       = mapToItem(root.map, curScreenPoint.x,   curScreenPoint.y)
+
+            var cPress = root.map.toCoordinate(pressMapPt, false)
+            var cCur   = root.map.toCoordinate(curMapPt,   false)
+
+            if (cPress && cCur) {
+                var dLon = cCur.longitude - cPress.longitude
+                var dLat = cCur.latitude  - cPress.latitude
+
+                root.coordinate = QtPositioning.coordinate(
+                    pressCoordinate.latitude  + dLat,
+                    pressCoordinate.longitude + dLon)
+            }
+        }
+
+        onReleased: dragging = false
+        onCanceled: dragging = false
+    }
+
+    // Visual source --------------------------------------------------------
     sourceItem: Rectangle {
         id: toolRectangle
-        width: 150
+        width: root.gridSize
         height: width
         color: Qt.rgba(255, 255, 255, 0.5)
 
         GridLayout {
             id: toolGridLayout
             anchors.fill: parent
-            rows: 1
-            columns: 1
+            rows: root.gridRows
+            columns: root.gridColumns
             rowSpacing: 0
             columnSpacing: 0
 
             Repeater {
                 model: toolGridLayout.rows * toolGridLayout.columns
+
                 delegate: Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     color: Qt.rgba(255, 255, 255, 0.0)
                     border.color: "black"
                     border.width: 1
+                    property int index: model.index
 
                     StackLayout {
+                        id: toolGridLayoutStackedLayout
                         anchors.fill: parent
                         currentIndex: 0
 
                         Rectangle {
+                            Layout.alignment: Qt.AlignCenter
                             color: Qt.rgba(255, 255, 255, 0.0)
+
                             Label {
-                                anchors.centerIn: parent
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.verticalCenter: parent.verticalCenter
                                 padding: 5
                                 text: ""
                                 color: "white"
+
                                 background: Rectangle {
                                     color: "black"
                                     radius: 5
@@ -62,14 +207,16 @@ MapQuickItem {
                         }
 
                         BusyIndicator {
-//                            anchors.centerIn: parent
-                            running: true
+                            id: busyIndicator
+                            Layout.alignment: Qt.AlignHCenter
+                            running: root.overlayEnabled
                         }
                     }
                 }
             }
         }
 
+        // Controls column (outside the rectangle, to the right) ------------
         ColumnLayout {
             anchors.left: parent.right
             anchors.top: parent.top
@@ -78,22 +225,25 @@ MapQuickItem {
 
             RowLayout {
                 Button {
+                    id: plusButton
                     implicitWidth: labelNumber.height
                     implicitHeight: labelNumber.height
                     text: "+"
                     onClicked: {
-                        toolGridLayout.rows    += 1
-                        toolGridLayout.columns  = toolGridLayout.rows
+                        root.gridRows = root.gridRows + 1
+                        root.gridColumns = root.gridRows
                     }
                 }
+
                 Button {
+                    id: minusButton
                     implicitWidth: labelNumber.height
                     implicitHeight: labelNumber.height
                     text: "-"
                     onClicked: {
-                        if (toolGridLayout.rows > 1) {
-                            toolGridLayout.rows    -= 1
-                            toolGridLayout.columns  = toolGridLayout.rows
+                        if (root.gridRows > 1) {
+                            root.gridRows = root.gridRows - 1
+                            root.gridColumns = root.gridRows
                         }
                     }
                 }
@@ -103,33 +253,37 @@ MapQuickItem {
                 Label {
                     id: labelNumber
                     padding: 5
-                    text: `${toolGridLayout.rows}x${toolGridLayout.columns}`
+                    text: `${root.gridRows}x${root.gridColumns}`
                     color: "white"
-                    background: Rectangle { color: "black"; radius: 5 }
+                    background: Rectangle {
+                        color: "black"
+                        radius: 5
+                    }
                 }
+
                 Label {
                     padding: 5
-                    text: root.distance() >= 0 ? root.distance().toFixed(1) : "—"
+                    text: root.distance().toFixed(1)
                     color: "white"
-                    background: Rectangle { color: "black"; radius: 5 }
+                    background: Rectangle {
+                        color: "black"
+                        radius: 5
+                    }
                 }
+
                 Label {
                     padding: 5
-                    text: root.cellDistance >= 0 ? root.cellDistance.toFixed(1) : "—"
+                    text: (root.distance() / root.gridRows).toFixed(1)
                     color: "white"
-                    background: Rectangle { color: "black"; radius: 5 }
+                    background: Rectangle {
+                        color: "black"
+                        radius: 5
+                    }
                 }
             }
         }
 
-        DragHandler {
-            target: root
-            xAxis.minimum: toolRectangle.border.width
-            xAxis.maximum: root.dragArea ? root.dragArea.width  - toolRectangle.width  - toolRectangle.border.width : Infinity
-            yAxis.minimum: toolRectangle.border.width
-            yAxis.maximum: root.dragArea ? root.dragArea.height - toolRectangle.height - toolRectangle.border.width : Infinity
-        }
-
+        // Resize handle (bottom-right corner) ------------------------------
         Rectangle {
             width: labelNumber.height * 0.5
             height: width
@@ -140,31 +294,19 @@ MapQuickItem {
             anchors.leftMargin: 2.5
 
             MouseArea {
-                id: mouseAreaResize
+                id: resizeMouseArea
+                preventStealing: true
                 anchors.fill: parent
                 cursorShape: Qt.SizeFDiagCursor
-                onPressedChanged: dragHandler.enabled = !pressed
 
                 onPositionChanged: {
                     if (pressed) {
-                        var s = Math.max(mouseAreaResize.mouseX - width / 2,
-                                         mouseAreaResize.mouseY - height / 2)
-                        toolRectangle.width += s
+                        var s = Math.max(resizeMouseArea.mouseX - width / 2,
+                                         resizeMouseArea.mouseY - height / 2)
+                        root.gridSize += s
                     }
                 }
             }
         }
-    }
-
-    function distance() {
-        if (!map || !startLocation) return -1
-        var point_topLeft     = Qt.point(root.x, root.y)
-        var point_bottomRight = Qt.point(root.x + toolRectangle.width, root.y + toolRectangle.height)
-        var coord_topLeft     = map.toCoordinate(point_topLeft)
-        var coord_bottomRight = map.toCoordinate(point_bottomRight)
-        if (coord_topLeft && coord_bottomRight) {
-            return coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0)
-        }
-        return -1
     }
 }
