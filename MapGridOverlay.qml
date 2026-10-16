@@ -225,21 +225,16 @@ MapQuickItem {
 
             RowLayout {
                 Button {
-                    id: plusButton
-                    implicitWidth: labelNumber.height
-                    implicitHeight: labelNumber.height
-                    text: "+"
-                    onClicked: {
-                        root.gridRows = root.gridRows + 1
-                        root.gridColumns = root.gridRows
-                    }
-                }
+                    id: decreaseButton
+                    icon.source: "qrc:/assets/icons/overlay_decrease.png"
+                    icon.color: "black"
+                    icon.width: 32
+                    icon.height: 32
+                    display: AbstractButton.IconOnly
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    padding: 0
 
-                Button {
-                    id: minusButton
-                    implicitWidth: labelNumber.height
-                    implicitHeight: labelNumber.height
-                    text: "-"
                     onClicked: {
                         if (root.gridRows > 1) {
                             root.gridRows = root.gridRows - 1
@@ -247,6 +242,45 @@ MapQuickItem {
                         }
                     }
                 }
+                Button {
+                    id: increaseButton
+                    icon.source: "qrc:/assets/icons/overlay_increase.png"
+                    icon.color: "black"
+                    icon.width: 32
+                    icon.height: 32
+                    display: AbstractButton.IconOnly
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    padding: 0
+
+                    onClicked: {
+                        root.gridRows = root.gridRows + 1
+                        root.gridColumns = root.gridRows
+                    }
+                }
+//                Button {
+//                    id: plusButton
+//                    implicitWidth: labelNumber.height
+//                    implicitHeight: labelNumber.height
+//                    text: "+"
+//                    onClicked: {
+//                        root.gridRows = root.gridRows + 1
+//                        root.gridColumns = root.gridRows
+//                    }
+//                }
+
+//                Button {
+//                    id: minusButton
+//                    implicitWidth: labelNumber.height
+//                    implicitHeight: labelNumber.height
+//                    text: "-"
+//                    onClicked: {
+//                        if (root.gridRows > 1) {
+//                            root.gridRows = root.gridRows - 1
+//                            root.gridColumns = root.gridRows
+//                        }
+//                    }
+//                }
             }
 
             RowLayout {

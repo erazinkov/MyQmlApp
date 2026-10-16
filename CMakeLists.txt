@@ -28,7 +28,6 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES AppWindow.qml
     QML_FILES MapPage.qml
     QML_FILES DensityPage.qml
-    QML_FILES NavigationButton.qml
     QML_FILES CurrentLocationMarker.qml
     QML_FILES MapControls.qml
     QML_FILES MapGridOverlay.qml
