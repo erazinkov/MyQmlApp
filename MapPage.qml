@@ -83,18 +83,18 @@ Page {
                     text: qsTr("Process")
                     onTriggered: {
                         var polygonsList = [];
-                        var point_topLeft = Qt.point(mi.x, mi.y);
-                        var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+                        var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
+                        var point_bottomRight = Qt.point(mapGridOverlay.x + r.width, mapGridOverlay.y + r.height);
                         var hor = (point_bottomRight.x - point_topLeft.x) / toolGridLayout.columns;
                         var ver = (point_bottomRight.y - point_topLeft.y) / toolGridLayout.rows;
                         for (var row = 0; row < toolGridLayout.rows; ++row) {
                             for (var column = 0; column < toolGridLayout.columns; ++column) {
                             polygonsList.push([
-                                                  map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
-                                                  map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + row * ver)),
-                                                  map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + (row + 1) * ver)),
-                                                  map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + (row + 1) * ver)),
-                                                  map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
+                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
+                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + row * ver)),
+                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + (column + 1) * hor, point_topLeft.y + (row + 1) * ver)),
+                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + (row + 1) * ver)),
+                                                  mapView.map.toCoordinate(Qt.point(point_topLeft.x + column * hor, point_topLeft.y + row * ver)),
                                               ]
                                          );
                             }
@@ -104,27 +104,27 @@ Page {
                 }
                 MenuSeparator {}
 
-//                Menu {
-//                    title: qsTr("Location")
-//                    MenuItem {
-//                        text: qsTr("Dubna")
-//                        onTriggered: {
-//                            map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
-//                        }
-//                    }
-//                    MenuItem {
-//                        text: qsTr("Stavropol_0")
-//                        onTriggered: {
-//                            map.center = QtPositioning.coordinate(44.9778133, 42.012765);
-//                        }
-//                    }
-//                    MenuItem {
-//                        text: qsTr("Stavropol_1")
-//                        onTriggered: {
-//                            map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
-//                        }
-//                    }
-//                }
+                Menu {
+                    title: qsTr("Location")
+                    MenuItem {
+                        text: qsTr("Dubna")
+                        onTriggered: {
+                            mapView.map.center = QtPositioning.coordinate(56.76176699999999, 37.22133433333334);
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Stavropol_0")
+                        onTriggered: {
+                            mapView.map.center = QtPositioning.coordinate(44.9778133, 42.012765);
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Stavropol_1")
+                        onTriggered: {
+                            mapView.map.center = QtPositioning.coordinate(45.37975713745419, 42.4504277671827);
+                        }
+                    }
+                }
 
             }
             PositionSource {
@@ -141,7 +141,6 @@ Page {
                     if (!positionSource.valid) {
                         return;
                     }
-                    console.log(mapControls.nearMeChecked);
                     if (startLocation.coordinate === QtPositioning.coordinate(0.0, 0.0) || mapControls.nearMeChecked) {
                         startLocation.coordinate = Object.assign({}, position.coordinate);
                     }
@@ -199,7 +198,7 @@ Page {
 
 
             MapQuickItem {
-                id: mi
+                id: mapGridOverlay
                 // Initial map coordinates for the center of the rectangle
                 coordinate: startLocation.coordinate
                 anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
@@ -207,8 +206,8 @@ Page {
                 parent: mapView.map
 
                 function distance() {
-                    var point_topLeft = Qt.point(mi.x, mi.y);
-                    var point_bottomRight = Qt.point(mi.x + r.width, mi.y + r.height);
+                    var point_topLeft = Qt.point(mapGridOverlay.x, mapGridOverlay.y);
+                    var point_bottomRight = Qt.point(mapGridOverlay.x + r.width, mapGridOverlay.y + r.height);
                     var coord_topLeft = mapView.map.toCoordinate(point_topLeft);
                     var coord_bottomRight = mapView.map.toCoordinate(point_bottomRight);
                     if (coord_topLeft && coord_bottomRight) {
@@ -231,18 +230,14 @@ Page {
                     onPressed: function(mouse) {
                         // Absolute reference in mapView space — unaffected by mi moving
                         pressScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-                        pressCoordinate  = mi.coordinate
+                        pressCoordinate  = mapGridOverlay.coordinate
                         dragging = true
                         mouse.accepted = true
                     }
 
                     onPositionChanged: function(mouse) {
                         if (!dragging) return
-
-                        // Current mouse in the same fixed space
                         var curScreenPoint = mapToItem(mapView, mouse.x, mouse.y)
-
-                        // Convert both reference points to map coordinates
                         var pressMapPt = mapToItem(mapView.map,
                                                    pressScreenPoint.x, pressScreenPoint.y)
                         var curMapPt   = mapToItem(mapView.map,
@@ -254,10 +249,7 @@ Page {
                         if (cPress && cCur) {
                             var dLon = cCur.longitude - cPress.longitude
                             var dLat = cCur.latitude  - cPress.latitude
-
-                            // Always offset from the ORIGINAL press coordinate,
-                            // not from the current mi.coordinate
-                            mi.coordinate = QtPositioning.coordinate(
+                            mapGridOverlay.coordinate = QtPositioning.coordinate(
                                 pressCoordinate.latitude  + dLat,
                                 pressCoordinate.longitude + dLon)
                         }
@@ -267,7 +259,6 @@ Page {
                     onCanceled: dragging = false
                 }
 
-                // The actual QtQuick item to be displayed
                 sourceItem: Rectangle {
                     id: r
                     width: 150
@@ -365,7 +356,7 @@ Page {
                         }
                         Label {
                             padding: 5
-                            text: mi.distance().toFixed(1)
+                            text: mapGridOverlay.distance().toFixed(1)
                             color: "white"
                             background: Rectangle {
                                 color: "black"
@@ -374,7 +365,7 @@ Page {
                         }
                         Label {
                             padding: 5
-                            text: (mi.distance() / toolGridLayout.rows).toFixed(1)
+                            text: (mapGridOverlay.distance() / toolGridLayout.rows).toFixed(1)
                             color: "white"
                             background: Rectangle {
                                 color: "black"
@@ -515,11 +506,6 @@ Page {
                }
             */
                Component.onCompleted: {
-
-                   console.log(Qt.resolvedUrl("qrc:/"))
-
-//                   console.log("Resource exists:", Qt.resolvedUrl("qrc:/MyQmlApp/assets/icons/near_me.png"))
-
                    dbController.operateConnectDb("Connection 0",
                                                  "QMYSQL",
                                                  "localhost",
