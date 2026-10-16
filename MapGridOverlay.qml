@@ -7,26 +7,15 @@ import QtPositioning
 MapQuickItem {
     id: root
 
-    // Public API ---------------------------------------------------------
-    // Map reference (required for coordinate conversions).
-    // Set this from outside, e.g. `map: mapView.map`
     property var map: null
-
-    // Map view reference (used for screen-space conversions during drag).
-    // Set this from outside, e.g. `mapView: mapView`
     property var mapView: null
-
-    // Initial coordinate for the overlay center.
     property var initialCoordinate: null
 
-    // Grid / rectangle size in pixels.
     property real gridSize: 150
 
-    // Current grid dimensions.
     property int gridRows: 1
     property int gridColumns: 1
 
-    // Read-only computed distance across the rectangle diagonal (meters).
     readonly property real diagonalDistance: distance()
 
     property bool overlayEnabled: true
@@ -36,10 +25,8 @@ MapQuickItem {
         }
     }
 
-    // Signals ------------------------------------------------------------
     signal processRequested(var polygonsList, int rows, int columns)
 
-    // Internal state -----------------------------------------------------
     anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
     visible: overlayEnabled
 
@@ -49,7 +36,6 @@ MapQuickItem {
 
 
 
-    // Distance calculation -------------------------------------------------
     function distance() {
         if (!map) return -1
 
@@ -110,7 +96,13 @@ MapQuickItem {
         return polygonsList
     }
 
-    // Drag handling --------------------------------------------------------
+    function setCellResult(index, result, isProcess) {
+        var cell = gridRepeater.itemAt(index)
+        if (!cell) return
+        cell.cellLabel.text = result
+        cell.cellStack.currentIndex = isProcess ? 1 : 0
+    }
+
     MouseArea {
         id: mouseAreaDrag
         anchors.fill: parent
@@ -156,7 +148,6 @@ MapQuickItem {
         onCanceled: dragging = false
     }
 
-    // Visual source --------------------------------------------------------
     sourceItem: Rectangle {
         id: toolRectangle
         width: root.gridSize
@@ -172,18 +163,24 @@ MapQuickItem {
             columnSpacing: 0
 
             Repeater {
+                id: gridRepeater
                 model: toolGridLayout.rows * toolGridLayout.columns
 
                 delegate: Rectangle {
+                    id: cellDelegate
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     color: Qt.rgba(255, 255, 255, 0.0)
                     border.color: "black"
                     border.width: 1
-                    property int index: model.index
+
+                    property int  cellIndex: index
+                    property alias cellLabel: cellLabel
+                    property alias cellStack: cellStack
 
                     StackLayout {
-                        id: toolGridLayoutStackedLayout
+                        id: cellStack
                         anchors.fill: parent
                         currentIndex: 0
 
@@ -192,12 +189,12 @@ MapQuickItem {
                             color: Qt.rgba(255, 255, 255, 0.0)
 
                             Label {
+                                id: cellLabel
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.verticalCenter: parent.verticalCenter
                                 padding: 5
                                 text: ""
                                 color: "white"
-
                                 background: Rectangle {
                                     color: "black"
                                     radius: 5
@@ -207,7 +204,6 @@ MapQuickItem {
                         }
 
                         BusyIndicator {
-                            id: busyIndicator
                             Layout.alignment: Qt.AlignHCenter
                             running: root.overlayEnabled
                         }
@@ -216,7 +212,6 @@ MapQuickItem {
             }
         }
 
-        // Controls column (outside the rectangle, to the right) ------------
         ColumnLayout {
             anchors.left: parent.right
             anchors.top: parent.top
@@ -258,29 +253,6 @@ MapQuickItem {
                         root.gridColumns = root.gridRows
                     }
                 }
-//                Button {
-//                    id: plusButton
-//                    implicitWidth: labelNumber.height
-//                    implicitHeight: labelNumber.height
-//                    text: "+"
-//                    onClicked: {
-//                        root.gridRows = root.gridRows + 1
-//                        root.gridColumns = root.gridRows
-//                    }
-//                }
-
-//                Button {
-//                    id: minusButton
-//                    implicitWidth: labelNumber.height
-//                    implicitHeight: labelNumber.height
-//                    text: "-"
-//                    onClicked: {
-//                        if (root.gridRows > 1) {
-//                            root.gridRows = root.gridRows - 1
-//                            root.gridColumns = root.gridRows
-//                        }
-//                    }
-//                }
             }
 
             RowLayout {
@@ -317,7 +289,6 @@ MapQuickItem {
             }
         }
 
-        // Resize handle (bottom-right corner) ------------------------------
         Rectangle {
             width: labelNumber.height * 0.5
             height: width

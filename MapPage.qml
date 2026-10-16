@@ -14,15 +14,9 @@ import markerModel
 Page {
             id: page
             function onProcessData(index, result, isProcess, rows, columns) {
-                var a = toolGridLayout.children[index]?.children[0];
-                var b = toolGridLayout.children[index]?.children[0]?.children[0]?.children[0];
-                if (b) {
-                    b.text = result;
-                }
-                if (a) {
-                    a.currentIndex = isProcess ? 1 : 0;
-                }
+                mapGridOverlay.setCellResult(index, result, isProcess)
             }
+
 
             function onDelete() {
                 markerModel.deleteData();
