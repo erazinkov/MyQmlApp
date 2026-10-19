@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.15
 ColumnLayout {
     id: root
 
+    property alias placesButton: placesButton
     property var map: null
 
     signal mapTypeClicked()
@@ -46,7 +47,7 @@ ColumnLayout {
 
     RowLayout {
         Layout.alignment: Qt.AlignRight
-        spacing: 4
+        spacing: 5
 
         Button {
             id: rightRotationButton

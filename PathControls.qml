@@ -13,8 +13,21 @@ ColumnLayout {
 
     RowLayout {
         Layout.alignment: Qt.AlignRight
-        spacing: 4
+        spacing: 5
 
+        Button {
+            id: resetPathButton
+            icon.source: "qrc:/assets/icons/refresh.png"
+            icon.color: "black"
+            icon.width: 32
+            icon.height: 32
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+
+            onClicked: root.resetPathClicked()
+        }
         Button {
             id: updatePathButton
             Layout.alignment: Qt.AlignRight
@@ -29,24 +42,6 @@ ColumnLayout {
             implicitWidth: 32
             implicitHeight: 32
             padding: 0
-        }
-
-        Button {
-            id: resetPathButton
-            icon.source: "qrc:/assets/icons/rotate_left.png"
-            icon.color: "black"
-            icon.width: 32
-            icon.height: 32
-            display: AbstractButton.IconOnly
-            implicitWidth: 32
-            implicitHeight: 32
-            padding: 0
-
-            autoRepeat: true
-            autoRepeatDelay: 500
-            autoRepeatInterval: 100
-
-            onClicked: root.resetPathClicked()
         }
 
     }

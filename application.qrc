@@ -14,5 +14,6 @@
         <file>assets/icons/conversion_path_on.png</file>
         <file>assets/icons/places.png</file>
         <file>assets/icons/side_navigation.png</file>
+        <file>assets/icons/refresh.png</file>
     </qresource>
 </RCC>

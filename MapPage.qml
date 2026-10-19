@@ -32,6 +32,7 @@ Page {
 
             DatabaseController { id: dbController}
             property bool nearMeActive: false
+            property bool initialPositionSourceHandled: true
 
             MarkerModel { id: markerModel}
 
@@ -88,6 +89,15 @@ Page {
                         return
                     }
                     var p = position.coordinate
+                    if (!p.isValid) {
+                        return
+                    }
+
+                    if (initialPositionSourceHandled) {
+                        startLocation.coordinate = p
+                        initialPositionSourceHandled = false
+                    }
+
                     if (pathControls.updatePathChecked) {
                         var pts = pathMapPolyLine.path
                         var last = pts.length ? pts[pts.length - 1] : null
@@ -132,48 +142,54 @@ Page {
                 z: 1
             }
 
-
-            MapControls {
-                id: mapControls
+            ColumnLayout {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.rightMargin: 5
+                spacing: 5
 
-                map: mapView.map
+                Layout.alignment: Qt.AlignRight
+                MapControls {
+                    id: mapControls
 
-                onMapTypeClicked: {
-                   dialogMapTypes.open()
-                }
-                onMyLocationClicked: {
-                    var c = positionSource.position.coordinate
-                    if (c.isValid) {
-                        mapView.map.center = c
-                        startLocation.coordinate = c
+                    map: mapView.map
+
+                    onMapTypeClicked: {
+                       dialogMapTypes.open()
                     }
-                }
-                onPlacesClicked: {
-                    dialogPlaces.open()
-                }
-                onNearMeToggled: function(checked) {
-                    nearMeActive = checked
-                    if (checked) {
+                    onMyLocationClicked: {
                         var c = positionSource.position.coordinate
-                        if (c.isValid)
+                        if (c.isValid) {
                             mapView.map.center = c
-                    } else {
-                        mapView.map.center = startLocation.coordinate
+                            startLocation.coordinate = c
+                        }
+                    }
+                    onPlacesClicked: {
+                        var pt = placesButton.mapToItem(dialogPlaces.parent, 0, 0)
+                        dialogPlaces.open()
+                        // Place the menu so its right edge touches the button's left edge
+                        dialogPlaces.x = pt.x - dialogPlaces.width
+                        dialogPlaces.y = pt.y
+//                        dialogPlaces.open()
+                    }
+                    onNearMeToggled: function(checked) {
+                        nearMeActive = checked
+                        if (checked) {
+                            var c = positionSource.position.coordinate
+                            if (c.isValid) {
+                                mapView.map.center = c
+                            }
+                        } else {
+                            mapView.map.center = startLocation.coordinate
+                        }
                     }
                 }
-            }
-            PathControls {
-                id: pathControls
-
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 5
-
-                onResetPathClicked: {
-                    pathMapPolyLine.path = []
+                PathControls {
+                    id: pathControls
+                    Layout.alignment: Qt.AlignRight
+                    onResetPathClicked: {
+                        pathMapPolyLine.path = []
+                    }
                 }
             }
 
@@ -258,29 +274,49 @@ Page {
                  }
              }
 
-             Popup {
+             Menu {
                  id: dialogPlaces
-                 modal: true
-                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                 anchors.centerIn: parent
+//                 modal: true
+//                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
-                 ColumnLayout {
-                     anchors.fill: parent
-                     Repeater {
-                         model: placesModel
-                         delegate: Button {
-                             required property string title
-                             required property real   latitude
-                             required property real   longitude
-                             text: title
-                             onClicked: {
-                                 mapView.map.center = QtPositioning.coordinate(latitude, longitude);
-                                 dialogPlaces.close()
-                             }
+                 Repeater {
+                     model: placesModel
+                     delegate: MenuItem {
+                         required property string title
+                         required property real   latitude
+                         required property real   longitude
+                         text: title
+                         onTriggered: {
+                             mapView.map.center = QtPositioning.coordinate(latitude, longitude)
+                             dialogPlaces.close()
                          }
                      }
                  }
              }
+
+//             Popup {
+//                 id: dialogPlaces
+//                 modal: true
+//                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+//                 anchors.centerIn: parent
+
+//                 ColumnLayout {
+//                     anchors.fill: parent
+//                     Repeater {
+//                         model: placesModel
+//                         delegate: Button {
+//                             required property string title
+//                             required property real   latitude
+//                             required property real   longitude
+//                             text: title
+//                             onClicked: {
+//                                 mapView.map.center = QtPositioning.coordinate(latitude, longitude);
+//                                 dialogPlaces.close()
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
 
         }
 
