@@ -146,6 +146,7 @@ Page {
                     var c = positionSource.position.coordinate
                     if (c.isValid) {
                         mapView.map.center = c
+                        startLocation.coordinate = c
                     }
                 }
                 onPlacesClicked: {
@@ -240,7 +241,6 @@ Page {
                  closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
                  parent: parent.contentItem
                  anchors.centerIn: parent
-
 
                  ColumnLayout {
                      anchors.fill: parent
