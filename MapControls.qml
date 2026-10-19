@@ -7,11 +7,10 @@ ColumnLayout {
 
     property var map: null
 
-    readonly property alias nearMeChecked: nearMeButton.checked
-
     signal mapTypeClicked()
     signal placesClicked()
     signal myLocationClicked()
+    signal nearMeToggled(bool checked)
 
     spacing: 5
 
@@ -120,6 +119,8 @@ ColumnLayout {
         implicitWidth: 32
         implicitHeight: 32
         padding: 0
+
+        onToggled: root.nearMeToggled(checked)
     }
 
     Button {

@@ -31,7 +31,7 @@ Page {
             }
 
             DatabaseController { id: dbController}
-            property bool nearMeEnabled: false
+            property bool nearMeActive: false
 
             MarkerModel { id: markerModel}
 
@@ -42,7 +42,10 @@ Page {
                 ListElement { placeId: "stavropol_0"; title: qsTr("Stavropol 0"); latitude: 44.977813; longitude: 42.012765 }
                 ListElement { placeId: "stavropol_1"; title: qsTr("Stavropol 1"); latitude: 45.379757; longitude: 42.450428 }
             }
-
+            Location {
+                id: startLocation
+                coordinate: QtPositioning.coordinate(0.0, 0.0)
+            }
             MouseArea {
                 id: mouseAreaWindow
                 anchors.fill: parent
@@ -93,8 +96,7 @@ Page {
                         pathMapPolyLine.path = pts
                     }
 
-                    var c = mapView.map.center
-                    if (!c.isValid || mapControls.nearMeChecked) {
+                    if (nearMeActive) {
                         mapView.map.center = p
                     }
                 }
@@ -111,7 +113,7 @@ Page {
 //                        value: "https://api.thunderforest.com/cycle/%z/%x/%y.png?apikey=e2d4258d86d743bc861d2a12cc3b67db"
 //                    }
                 }
-//                map.center: QtPositioning.coordinate(0.0, 0.0)
+                map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
             }
             MapPolyline {
@@ -141,10 +143,23 @@ Page {
                    dialogMapTypes.open()
                 }
                 onMyLocationClicked: {
-                    mapView.map.center = QtPositioning.coordinate(positionSource.position.coordinate.latitude, positionSource.position.coordinate.longitude)
+                    var c = positionSource.position.coordinate
+                    if (c.isValid) {
+                        mapView.map.center = c
+                    }
                 }
                 onPlacesClicked: {
                     dialogPlaces.open()
+                }
+                onNearMeToggled: function(checked) {
+                    nearMeActive = checked
+                    if (checked) {
+                        var c = positionSource.position.coordinate
+                        if (c.isValid)
+                            mapView.map.center = c
+                    } else {
+                        mapView.map.center = startLocation.coordinate
+                    }
                 }
             }
             PathControls {
