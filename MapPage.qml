@@ -83,8 +83,6 @@ Page {
                 updateInterval: 1000 // Request updates every second
                 active: true
 
-                property var lastPositionCoordinate: null
-
                 onPositionChanged: {
                     if (!positionSource.valid) {
                         return
@@ -92,8 +90,11 @@ Page {
                     var p = position.coordinate
                     if (pathControls.updatePathChecked) {
                         var pts = pathMapPolyLine.path
-                        pts.push(QtPositioning.coordinate(p.latitude, p.longitude))
-                        pathMapPolyLine.path = pts
+                        var last = pts.length ? pts[pts.length - 1] : null
+                        if (!last || last.distanceTo(p) > 1) {
+                            pts.push(p)
+                            pathMapPolyLine.path = pts
+                        }
                     }
 
                     if (nearMeActive) {
@@ -116,11 +117,11 @@ Page {
                 map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
             }
+
             MapPolyline {
                 id: pathMapPolyLine
                 parent: mapView.map
-                line.width: 3
-                line.color: "green"
+                line.width: 5
                 path: []
             }
 
@@ -128,6 +129,7 @@ Page {
                 id: currentLocationMarker
                 parent: mapView.map
                 positionSource: positionSource
+                z: 1
             }
 
 
