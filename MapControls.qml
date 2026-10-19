@@ -106,6 +106,43 @@ ColumnLayout {
         }
     }
 
+    RowLayout {
+            Layout.alignment: Qt.AlignRight
+            spacing: 5
+
+            Button {
+                id: zoomInButton
+                icon.source: "qrc:/assets/icons/zoom_in.png"
+                icon.color: "black"
+                icon.width: 32
+                icon.height: 32
+                display: AbstractButton.IconOnly
+                implicitWidth: 32
+                implicitHeight: 32
+                padding: 0
+
+                enabled: root.map !== null
+                onClicked: root.map.zoomLevel = Math.min(root.map.maximumZoomLevel,
+                                                        root.map.zoomLevel + 1)
+            }
+
+            Button {
+                id: zoomOutButton
+                icon.source: "qrc:/assets/icons/zoom_out.png"
+                icon.color: "black"
+                icon.width: 32
+                icon.height: 32
+                display: AbstractButton.IconOnly
+                implicitWidth: 32
+                implicitHeight: 32
+                padding: 0
+
+                enabled: root.map !== null
+                onClicked: root.map.zoomLevel = Math.max(root.map.minimumZoomLevel,
+                                                        root.map.zoomLevel - 1)
+            }
+        }
+
     Button {
         id: nearMeButton
         Layout.alignment: Qt.AlignRight

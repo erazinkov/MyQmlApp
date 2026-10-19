@@ -15,5 +15,7 @@
         <file>assets/icons/places.png</file>
         <file>assets/icons/side_navigation.png</file>
         <file>assets/icons/refresh.png</file>
+        <file>assets/icons/zoom_in.png</file>
+        <file>assets/icons/zoom_out.png</file>
     </qresource>
 </RCC>

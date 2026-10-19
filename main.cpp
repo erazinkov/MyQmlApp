@@ -16,12 +16,16 @@
 
  #include "processingcontroller.h"
 
+#include <QGeoServiceProvider>
+
 using namespace Qt::StringLiterals;
 
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
+    qDebug() << QGeoServiceProvider::availableServiceProviders();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
