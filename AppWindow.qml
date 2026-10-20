@@ -14,6 +14,8 @@ ApplicationWindow {
     visible: false
     title: qsTr("SAI-GPS")
 
+    property bool dbConnected: false
+
     header: ToolBar {
             ToolButton {
                 Accessible.name: qsTr("Toggle navigation")
@@ -30,6 +32,8 @@ ApplicationWindow {
                 }
             }
     }
+
+    DatabaseController { id: dbController}
 
     DensityPage {
         id: densityPage
@@ -91,7 +95,7 @@ ApplicationWindow {
     }
 
     footer: Rectangle {
-        implicitHeight: 24
+        implicitHeight: 32
 
         RowLayout {
             anchors.fill: parent
@@ -112,7 +116,7 @@ ApplicationWindow {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     colorization: 1.0
-                    colorizationColor: "#2ecc71"      // green
+                    colorizationColor: dbConnected ? "green" : "red"      // green
                     brightness: 1.0
                 }
             }
@@ -133,5 +137,21 @@ ApplicationWindow {
         repeat: true
         triggeredOnStart: true
         onTriggered: clockLabel.text = Qt.formatDateTime(new Date(), "hh:mm:ss")
+    }
+
+    Component.onCompleted: {
+        dbController.operateConnectDb("Connection 0",
+                                      "QMYSQL",
+                                      "localhost",
+                                      "napdb",
+                                      "testuser",
+                                      "Dubna@123",
+                                      "curr_meas");
+    }
+    Connections {
+        target: dbController
+        function onConnectDb(success, errorText) {
+            dbConnected = success
+        }
     }
 }

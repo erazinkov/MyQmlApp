@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import QtQuick.Shapes
 
-import dbController
 import markerModel
 
 Page {
@@ -21,18 +20,24 @@ Page {
                 markerModel.deleteData();
             }
 
-            function onSelectForTable(data) {
-                markerModel.addData(data);
-                pController.operateAddData(data);
-            }
 
-            function onConnectDb(success, errorText) {
-                console.log(`Database connected: ${success}, Error: ${errorText}`);
-            }
 
-            DatabaseController { id: dbController}
+
             property bool nearMeActive: false
             property bool initialPositionSourceHandled: true
+
+
+            Connections {
+                target: dbController
+                function onSelectForTable(data) {
+                    markerModel.addData(data);
+                    pController.operateAddData(data);
+                }
+
+                function onConnectDb(success, errorText) {
+                    console.log(`Database connected: ${success}, Error: ${errorText}`);
+                }
+            }
 
             MarkerModel { id: markerModel}
 
@@ -222,10 +227,10 @@ Page {
                 parent: mapView.map
                 overlayEnabled: mapGridOverlaySwitch.checked
 
-                onCoordinateChanged: function(newCoordinate) {
-                    console.log("Grid moved to:", coordinate.latitude,
-                                        coordinate.longitude)
-                }
+//                onCoordinateChanged: function(newCoordinate) {
+//                    console.log("Grid moved to:", coordinate.latitude,
+//                                        coordinate.longitude)
+//                }
                 onProcessRequested: function(polygons, rows, columns) {
                     pController.operateProcessData(polygons, rows, columns)
                 }
@@ -237,16 +242,16 @@ Page {
              }
 
              Component.onCompleted: {
-                 dbController.operateConnectDb("Connection 0",
-                                               "QMYSQL",
-                                               "localhost",
-                                               "napdb",
-                                               "testuser",
-                                               "Dubna@123",
-                                               "curr_meas");
+//                 dbController.operateConnectDb("Connection 0",
+//                                               "QMYSQL",
+//                                               "localhost",
+//                                               "napdb",
+//                                               "testuser",
+//                                               "Dubna@123",
+//                                               "curr_meas");
 
-                 dbController.connectDb.connect(onConnectDb);
-                 dbController.selectForTable.connect(onSelectForTable);
+//                 dbController.connectDb.connect(onConnectDb);
+//                 dbController.selectForTable.connect(onSelectForTable);
                  pController.processData.connect(onProcessData);
                  for (var i = 0; i < mapView.map.supportedMapTypes.length; ++i) {
                      if (mapView.map.supportedMapTypes[i].description !== "Hiking map view") {
@@ -281,9 +286,6 @@ Page {
 
              Menu {
                  id: dialogPlaces
-//                 modal: true
-//                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
                  Repeater {
                      model: placesModel
                      delegate: MenuItem {
