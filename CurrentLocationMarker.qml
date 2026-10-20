@@ -29,14 +29,6 @@ MapQuickItem {
                 angle: root.map ? root.map.tilt : 0
             }
             Rectangle {
-                id: locationMarker
-                anchors.fill: parent
-                color: "red"
-                border.color: "white"
-                border.width: 1
-                radius: 10
-            }
-            Rectangle {
                 id: accuracyMarker
                 visible: root.positionSource && root.positionSource.position.horizontalAccuracyValid
                 anchors.centerIn: parent
@@ -49,7 +41,15 @@ MapQuickItem {
                 border.color: "white"
                 border.width: 1
                 radius: width / 2
-                z: -1
+            }
+
+            Rectangle {
+                id: locationMarker
+                anchors.fill: parent
+                color: "red"
+                border.color: "white"
+                border.width: 1
+                radius: 10
             }
         }
 

@@ -15,21 +15,20 @@ ApplicationWindow {
     title: qsTr("SAI-GPS")
 
     header: ToolBar {
-        RowLayout {
-            spacing: 20
-            anchors.fill: parent
             ToolButton {
-                Accessible.name: qsTr("Toggle drawer")
-                text: drawer.opened ? "\u{2715}" : "\u{2630}"
-                onClicked:{
-                        if (drawer.opened) {
-                            drawer.close();
-                        } else {
-                            drawer.open();
-                        }
+                Accessible.name: qsTr("Toggle navigation")
+                icon.source: navigationDrawer.opened ? "qrc:/assets/icons/close.svg"
+                                                     : "qrc:/assets/icons/side_navigation.svg"
+                icon.width: 24
+                icon.height: 24
+                onClicked: {
+                    if (navigationDrawer.opened) {
+                        navigationDrawer.close();
+                    } else {
+                        navigationDrawer.open();
+                    }
                 }
             }
-        }
     }
 
     DensityPage {
@@ -40,7 +39,7 @@ ApplicationWindow {
     }
 
     Drawer {
-        id: drawer
+        id: navigationDrawer
         y: header.height
         width: Math.min(window.width, window.height) / 3
         height: window.height - header.height
@@ -92,13 +91,13 @@ ApplicationWindow {
     }
 
     footer: Rectangle {
-        implicitHeight: 28
+        implicitHeight: 24
 
         RowLayout {
             anchors.fill: parent
             anchors.leftMargin: 8
             anchors.rightMargin: 8
-            spacing: 8
+            spacing: 5
 
             Image {
                 id: dbStatusImage
