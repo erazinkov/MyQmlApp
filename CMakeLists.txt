@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql REQUIRED)
-find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql Graphs REQUIRED)
+find_package(Qt6 6.2 COMPONENTS Quick Location Positioning Sql Graphs Svg REQUIRED)
 
 qt_add_executable(appMyQmlApp
     application.qrc
@@ -45,4 +45,4 @@ set_target_properties(appMyQmlApp PROPERTIES
 target_compile_definitions(appMyQmlApp
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(appMyQmlApp
-    PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql Qt6::Graphs Qt6::Location)
+    PRIVATE Qt6::Quick Qt6::Positioning Qt6::Sql Qt6::Graphs Qt6::Location Qt6::Svg)

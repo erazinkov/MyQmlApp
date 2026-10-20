@@ -17,10 +17,10 @@ ColumnLayout {
 
         Button {
             id: resetPathButton
-            icon.source: "qrc:/assets/icons/refresh.png"
+            icon.source: "qrc:/assets/icons/refresh.svg"
             icon.color: "black"
-            icon.width: 32
-            icon.height: 32
+            icon.width: 24
+            icon.height: 24
             display: AbstractButton.IconOnly
             implicitWidth: 32
             implicitHeight: 32
@@ -33,11 +33,11 @@ ColumnLayout {
             Layout.alignment: Qt.AlignRight
             checkable: true
             checked: false
-            icon.source: checked ? "qrc:/assets/icons/conversion_path_on.png"
-                                 : "qrc:/assets/icons/conversion_path_off.png"
+            icon.source: checked ? "qrc:/assets/icons/conversion_path.svg"
+                                 : "qrc:/assets/icons/conversion_path_off.svg"
             icon.color: "black"
-            icon.width: 32
-            icon.height: 32
+            icon.width: 24
+            icon.height: 24
             display: AbstractButton.IconOnly
             implicitWidth: 32
             implicitHeight: 32

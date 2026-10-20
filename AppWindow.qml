@@ -2,6 +2,9 @@ import QtQuick
 
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Effects
+
+import dbController
 
 ApplicationWindow {
     id: window
@@ -95,16 +98,32 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.leftMargin: 8
             anchors.rightMargin: 8
+            spacing: 8
 
-            Label {
-                text: "..."
-                elide: Label.ElideRight
-                Layout.fillWidth: true
+            Image {
+                id: dbStatusImage
+                source: "qrc:/assets/icons/database.svg"
+                sourceSize.width: 24
+                sourceSize.height: 24
+                fillMode: Image.PreserveAspectFit
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
+                Layout.alignment: Qt.AlignVCenter
+
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    colorization: 1.0
+                    colorizationColor: "#2ecc71"      // green
+                    brightness: 1.0
+                }
             }
+
+            Item { Layout.fillWidth: true }
 
             Label {
                 id: clockLabel
                 text: Qt.formatDateTime(new Date(), "hh:mm:ss")
+                Layout.alignment: Qt.AlignVCenter
             }
         }
     }

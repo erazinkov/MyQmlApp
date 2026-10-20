@@ -18,10 +18,10 @@ ColumnLayout {
     Button {
         id: mapTypeButton
         Layout.alignment: Qt.AlignRight
-        icon.source: "qrc:/assets/icons/map.png"
+        icon.source: "qrc:/assets/icons/map.svg"
         icon.color: "black"
-        icon.width: 32
-        icon.height: 32
+        icon.width: 24
+        icon.height: 24
         display: AbstractButton.IconOnly
         implicitWidth: 32
         implicitHeight: 32
@@ -33,10 +33,10 @@ ColumnLayout {
     Button {
         id: placesButton
         Layout.alignment: Qt.AlignRight
-        icon.source: "qrc:/assets/icons/places.png"
+        icon.source: "qrc:/assets/icons/places.svg"
         icon.color: "black"
-        icon.width: 32
-        icon.height: 32
+        icon.width: 24
+        icon.height: 24
         display: AbstractButton.IconOnly
         implicitWidth: 32
         implicitHeight: 32
@@ -51,10 +51,10 @@ ColumnLayout {
 
         Button {
             id: rightRotationButton
-            icon.source: "qrc:/assets/icons/rotate_right.png"
+            icon.source: "qrc:/assets/icons/rotate_right.svg"
             icon.color: "black"
-            icon.width: 32
-            icon.height: 32
+            icon.width: 24
+            icon.height: 24
             display: AbstractButton.IconOnly
             implicitWidth: 32
             implicitHeight: 32
@@ -70,10 +70,10 @@ ColumnLayout {
 
         Button {
             id: leftRotationButton
-            icon.source: "qrc:/assets/icons/rotate_left.png"
+            icon.source: "qrc:/assets/icons/rotate_left.svg"
             icon.color: "black"
-            icon.width: 32
-            icon.height: 32
+            icon.width: 24
+            icon.height: 24
             display: AbstractButton.IconOnly
             implicitWidth: 32
             implicitHeight: 32
@@ -94,7 +94,7 @@ ColumnLayout {
             enabled: root.map !== null
 
             contentItem: Image {
-                source: "qrc:/assets/icons/north.png"
+                source: "qrc:/assets/icons/north.svg"
                 sourceSize.width: 24
                 sourceSize.height: 24
                 fillMode: Image.PreserveAspectFit
@@ -107,52 +107,97 @@ ColumnLayout {
     }
 
     RowLayout {
-            Layout.alignment: Qt.AlignRight
-            spacing: 5
+        id: tiltControls
+        Layout.alignment: Qt.AlignRight
+        spacing: 5
 
-            Button {
-                id: zoomInButton
-                icon.source: "qrc:/assets/icons/zoom_in.png"
-                icon.color: "black"
-                icon.width: 32
-                icon.height: 32
-                display: AbstractButton.IconOnly
-                implicitWidth: 32
-                implicitHeight: 32
-                padding: 0
+        readonly property real tiltStep: 10
+        readonly property real minTilt: 0
+        readonly property real maxTilt: 60
 
-                enabled: root.map !== null
-                onClicked: root.map.zoomLevel = Math.min(root.map.maximumZoomLevel,
-                                                        root.map.zoomLevel + 1)
-            }
+        Button {
+            id: tiltDownButton
+            icon.source: "qrc:/assets/icons/tilt_arrow_down.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
 
-            Button {
-                id: zoomOutButton
-                icon.source: "qrc:/assets/icons/zoom_out.png"
-                icon.color: "black"
-                icon.width: 32
-                icon.height: 32
-                display: AbstractButton.IconOnly
-                implicitWidth: 32
-                implicitHeight: 32
-                padding: 0
-
-                enabled: root.map !== null
-                onClicked: root.map.zoomLevel = Math.max(root.map.minimumZoomLevel,
-                                                        root.map.zoomLevel - 1)
+            enabled: root.map !== null && root.map.tilt > tiltControls.minTilt
+            onClicked: {
+                root.map.tilt = Math.max(tiltControls.minTilt, root.map.tilt - tiltControls.tiltStep)
             }
         }
+
+        Button {
+            id: tiltUpButton
+            icon.source: "qrc:/assets/icons/tilt_arrow_up.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+
+            enabled: root.map !== null && root.map.tilt < tiltControls.maxTilt
+            onClicked: {
+                root.map.tilt = Math.min(tiltControls.maxTilt, root.map.tilt + tiltControls.tiltStep)
+            }
+        }
+    }
+
+    RowLayout {
+        id: zoomControls
+        Layout.alignment: Qt.AlignRight
+        spacing: 5
+
+        Button {
+            id: zoomInButton
+            icon.source: "qrc:/assets/icons/zoom_in.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+
+            enabled: root.map !== null
+            onClicked: root.map.zoomLevel = Math.min(root.map.maximumZoomLevel,
+                                                    root.map.zoomLevel + 1)
+        }
+
+        Button {
+            id: zoomOutButton
+            icon.source: "qrc:/assets/icons/zoom_out.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+
+            enabled: root.map !== null
+            onClicked: root.map.zoomLevel = Math.max(root.map.minimumZoomLevel,
+                                                    root.map.zoomLevel - 1)
+        }
+    }
 
     Button {
         id: nearMeButton
         Layout.alignment: Qt.AlignRight
         checkable: true
         checked: false
-        icon.source: checked ? "qrc:/assets/icons/near_me.png"
-                             : "qrc:/assets/icons/near_me_disabled.png"
+        icon.source: checked ? "qrc:/assets/icons/near_me.svg"
+                             : "qrc:/assets/icons/near_me_disabled.svg"
         icon.color: "black"
-        icon.width: 32
-        icon.height: 32
+        icon.width: 24
+        icon.height: 24
         display: AbstractButton.IconOnly
         implicitWidth: 32
         implicitHeight: 32
@@ -164,10 +209,10 @@ ColumnLayout {
     Button {
         id: myLocationButton
         Layout.alignment: Qt.AlignRight
-        icon.source: "qrc:/assets/icons/my_location.png"
+        icon.source: "qrc:/assets/icons/my_location.svg"
         icon.color: "black"
-        icon.width: 32
-        icon.height: 32
+        icon.width: 24
+        icon.height: 24
         display: AbstractButton.IconOnly
         implicitWidth: 32
         implicitHeight: 32

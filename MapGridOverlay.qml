@@ -221,10 +221,10 @@ MapQuickItem {
             RowLayout {
                 Button {
                     id: decreaseButton
-                    icon.source: "qrc:/assets/icons/overlay_decrease.png"
+                    icon.source: "qrc:/assets/icons/overlay_decrease.svg"
                     icon.color: "black"
-                    icon.width: 32
-                    icon.height: 32
+                    icon.width: 24
+                    icon.height: 24
                     display: AbstractButton.IconOnly
                     implicitWidth: 32
                     implicitHeight: 32
@@ -239,10 +239,10 @@ MapQuickItem {
                 }
                 Button {
                     id: increaseButton
-                    icon.source: "qrc:/assets/icons/overlay_increase.png"
+                    icon.source: "qrc:/assets/icons/overlay_increase.svg"
                     icon.color: "black"
-                    icon.width: 32
-                    icon.height: 32
+                    icon.width: 24
+                    icon.height: 24
                     display: AbstractButton.IconOnly
                     implicitWidth: 32
                     implicitHeight: 32

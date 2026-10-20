@@ -1,21 +1,25 @@
 <RCC>
     <qresource prefix="/">
-        <file>assets/icons/map.png</file>
-        <file>assets/icons/my_location.png</file>
         <file>assets/icons/navigation.png</file>
-        <file>assets/icons/near_me.png</file>
-        <file>assets/icons/near_me_disabled.png</file>
-        <file>assets/icons/north.png</file>
-        <file>assets/icons/rotate_left.png</file>
-        <file>assets/icons/rotate_right.png</file>
-        <file>assets/icons/overlay_decrease.png</file>
-        <file>assets/icons/overlay_increase.png</file>
-        <file>assets/icons/conversion_path_off.png</file>
-        <file>assets/icons/conversion_path_on.png</file>
-        <file>assets/icons/places.png</file>
         <file>assets/icons/side_navigation.png</file>
-        <file>assets/icons/refresh.png</file>
-        <file>assets/icons/zoom_in.png</file>
-        <file>assets/icons/zoom_out.png</file>
+        <file>assets/icons/database.svg</file>
+        <file>assets/icons/map.svg</file>
+        <file>assets/icons/refresh.svg</file>
+        <file>assets/icons/north.svg</file>
+        <file>assets/icons/tilt.svg</file>
+        <file>assets/icons/tilt_arrow_down.svg</file>
+        <file>assets/icons/tilt_arrow_up.svg</file>
+        <file>assets/icons/near_me.svg</file>
+        <file>assets/icons/near_me_disabled.svg</file>
+        <file>assets/icons/rotate_left.svg</file>
+        <file>assets/icons/rotate_right.svg</file>
+        <file>assets/icons/zoom_in.svg</file>
+        <file>assets/icons/zoom_out.svg</file>
+        <file>assets/icons/my_location.svg</file>
+        <file>assets/icons/overlay_decrease.svg</file>
+        <file>assets/icons/overlay_increase.svg</file>
+        <file>assets/icons/places.svg</file>
+        <file>assets/icons/conversion_path.svg</file>
+        <file>assets/icons/conversion_path_off.svg</file>
     </qresource>
 </RCC>

@@ -137,6 +137,7 @@ Page {
 
             CurrentLocationMarker {
                 id: currentLocationMarker
+                map: mapView.map
                 parent: mapView.map
                 positionSource: positionSource
                 z: 1
@@ -248,7 +249,9 @@ Page {
                  dbController.selectForTable.connect(onSelectForTable);
                  pController.processData.connect(onProcessData);
                  for (var i = 0; i < mapView.map.supportedMapTypes.length; ++i) {
-                      mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
+                     if (mapView.map.supportedMapTypes[i].description !== "Hiking map view") {
+                         mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
+                     }
                  }
              }
 
@@ -266,6 +269,8 @@ Page {
                          model: mapTypesModel
                          Button {
                              text: mapTypeName
+                             checkable: true
+                             checked: mapView.map.activeMapType === mapView.map.supportedMapTypes[index]
                              onClicked: {
                                  mapView.map.activeMapType = mapView.map.supportedMapTypes[index]
                              }
@@ -293,31 +298,6 @@ Page {
                      }
                  }
              }
-
-//             Popup {
-//                 id: dialogPlaces
-//                 modal: true
-//                 closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-//                 anchors.centerIn: parent
-
-//                 ColumnLayout {
-//                     anchors.fill: parent
-//                     Repeater {
-//                         model: placesModel
-//                         delegate: Button {
-//                             required property string title
-//                             required property real   latitude
-//                             required property real   longitude
-//                             text: title
-//                             onClicked: {
-//                                 mapView.map.center = QtPositioning.coordinate(latitude, longitude);
-//                                 dialogPlaces.close()
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-
         }
 
 
