@@ -8,8 +8,8 @@ DatabaseController::DatabaseController(QObject *parent) : QObject{parent}
     m_worker = new DatabaseWorker;
     m_worker->moveToThread(m_thread);
     // Connect signals from controller to worker slots (queued connection by default)
-    connect(this, &DatabaseController::operateConnectDb, m_worker, &DatabaseWorker::handleConnectDb);
-    connect(this, &DatabaseController::operateDisconnectDb, m_worker, &DatabaseWorker::handleDisconnectDb);
+    connect(this, &DatabaseController::operateConnectDatabase, m_worker, &DatabaseWorker::onConnectDatabase);
+    connect(this, &DatabaseController::operateDisconnectDatabase, m_worker, &DatabaseWorker::onDisconnectDatabase);
 
     connect(this, &DatabaseController::operateSelectTables, m_worker, &DatabaseWorker::handleSelectTables);
     connect(this, &DatabaseController::operateSelectForTable, m_worker, &DatabaseWorker::handleSelectForTable1);
@@ -18,14 +18,16 @@ DatabaseController::DatabaseController(QObject *parent) : QObject{parent}
 
     connect(this, &DatabaseController::operateInsertCoordinate, m_worker, &DatabaseWorker::handleInsertCoordinate);
 
-    connect(m_worker, &DatabaseWorker::connectDb, this, &DatabaseController::connectDb);
-    connect(m_worker, &DatabaseWorker::disconnectDb, this, &DatabaseController::disconnectDb);
+    connect(m_worker, &DatabaseWorker::connectionStateChanged, this, &DatabaseController::connectionStateChanged);
+
+//    connect(m_worker, &DatabaseWorker::connectDb, this, &DatabaseController::connectDb);
+//    connect(m_worker, &DatabaseWorker::disconnectDb, this, &DatabaseController::disconnectDb);
     connect(m_worker, &DatabaseWorker::selectTables, this, &DatabaseController::selectTables);
     connect(m_worker, &DatabaseWorker::selectForTable, this, &DatabaseController::selectForTable);
 
     connect(m_worker, &DatabaseWorker::selectForTableWithCoordinate, this, &DatabaseController::selectForTableWithCoordinate);
 
-    connect(m_worker, &DatabaseWorker::errorOccurred, this, &DatabaseController::errorOccured);
+    connect(m_worker, &DatabaseWorker::errorOccurred, this, &DatabaseController::errorOccurred);
 
     // Ensure thread and worker cleanup
     connect(m_thread, &QThread::finished, m_worker, &QObject::deleteLater);

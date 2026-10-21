@@ -15,14 +15,13 @@ public:
     DatabaseWorker(QObject *parent = nullptr);
     ~DatabaseWorker() override;
 public slots:
-    void handleConnectDb(const QString &connectionName,
+    void onConnectDatabase(const QString &connectionName,
                            const QString &driver,
                            const QString &hostName,
                            const QString &databaseName,
                            const QString &userName,
-                           const QString &password,
-                           const QString &tableName, bool test = false);
-    void handleDisconnectDb();
+                           const QString &password);
+    void onDisconnectDatabase();
     void handleSelectTables();
     void handleSelectForTable(const QString &queryString, const QStringList &keysAs);
 
@@ -38,6 +37,7 @@ public slots:
 signals:
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();
+    void connectionStateChanged(bool);
     void selectTables(QList<QVariant> queryResult);
     void selectForTable(QList<QVariantHash> queryResult);
 

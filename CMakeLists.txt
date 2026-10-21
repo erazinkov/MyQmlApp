@@ -32,6 +32,8 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES MapControls.qml
     QML_FILES MapGridOverlay.qml
     QML_FILES PathControls.qml
+    QML_FILES DatabaseControls.qml
+    QML_FILES Snackbar.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES

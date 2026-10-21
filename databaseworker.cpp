@@ -20,16 +20,13 @@ DatabaseWorker::~DatabaseWorker()
 
 }
 
-void DatabaseWorker::handleConnectDb(const QString &connectionName,
+void DatabaseWorker::onConnectDatabase(const QString &connectionName,
                                const QString &driver,
                                const QString &hostName,
                                const QString &databaseName,
                                const QString &userName,
-                               const QString &password,
-                               const QString &tableName,
-                               bool test)
+                               const QString &password)
 {
-    {
         m_connectionName = connectionName + QUuid::createUuid().toString();
         QSqlDatabase db = QSqlDatabase::addDatabase(driver, m_connectionName);
         db.setHostName(hostName);
@@ -37,19 +34,26 @@ void DatabaseWorker::handleConnectDb(const QString &connectionName,
         db.setUserName(userName);
         db.setPassword(password);
 
-        auto success{db.open()};
-        QString errorText{db.lastError().text()};
-        if (success) {
-            success = checkTable(db, tableName);
-            if (!success) {
-                errorText = QString("No \'%1\' table in database.").arg(tableName);
-            }
+        auto result{db.open()};
+        auto lastError{db.lastError()};
+        if (!result) {
+            emit errorOccurred(lastError.text());
+            return;
         }
-        emit connectDb(success, errorText, test);
-    }
-    if (test) {
-        handleDisconnectDb();
-    }
+        emit connectionStateChanged(result);
+
+//        auto success{db.open()};
+//        auto lastError{db.lastError()};
+//        QString errorText{db.lastError().text()};
+//        if (success) {
+//            success = checkTable(db, tableName);
+//            if (!success) {
+//                errorText = QString("No \'%1\' table in database.").arg(tableName);
+//            }
+//        }
+//        emit connectDb(success, errorText, test);
+//        emit connectionStateChanged(success);
+
 }
 
 void DatabaseWorker::handleSelectTables()
@@ -113,13 +117,18 @@ bool DatabaseWorker::checkTable(QSqlDatabase &db, const QString &tableName)
         return false;
     }
 }
-void DatabaseWorker::handleDisconnectDb()
+void DatabaseWorker::onDisconnectDatabase()
 {
-    if (QSqlDatabase::contains(m_connectionName)) {
+    auto result{QSqlDatabase::contains(m_connectionName)};
+    if (result) {
         QSqlDatabase::database(m_connectionName).close();
         QSqlDatabase::removeDatabase(m_connectionName);
-        emit disconnectDb();
     }
+    if (!result) {
+        emit errorOccurred(QString("Can\'t disconnect \'%1\'").arg(m_connectionName));
+        return;
+    }
+    emit connectionStateChanged(!result);
 }
 
 void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const QStringList &/*keysAs*/)

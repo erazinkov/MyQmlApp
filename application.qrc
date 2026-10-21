@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>assets/icons/navigation.png</file>
         <file>assets/icons/database.svg</file>
         <file>assets/icons/map.svg</file>
         <file>assets/icons/refresh.svg</file>
@@ -22,5 +21,8 @@
         <file>assets/icons/conversion_path_off.svg</file>
         <file>assets/icons/side_navigation.svg</file>
         <file>assets/icons/close.svg</file>
+        <file>assets/icons/database_off.svg</file>
+        <file>assets/icons/database_search.svg</file>
+        <file>assets/icons/database_upload.svg</file>
     </qresource>
 </RCC>

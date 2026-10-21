@@ -16,15 +16,17 @@ public:
     DatabaseController(QObject *parent = nullptr);
     ~DatabaseController() override;
 signals:
-    void operateConnectDb(const QString &connectionName,
-                              const QString &driver,
-                              const QString &hostName,
-                              const QString &databaseName,
-                              const QString &userName,
-                              const QString &password,
-                              const QString &tableName, bool test = false);
+    void connectionStateChanged(bool);
+    void errorOccurred(const QString &);
 
-    void operateDisconnectDb();
+    void operateConnectDatabase(const QString &connectionName,
+                                const QString &driver,
+                                const QString &hostName,
+                                const QString &databaseName,
+                                const QString &userName,
+                                const QString &password);
+
+    void operateDisconnectDatabase();
 
     void operateQuery(const QString &queryString);
 
@@ -45,7 +47,7 @@ signals:
 
     void selectForTableWithCoordinate(QList<QVariantHash> data);
 
-    void errorOccured(const QString &errorText);
+
 
 public slots:
     void handleQuery(int timeAvg_min); // ??

@@ -33,7 +33,13 @@ ApplicationWindow {
             }
     }
 
-    DatabaseController { id: dbController}
+    Snackbar {
+        id: snackbar
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
+    }
+
+    DatabaseController { id: databaseController}
 
     DensityPage {
         id: densityPage
@@ -95,7 +101,17 @@ ApplicationWindow {
     }
 
     footer: Rectangle {
+        id: footerRectangle
         implicitHeight: 32
+        readonly property string defaultStatus: ""
+
+        function setStatus(newStatus, timeout = 5000) {
+            statusText.text = newStatus
+            statusTimer.stop()
+            if (timeout > 0) {
+                statusTimer.start()
+            }
+        }
 
         RowLayout {
             anchors.fill: parent
@@ -103,23 +119,11 @@ ApplicationWindow {
             anchors.rightMargin: 8
             spacing: 5
 
-            Image {
-                id: dbStatusImage
-                source: "qrc:/assets/icons/database.svg"
-                sourceSize.width: 24
-                sourceSize.height: 24
-                fillMode: Image.PreserveAspectFit
-                Layout.preferredWidth: 24
-                Layout.preferredHeight: 24
-                Layout.alignment: Qt.AlignVCenter
-
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    colorization: 1.0
-                    colorizationColor: dbConnected ? "green" : "red"      // green
-                    brightness: 1.0
-                }
+            Text {
+                id: statusText
+                text: footerRectangle.defaultStatus
             }
+
 
             Item { Layout.fillWidth: true }
 
@@ -129,29 +133,60 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignVCenter
             }
         }
+
+        Timer {
+            id: statusTimer
+            interval: 5000
+            repeat: false
+            onTriggered: statusText.text = footerRectangle.defaultStatus
+        }
+        Timer {
+            id: clockTimer
+            interval: 1000
+            running: true
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: clockLabel.text = Qt.formatDateTime(new Date(), "hh:mm:ss")
+        }
     }
 
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: clockLabel.text = Qt.formatDateTime(new Date(), "hh:mm:ss")
-    }
+
 
     Component.onCompleted: {
-        dbController.operateConnectDb("Connection 0",
-                                      "QMYSQL",
-                                      "localhost",
-                                      "napdb",
-                                      "testuser",
-                                      "Dubna@123",
-                                      "curr_meas");
+//        dbController.operateConnectDb("Connection 0",
+//                                      "QMYSQL",
+//                                      "localhost",
+//                                      "napdb",
+//                                      "testuser",
+//                                      "Dubna@1234",
+//                                      "curr_meas");
     }
     Connections {
-        target: dbController
-        function onConnectDb(success, errorText) {
-            dbConnected = success
+        target: databaseController
+        function onConnectionStateChanged(result) {
+            snackbar.show(`Database ${result ? "connected" : "disconnected"}`)
+//            footerRectangle.setStatus(`DB: ${result ? "connected" : "disconnected"}`)
+        }
+        function onErrorOccurred(errorText) {
+            snackbar.show(errorText)
+//             footerRectangle.setStatus(errorText)
         }
     }
 }
+//            Image {
+//                id: dbStatusImage
+//                source: "qrc:/assets/icons/database.svg"
+//                sourceSize.width: 24
+//                sourceSize.height: 24
+//                fillMode: Image.PreserveAspectFit
+//                Layout.preferredWidth: 24
+//                Layout.preferredHeight: 24
+//                Layout.alignment: Qt.AlignVCenter
+
+//                layer.enabled: true
+//                layer.effect: MultiEffect {
+//                    colorization: 1.0
+//                    colorizationColor: dbConnected ? "green" : "red"      // green
+//                    brightness: 1.0
+//                }
+//            }

@@ -27,17 +27,22 @@ Page {
             property bool initialPositionSourceHandled: true
 
 
-            Connections {
-                target: dbController
-                function onSelectForTable(data) {
-                    markerModel.addData(data);
-                    pController.operateAddData(data);
-                }
+//            Connections {
+//                target: dbController
+//                function onSelectForTable(data) {
+//                    markerModel.addData(data);
+//                    pController.operateAddData(data);
+//                }
 
-                function onConnectDb(success, errorText) {
-                    console.log(`Database connected: ${success}, Error: ${errorText}`);
-                }
-            }
+//                function onConnectDb(success, errorText) {
+//                    console.log(`Database connected: ${success}, Error: ${errorText}`);
+//                    databaseControls.connectDatabase = success
+//                }
+
+//                function onDisconnectDb() {
+//                    databaseControls.connectDatabase = false
+//                }
+//            }
 
             MarkerModel { id: markerModel}
 
@@ -68,7 +73,7 @@ Page {
                 id: menu
                 MenuItem {
                     text: qsTr("Add markers")
-                    onTriggered: dbController.operateSelectForTable("", {})
+                    onTriggered: databaseController.operateSelectForTable("", {})
                 }
                 MenuItem {
                     id: deleteMenuItem
@@ -173,10 +178,8 @@ Page {
                     onPlacesClicked: {
                         var pt = placesButton.mapToItem(dialogPlaces.parent, 0, 0)
                         dialogPlaces.open()
-                        // Place the menu so its right edge touches the button's left edge
                         dialogPlaces.x = pt.x - dialogPlaces.width
                         dialogPlaces.y = pt.y
-//                        dialogPlaces.open()
                     }
                     onNearMeToggled: function(checked) {
                         nearMeActive = checked
@@ -195,6 +198,38 @@ Page {
                     Layout.alignment: Qt.AlignRight
                     onResetPathClicked: {
                         pathMapPolyLine.path = []
+                    }
+                }
+                DatabaseControls {
+                    id: databaseControls
+                    Layout.alignment: Qt.AlignRight
+                    onSearchDatabaseClicked: {
+                        databaseController.operateSelectForTable("", {})
+                    }
+                    onConnectDatabaseClicked: {
+                        databaseController.operateConnectDatabase("Connection 0",
+                                                  "QMYSQL",
+                                                  "localhost",
+                                                  "napdb",
+                                                  "testuser",
+                                                  "Dubna@1234");
+                        console.log("onConnectDatabaseClicked")
+                    }
+                    onDisconnectDatabaseClicked: {
+                        databaseController.operateDisconnectDatabase()
+                        console.log("onDisconnectDatabaseClicked")
+                    }
+                    Connections {
+                        target: databaseController
+//                        function onSelectForTable(data) {
+//                            markerModel.addData(data);
+//                            pController.operateAddData(data);
+//                        }
+
+                        function onConnectionStateChanged(result) {
+                            console.log(`Database connected: ${result}`);
+                            databaseControls.connectionState = result
+                        }
                     }
                 }
             }
