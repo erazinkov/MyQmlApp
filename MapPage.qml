@@ -212,7 +212,7 @@ Page {
                                                   "localhost",
                                                   "napdb",
                                                   "testuser",
-                                                  "Dubna@1234");
+                                                  "Dubna@123");
                         console.log("onConnectDatabaseClicked")
                     }
                     onDisconnectDatabaseClicked: {

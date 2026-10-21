@@ -34,6 +34,7 @@ qt_add_qml_module(appMyQmlApp
     QML_FILES PathControls.qml
     QML_FILES DatabaseControls.qml
     QML_FILES Snackbar.qml
+    QML_FILES SnackbarManager.qml
 )
 
 set_target_properties(appMyQmlApp PROPERTIES

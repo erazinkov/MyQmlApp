@@ -14,7 +14,6 @@ ApplicationWindow {
     visible: false
     title: qsTr("SAI-GPS")
 
-    property bool dbConnected: false
 
     header: ToolBar {
             ToolButton {
@@ -33,11 +32,7 @@ ApplicationWindow {
             }
     }
 
-    Snackbar {
-        id: snackbar
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
-    }
+
 
     DatabaseController { id: databaseController}
 
@@ -101,29 +96,13 @@ ApplicationWindow {
     }
 
     footer: Rectangle {
-        id: footerRectangle
         implicitHeight: 32
-        readonly property string defaultStatus: ""
-
-        function setStatus(newStatus, timeout = 5000) {
-            statusText.text = newStatus
-            statusTimer.stop()
-            if (timeout > 0) {
-                statusTimer.start()
-            }
-        }
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: 8
-            anchors.rightMargin: 8
+            anchors.leftMargin: 5
+            anchors.rightMargin: 5
             spacing: 5
-
-            Text {
-                id: statusText
-                text: footerRectangle.defaultStatus
-            }
-
 
             Item { Layout.fillWidth: true }
 
@@ -134,12 +113,6 @@ ApplicationWindow {
             }
         }
 
-        Timer {
-            id: statusTimer
-            interval: 5000
-            repeat: false
-            onTriggered: statusText.text = footerRectangle.defaultStatus
-        }
         Timer {
             id: clockTimer
             interval: 1000
@@ -152,7 +125,7 @@ ApplicationWindow {
 
 
 
-    Component.onCompleted: {
+//    Component.onCompleted: {
 //        dbController.operateConnectDb("Connection 0",
 //                                      "QMYSQL",
 //                                      "localhost",
@@ -160,33 +133,25 @@ ApplicationWindow {
 //                                      "testuser",
 //                                      "Dubna@1234",
 //                                      "curr_meas");
+//    }
+
+
+    SnackbarManager {
+        id: snackbarManager
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
     }
+
     Connections {
         target: databaseController
         function onConnectionStateChanged(result) {
-            snackbar.show(`Database ${result ? "connected" : "disconnected"}`)
-//            footerRectangle.setStatus(`DB: ${result ? "connected" : "disconnected"}`)
+            snackbarManager.show(`Database ${result ? "connected" : "disconnected"}`)
         }
         function onErrorOccurred(errorText) {
-            snackbar.show(errorText)
-//             footerRectangle.setStatus(errorText)
+            console.log(errorText)
+            snackbarManager.show(errorText)
         }
     }
 }
-//            Image {
-//                id: dbStatusImage
-//                source: "qrc:/assets/icons/database.svg"
-//                sourceSize.width: 24
-//                sourceSize.height: 24
-//                fillMode: Image.PreserveAspectFit
-//                Layout.preferredWidth: 24
-//                Layout.preferredHeight: 24
-//                Layout.alignment: Qt.AlignVCenter
-
-//                layer.enabled: true
-//                layer.effect: MultiEffect {
-//                    colorization: 1.0
-//                    colorizationColor: dbConnected ? "green" : "red"      // green
-//                    brightness: 1.0
-//                }
-//            }
