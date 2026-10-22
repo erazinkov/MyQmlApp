@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.15
 
 ColumnLayout {
     id: root
-
+    Layout.alignment: Qt.AlignRight
     property alias placesButton: placesButton
     property var map: null
 

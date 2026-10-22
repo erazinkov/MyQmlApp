@@ -210,12 +210,13 @@ Page {
                         databaseController.operateSelectForTable("", {})
                     }
                     onConnectDatabaseClicked: {
-                        databaseController.operateConnectDatabase("Connection 0",
-                                                  "QMYSQL",
-                                                  "localhost",
-                                                  "napdb",
-                                                  "testuser",
-                                                  "Dubna@123");
+                        databaseController.operateConnectDatabase(
+                                    databaseSettingsDialog.current.connectionName,
+                                    databaseSettingsDialog.current.driver,
+                                    databaseSettingsDialog.current.hostName,
+                                    databaseSettingsDialog.current.databaseName,
+                                    databaseSettingsDialog.current.userName,
+                                    databaseSettingsDialog.current.password)
                     }
                     onDisconnectDatabaseClicked: {
                         databaseController.operateDisconnectDatabase()
@@ -342,7 +343,6 @@ Page {
                  modal: true
                  focus: true
                  anchors.centerIn: parent
-//                 standardButtons: Dialog.Ok | Dialog.Cancel | Dialog.Reset |Dialog.Retry
 
                  property var defaults: ({
                     connectionName: "Connection 0",
@@ -437,30 +437,6 @@ Page {
                         }
                      }
                  }
-//                 onReset: {
-//                     loadValues(defaults)
-//                     console.log("Reset")
-//                 }
-
-//                 onAccepted: {
-//                     var s = saveValues()
-////                     var ok = dbManager.configureConnection(
-////                         connNameField.text,
-////                         driverBox.currentText,
-////                         hostField.text,
-////                         dbNameField.text,
-////                         userField.text,
-////                         pwdField.text
-////                     )
-////                     if (!ok) {
-////                         console.warn("Connection failed")
-////                         // A prompt can be displayed here, or the dialog can be kept open
-////                     }
-//                 }
-
-//                 onRejected: {
-//                     // User cancelled; no processing needed
-//                 }
              }
         }
 
