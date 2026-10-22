@@ -6,12 +6,13 @@ ColumnLayout {
     id: root
 
     property bool connectionState: false
-    readonly property alias uploadDatabaseChecked: uploadDatabaseButton.checked
+//    readonly property alias uploadDatabaseChecked: uploadDatabaseButton.checked
 
     signal searchDatabaseClicked()
     signal connectDatabaseClicked()
     signal disconnectDatabaseClicked()
     signal settingsDatabaseClicked()
+    signal uploadDatabaseToggled(bool checked)
 
     spacing: 5
 
@@ -33,6 +34,9 @@ ColumnLayout {
             implicitWidth: 32
             implicitHeight: 32
             padding: 0
+
+            onCheckedChanged: root.uploadDatabaseToggled(checked)
+
         }
         Button {
             id: searchDatabaseButton

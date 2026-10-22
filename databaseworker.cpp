@@ -158,8 +158,10 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
 //        queryString.append(QString("%1 >= '%2' AND %1 <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd HH:mm:ss")).arg(d_1.toString("yyyy-MM-dd HH:mm:ss")));
 
 
-        QDate d_0{2025, 06, 15};
-        QDate d_1{2025, 06, 21};
+//        QDate d_0{2025, 06, 15};
+//        QDate d_1{2025, 06, 21};
+        QDate d_0{2026, 06, 15};
+        QDate d_1{2026, 12, 21};
         queryString.append(QString("DATE(%1) >= '%2' AND DATE(%1) <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd")).arg(d_1.toString("yyyy-MM-dd")));
 //        queryString.append(QString(" LIMIT 1000"));
 
@@ -185,6 +187,70 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
             queryResult.append(row);
         }
         emit selectForTable(queryResult);
+    } else {
+        emit errorOccurred(query.lastError().text());
+    }
+}
+
+void DatabaseWorker::onInsertData(int n,
+                                  const QString &dt,
+                                  const QString &fname,
+                                  double gps_lat,
+                                  double gps_lon,
+                                  const QString &gps_msg)
+{
+    const QStringList keys{
+        "n",
+        "dt",
+        "fname",
+        "gps_lat",
+        "gps_lon",
+        "gps_msg"
+    };
+    QStringList values;
+    values.push_back(QString::number(n));
+    values.push_back("'" + dt + "'");
+    values.push_back("'" + fname + "'");
+    values.push_back(QString::number(gps_lat, 'g', 17));
+    values.push_back(QString::number(gps_lon, 'g', 17));
+    values.push_back("'" + gps_msg + "'");
+    auto createQueryString = [&keys, &values]()
+    {
+        const QString tableName{"curr_meas"};
+        QString queryString;
+
+        queryString.append(QString("INSERT "));
+        queryString.append(QString("INTO %1").arg(tableName));
+        queryString.append(QString(" ("));
+        QStringList sL_temp;
+        for (auto i{0}; i < keys.count(); ++i) {
+            sL_temp.append(QString("%1").arg(keys.at(i)));
+        }
+        queryString.append(sL_temp.join(", "));
+        sL_temp.clear();
+        queryString.append(QString(")"));
+        queryString.append(" VALUES");
+        queryString.append(QString(" ("));
+        for (auto i{0}; i < values.count(); ++i) {
+            sL_temp.append(QString("%1").arg(values.at(i)));
+        }
+        queryString.append(sL_temp.join(", "));
+        queryString.append(QString(")"));
+        sL_temp.clear();
+
+        qDebug() << queryString;
+
+        return queryString;
+    };
+    const QString queryString = createQueryString();
+
+    QSqlDatabase db = QSqlDatabase::database(m_connectionName);
+    QSqlQuery query(db);
+    if (query.exec(queryString)) {
+        emit insertData(QString("INSERT successful | %1 | %2 | %3").arg(values.at(1),
+                                                     QString::number(values.at(3).toDouble(), 'g', 9),
+                                                     QString::number(values.at(4).toDouble(), 'g', 9))
+                        );
     } else {
         emit errorOccurred(query.lastError().text());
     }

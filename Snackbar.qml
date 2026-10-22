@@ -10,6 +10,8 @@ Rectangle {
     property color backgroundColor: "black"
     property color textColor: "white"
 
+    property int maxWidth: Overlay.overlay ? Overlay.overlay.width * 0.5 : 300
+
     radius: 5
     color: root.backgroundColor
     width: snackbarRowLayout.implicitWidth

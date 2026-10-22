@@ -62,7 +62,7 @@ void MarkerModel::addData(QList<QVariantHash> data)
             m_gpsData.append({QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j)});
         }
     }
-    auto nth{20};
+    auto nth{1};
     for (auto i{nth - 1}, j{0}; i < m_gpsData.count(); i += nth) {
             addMarker(QGeoCoordinate(data.at(i)["gps_lat"].value<double>(), data.at(i)["gps_lon"].value<double>()), QString::number(++j));
     }

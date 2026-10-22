@@ -27,6 +27,13 @@ public slots:
 
     void handleSelectForTable1(const QString &queryString, const QStringList &keysAs);
 
+    void onInsertData(int n,
+                    const QString &dt,
+                    const QString &fname,
+                    double gps_lat,
+                    double gps_lon,
+                    const QString &gps_msg);
+
     void handleSelectForTableWithCoordinate(const QGeoCoordinate &topLeft,
                                             const QGeoCoordinate &bottomRight,
                                             const QString &queryString,
@@ -37,6 +44,7 @@ public slots:
 signals:
     void connectDb(bool success, const QString &errorText, bool test = false);
     void disconnectDb();
+    void insertData(const QString &str);
     void connectionStateChanged(bool);
     void selectTables(QList<QVariant> queryResult);
     void selectForTable(QList<QVariantHash> queryResult);

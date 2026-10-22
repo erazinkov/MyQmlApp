@@ -20,11 +20,11 @@ Page {
                 markerModel.deleteData();
             }
 
-
-
-
             property bool nearMeActive: false
+            property bool uploadDatabaseActive: false
             property bool initialPositionSourceHandled: true
+
+            property int n: 0
 
 
 //            Connections {
@@ -120,6 +120,12 @@ Page {
                     if (nearMeActive) {
                         mapView.map.center = p
                     }
+
+                    if (uploadDatabaseActive) {
+                        var now = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss")
+                        databaseController.operateInsertData(n, now, "test1", p.latitude, p.longitude, "GPS")
+                        n++;
+                    }
                 }
             }
 
@@ -142,6 +148,7 @@ Page {
                 id: pathMapPolyLine
                 parent: mapView.map
                 line.width: 5
+                opacity: 0.75
                 path: []
             }
 
@@ -203,6 +210,14 @@ Page {
                 DatabaseControls {
                     id: databaseControls
                     Layout.alignment: Qt.AlignRight
+
+                    onUploadDatabaseToggled: function(checked) {
+                        if (!checked) {
+                            n = 0
+                        }
+                        uploadDatabaseActive = checked
+                    }
+
                     onSettingsDatabaseClicked: {
                         databaseSettingsDialog.open()
                     }
@@ -223,10 +238,10 @@ Page {
                     }
                     Connections {
                         target: databaseController
-//                        function onSelectForTable(data) {
-//                            markerModel.addData(data);
-//                            pController.operateAddData(data);
-//                        }
+                        function onSelectForTable(data) {
+                            markerModel.addData(data);
+                            pController.operateAddData(data);
+                        }
 
                         function onConnectionStateChanged(result) {
                             databaseControls.connectionState = result
@@ -278,14 +293,6 @@ Page {
              }
 
              Component.onCompleted: {
-//                 dbController.operateConnectDb("Connection 0",
-//                                               "QMYSQL",
-//                                               "localhost",
-//                                               "napdb",
-//                                               "testuser",
-//                                               "Dubna@123",
-//                                               "curr_meas");
-
 //                 dbController.connectDb.connect(onConnectDb);
 //                 dbController.selectForTable.connect(onSelectForTable);
                  pController.processData.connect(onProcessData);

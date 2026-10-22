@@ -147,10 +147,13 @@ ApplicationWindow {
     Connections {
         target: databaseController
         function onConnectionStateChanged(result) {
-            snackbarManager.show(`Database ${result ? "connected" : "disconnected"}`)
+            snackbarManager.show(`Database ${result ? "connected" : "disconnected"} successfully`)
         }
         function onErrorOccurred(errorText) {
-            snackbarManager.show(errorText)
+            snackbarManager.show(errorText, 5000, "red")
+        }
+        function onInsertData(str) {
+            snackbarManager.show(str, 3500)
         }
     }
 }

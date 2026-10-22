@@ -4,6 +4,7 @@ Item {
     id: root
 
     property int defaultTimeout: 5000
+    property color defaultTextColor: "white"
     property int spacing: 5
     property int maxVisible: 5
 
@@ -17,7 +18,7 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    function show(msg, timeout) {
+    function show(message, timeout, textColor) {
         // evict oldest if over cap — children list is now accurate
         while (maxVisible > 0 && stack.children.length >= maxVisible) {
             stack.children[0].dismiss()
@@ -30,8 +31,9 @@ Item {
         }
 
         const bar = comp.createObject(stack, {
-            message: msg,
-            timeout: timeout === undefined ? defaultTimeout : timeout
+            message: message,
+            timeout: timeout === undefined ? defaultTimeout : timeout,
+            textColor: textColor === undefined ? defaultTextColor : textColor
         })
         if (!bar) {
             console.error("createObject failed")
