@@ -24,5 +24,6 @@
         <file>assets/icons/database_off.svg</file>
         <file>assets/icons/database_search.svg</file>
         <file>assets/icons/database_upload.svg</file>
+        <file>assets/icons/settings.svg</file>
     </qresource>
 </RCC>

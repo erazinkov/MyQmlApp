@@ -166,7 +166,7 @@ Page {
                     map: mapView.map
 
                     onMapTypeClicked: {
-                       dialogMapTypes.open()
+                       mapTypesDialog.open()
                     }
                     onMyLocationClicked: {
                         var c = positionSource.position.coordinate
@@ -176,10 +176,10 @@ Page {
                         }
                     }
                     onPlacesClicked: {
-                        var pt = placesButton.mapToItem(dialogPlaces.parent, 0, 0)
-                        dialogPlaces.open()
-                        dialogPlaces.x = pt.x - dialogPlaces.width
-                        dialogPlaces.y = pt.y
+                        var pt = placesButton.mapToItem(placesDialog.parent, 0, 0)
+                        placesDialog.open()
+                        placesDialog.x = pt.x - placesDialog.width
+                        placesDialog.y = pt.y
                     }
                     onNearMeToggled: function(checked) {
                         nearMeActive = checked
@@ -203,6 +203,9 @@ Page {
                 DatabaseControls {
                     id: databaseControls
                     Layout.alignment: Qt.AlignRight
+                    onSettingsDatabaseClicked: {
+                        databaseSettingsDialog.open()
+                    }
                     onSearchDatabaseClicked: {
                         databaseController.operateSelectForTable("", {})
                     }
@@ -213,11 +216,9 @@ Page {
                                                   "napdb",
                                                   "testuser",
                                                   "Dubna@123");
-                        console.log("onConnectDatabaseClicked")
                     }
                     onDisconnectDatabaseClicked: {
                         databaseController.operateDisconnectDatabase()
-                        console.log("onDisconnectDatabaseClicked")
                     }
                     Connections {
                         target: databaseController
@@ -227,7 +228,6 @@ Page {
 //                        }
 
                         function onConnectionStateChanged(result) {
-                            console.log(`Database connected: ${result}`);
                             databaseControls.connectionState = result
                         }
                     }
@@ -296,11 +296,11 @@ Page {
              }
 
              Popup {
-                 id: dialogMapTypes
+                 id: mapTypesDialog
                  modal: true
                  focus: true
                  closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-                 parent: parent.contentItem
+//                 parent: parent.contentItem
                  anchors.centerIn: parent
 
                  ColumnLayout {
@@ -320,7 +320,7 @@ Page {
              }
 
              Menu {
-                 id: dialogPlaces
+                 id: placesDialog
                  Repeater {
                      model: placesModel
                      delegate: MenuItem {
@@ -330,10 +330,137 @@ Page {
                          text: title
                          onTriggered: {
                              mapView.map.center = QtPositioning.coordinate(latitude, longitude)
-                             dialogPlaces.close()
+                             placesDialog.close()
                          }
                      }
                  }
+             }
+
+             Dialog {
+                 id: databaseSettingsDialog
+                 title: "Database Settings"
+                 modal: true
+                 focus: true
+                 anchors.centerIn: parent
+//                 standardButtons: Dialog.Ok | Dialog.Cancel | Dialog.Reset |Dialog.Retry
+
+                 property var defaults: ({
+                    connectionName: "Connection 0",
+                    driver:         "QMYSQL",
+                    hostName:       "localhost",
+                    databaseName:   "napdb",
+                    userName:       "testuser",
+                    password:       "Dubna@123"
+                 })
+
+                 property var current: ({})
+
+                 function loadValues(values) {
+                    current = Object.assign({}, defaults, values || {})
+                    connectionNameTextField.text = current.connectionName
+                    driverComboBox.currentIndex = Math.max(0, driverComboBox.model.indexOf(current.driver))
+                    hostNameTextField.text   = current.hostName
+                    databaseNameTextField.text = current.databaseName
+                    userNameTextField.text   = current.userName
+                    passwordTextField.text    = current.password
+                 }
+
+                 function saveValues() {
+                    current = {
+                        connectionName: connectionNameTextField.text,
+                        driver:         driverComboBox.currentText,
+                        hostName:       hostNameTextField.text,
+                        databaseName:   databaseNameTextField.text,
+                        userName:       userNameTextField.text,
+                        password:       passwordTextField.text
+                    }
+                    return current
+                 }
+
+                 Component.onCompleted: loadValues(defaults)
+                 onOpened: loadValues(current)
+
+                 GridLayout {
+                     columns: 2
+                     anchors.fill: parent
+                     rowSpacing: 5
+                     columnSpacing: 5
+
+                     Label { text: qsTr("Connection\'s name:") }
+                     TextField { id: connectionNameTextField; Layout.fillWidth: true }
+
+                     Label { text: qsTr("Driver:") }
+                     ComboBox {
+                         id: driverComboBox
+                         Layout.fillWidth: true
+                         model: ["QSQLITE", "QMYSQL", "QPSQL", "QODBC"]
+                     }
+
+                     Label { text: qsTr("Database Host:") }
+                     TextField { id: hostNameTextField; Layout.fillWidth: true }
+
+                     Label { text: qsTr("Database\'s name:") }
+                     TextField { id: databaseNameTextField; Layout.fillWidth: true }
+
+                     Label { text: qsTr("Database\'s user:") }
+                     TextField { id: userNameTextField; Layout.fillWidth: true }
+
+                     Label { text: qsTr("Password:") }
+                     TextField { id: passwordTextField; Layout.fillWidth: true; echoMode: TextInput.Password }
+                 }
+                 footer: DialogButtonBox {
+                     Button {
+                        text: qsTr("Reset")
+                        onClicked: {
+                            databaseSettingsDialog.loadValues(databaseSettingsDialog.defaults)
+                        }
+                     }
+                     Button {
+                        text: qsTr("Cancel")
+                        DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
+                        onClicked: {
+                            databaseSettingsDialog.close()
+                        }
+                     }
+                     Button {
+                        text: qsTr("Ok")
+                        DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
+                        onClicked: {
+                            var s = databaseSettingsDialog.saveValues()
+                            databaseSettingsDialog.accept()
+                        }
+                     }
+                     Button {
+                        text: qsTr("Test")
+                        onClicked: {
+
+                        }
+                     }
+                 }
+//                 onReset: {
+//                     loadValues(defaults)
+//                     console.log("Reset")
+//                 }
+
+//                 onAccepted: {
+//                     var s = saveValues()
+////                     var ok = dbManager.configureConnection(
+////                         connNameField.text,
+////                         driverBox.currentText,
+////                         hostField.text,
+////                         dbNameField.text,
+////                         userField.text,
+////                         pwdField.text
+////                     )
+////                     if (!ok) {
+////                         console.warn("Connection failed")
+////                         // A prompt can be displayed here, or the dialog can be kept open
+////                     }
+//                 }
+
+//                 onRejected: {
+//                     // User cancelled; no processing needed
+//                 }
              }
         }
 

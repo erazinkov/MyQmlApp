@@ -150,7 +150,6 @@ ApplicationWindow {
             snackbarManager.show(`Database ${result ? "connected" : "disconnected"}`)
         }
         function onErrorOccurred(errorText) {
-            console.log(errorText)
             snackbarManager.show(errorText)
         }
     }

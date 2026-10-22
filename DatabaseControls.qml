@@ -11,7 +11,7 @@ ColumnLayout {
     signal searchDatabaseClicked()
     signal connectDatabaseClicked()
     signal disconnectDatabaseClicked()
-
+    signal settingsDatabaseClicked()
 
     spacing: 5
 
@@ -19,6 +19,21 @@ ColumnLayout {
         Layout.alignment: Qt.AlignRight
         spacing: 5
 
+        Button {
+            id: uploadDatabaseButton
+            visible: connectionState
+            enabled: connectionState
+            checkable: true
+            checked: false
+            icon.source: "qrc:/assets/icons/database_upload.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+        }
         Button {
             id: searchDatabaseButton
             visible: connectionState
@@ -36,7 +51,6 @@ ColumnLayout {
         }
         Button {
             id: connectDatabaseButton
-            Layout.alignment: Qt.AlignRight
             icon.source: connectionState ? "qrc:/assets/icons/database.svg"
                                          : "qrc:/assets/icons/database_off.svg"
             icon.color: "black"
@@ -49,12 +63,10 @@ ColumnLayout {
 
             onClicked: connectionState ? root.disconnectDatabaseClicked() : root.connectDatabaseClicked()
         }
+
         Button {
-            id: uploadDatabaseButton
-            Layout.alignment: Qt.AlignRight
-            checkable: true
-            checked: false
-            icon.source: "qrc:/assets/icons/database_upload.svg"
+            id: settingsDatabaseButton
+            icon.source: "qrc:/assets/icons/settings.svg"
             icon.color: "black"
             icon.width: 24
             icon.height: 24
@@ -62,6 +74,9 @@ ColumnLayout {
             implicitWidth: 32
             implicitHeight: 32
             padding: 0
+
+            onClicked: root.settingsDatabaseClicked()
         }
+
     }
 }
