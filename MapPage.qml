@@ -239,6 +239,7 @@ Page {
                     Connections {
                         target: databaseController
                         function onSelectForTable(data) {
+                            console.log(data)
                             markerModel.addData(data);
                             pController.operateAddData(data);
                         }

@@ -185,6 +185,7 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
                 }
             }
             queryResult.append(row);
+            qDebug() << row;
         }
         emit selectForTable(queryResult);
     } else {
