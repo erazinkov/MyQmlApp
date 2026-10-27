@@ -278,6 +278,8 @@ Page {
                 gridColumns: 1
                 parent: mapView.map
                 overlayEnabled: mapGridOverlaySwitch.checked
+                z: 10000
+
 
 //                onCoordinateChanged: function(newCoordinate) {
 //                    console.log("Grid moved to:", coordinate.latitude,
@@ -456,23 +458,180 @@ Page {
              }
 
 
-             property var topLeft:     QtPositioning.coordinate(56.7626490954404, 37.219724674593664)
-             property var bottomRight: QtPositioning.coordinate(56.76088488383156, 37.2229433254102)
-             property var center: QtPositioning.coordinate(56.76176698963598, 37.22133400000193)
-             property int bearing: 0
+             //44.98123315320525 42.008523822560335
+             //150.8
+             //17
+//             readonly property var    center_:   QtPositioning.coordinate(56.761767, 37.221334)
+             readonly property var    center_:   QtPositioning.coordinate(44.98123315320525, 42.008523822560335)
+             readonly property real   size_:     150.8
+             readonly property real   bearing_:  17
 
+             MapQuickItem {
+                 id: densityMapQuickItem
+                     parent: mapView.map
+                     coordinate: center_
+                     z: 10000
+                     anchorPoint: Qt.point(densityImage.width / 2, densityImage.height / 2)
+
+                     sourceItem: Image {
+                         id: densityImage
+                         source: "file:///home/egor/MyQmlApp/matrix_hist.png"
+                         antialiasing: true
+                         mipmap: true
+                         width: 100
+                         height: 100
+                         opacity: 0.8
+                         transform: [
+                             Rotation {
+                                origin.x: densityImage.width / 2
+                                origin.y: densityImage.height / 2
+                                axis { x: 0; y: 0; z: 1 }
+                                angle: bearing_ - mapView.map.bearing
+                             },
+                             Rotation {
+                                origin.x: densityImage.width / 2
+                                origin.y: densityImage.height / 2
+                                axis { x: 1; y: 0; z: 0 }
+                                angle: mapView.map.tilt
+                             }
+                         ]
+                     }
+                     function updateSize() {
+                         if (!mapView.map.mapReady) {
+                             return
+                         }
+                         var lat = center_.latitude
+                         var mpp = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, mapView.map.zoomLevel)
+                         var sidePx = size_ / mpp
+                         densityImage.width  = sidePx
+                         densityImage.height = sidePx
+                     }
+
+                     Connections {
+                         target: mapView.map
+                         function onMapReadyChanged()   { densityMapQuickItem.updateSize() }
+                         function onZoomLevelChanged()  { densityMapQuickItem.updateSize() }
+                         function onTiltChanged() { densityMapQuickItem.updateSize() }
+                         function onCenterChanged()     { densityMapQuickItem.updateSize() }
+                     }
+
+                     Component.onCompleted: {
+                         updateSize()
+//                         Qt.callLater(function() { bearing_ = 45 })
+                     }
+
+                 }
 
 
 //             MapQuickItem {
+//                 id: densityMapQuickItem
+//                     // Known geographic anchor center
+//                     parent: mapView.map
+//                     coordinate: center_
+
+//                     // Match the center point of your item to the coordinate
+//                     anchorPoint: Qt.point(densityRectangle.width / 2, densityRectangle.height / 2)
+
+//                     sourceItem: Rectangle {
+//                         id: densityRectangle
+//                         width: 100  // Dimensions in screen pixels
+//                         height: 100
+//                         color: "blue"
+//                         border.color: "white"
+//                         border.width: 1
+
+//                         // Rotate the screen item around its exact center
+//                         transform: Rotation {
+//                             origin.x: densityRectangle.width / 2
+//                             origin.y: densityRectangle.height / 2
+//                             angle: bearing_
+//                         }
+//                     }
+//                     function updateSize() {
+//                         if (!mapView.map.mapReady) {
+//                             return
+//                         }
+//                         var lat = center_.latitude
+//                         var mpp = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, mapView.map.zoomLevel)
+//                         var sidePx = size_ / mpp
+//                         densityRectangle.width  = sidePx
+//                         densityRectangle.height = sidePx
+//                     }
+
+//                     Connections {
+//                         target: mapView.map
+//                         function onMapReadyChanged()   { densityMapQuickItem.updateSize() }
+//                         function onZoomLevelChanged()  { densityMapQuickItem.updateSize() }
+////                         function onCenterChanged()     { densityMapQuickItem.updateSize() }
+//                     }
+
+//                     Component.onCompleted: {
+//                         updateSize()
+////                         Qt.callLater(function() { bearing_ = 45 })
+//                     }
+
+//                 }
+
+//             MapQuickItem {
+//                     id: densityMapQuickItem
+//                     parent: mapView.map
+//                     coordinate: center_
+////                     anchorPoint.x: densityMapQuickItem.sourceItem ? densityMapQuickItem.sourceItem.width  / 2 : 0
+////                     anchorPoint.y: densityMapQuickItem.sourceItem ? densityMapQuickItem.sourceItem.height / 2 : 0
+
+//                     sourceItem: Item {
+//                         id: densityItem
+//                         width: 10
+//                         height: 10
+////                         anchors.centerIn: parent
+//                         rotation: bearing_          // rotates around Item.Center by default
+//                         transformOrigin: Item.Center
+
+//                         Rectangle {
+//                             anchors.fill: parent
+//                             color: "blue"
+//                             border.color: "black"
+//                             border.width: 1
+//                         }
+//                     }
+
+//                     function updateSize() {
+//                         if (!mapView.map.mapReady) {
+//                             return
+//                         }
+//                         var lat = center_.latitude
+//                         var mpp = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, mapView.map.zoomLevel)
+//                         var sidePx = size_ / mpp
+//                         console.log("sidePx", sidePx)
+//                         densityItem.width  = sidePx
+//                         densityItem.height = sidePx
+//                         densityMapQuickItem.anchorPoint.x = densityItem ? densityItem.width  / 2 : 0
+//                         densityMapQuickItem.anchorPoint.y = densityItem ? densityItem.height  / 2 : 0
+
+//                     }
+
+//                     Connections {
+//                         target: mapView.map
+//                         function onMapReadyChanged()   { densityMapQuickItem.updateSize() }
+//                         function onZoomLevelChanged()  { densityMapQuickItem.updateSize() }
+////                         function onCenterChanged()     { densityMapQuickItem.updateSize() }
+//                     }
+
+//                     Component.onCompleted: {
+//                         updateSize()
+//                         // Rotate 45° after everything is laid out
+//                         Qt.callLater(function() { bearing_ = 45 })
+//                     }
+//                 }
+//             MapQuickItem {
 //                 id: topLeftMarker
 //                 parent: mapView.map
-//                 coordinate: topLeft
+//                 coordinate: center
 //                 sourceItem: Item {
 //                     id: topLeftItem
-////                     anchors.centerIn: parent
+//                     anchors.centerIn: parent
 //                     width: 0
 //                     height: 0
-//                     rotation: bearing
 //                     Rectangle {
 //                         anchors.centerIn: parent
 //                         anchors.fill: parent
@@ -493,7 +652,7 @@ Page {
 //                             console.log(topLeft.distanceTo(bottomRight) * Math.cos(Math.PI / 4.0))
 //                             topLeftItem.width = (bR.x - tL.x);
 //                             topLeftItem.height = (bR.y - tL.y);
-////                             topLeftItem.rotation = -bearing;
+//                             topLeftItem.rotation = bearing;
 //                         }
 //                     }
 

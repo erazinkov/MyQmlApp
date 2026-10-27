@@ -57,8 +57,8 @@ MapQuickItem {
 
 //            console.log("topLeft", coord_topLeft.latitude, coord_topLeft.longitude)
 //            console.log("bottomRight", coord_bottomRight.latitude, coord_bottomRight.longitude)
-//            console.log("bearing", map.bearing)
-//            console.log("center", coord_center.latitude, coord_center.longitude)
+            console.log("bearing", map.bearing)
+            console.log("center", coord_center.latitude, coord_center.longitude)
 
             return coord_topLeft.distanceTo(coord_bottomRight) * Math.cos(Math.PI / 4.0)
         }
