@@ -239,7 +239,6 @@ Page {
                     Connections {
                         target: databaseController
                         function onSelectForTable(data) {
-                            console.log(data)
                             markerModel.addData(data);
                             pController.operateAddData(data);
                         }
@@ -273,6 +272,7 @@ Page {
                 map: mapView.map
                 mapView: mapView
                 initialCoordinate: mapView.map.center
+//                initialCoordinate: QtPositioning.coordinate(56.761767, 37.221334)
                 gridSize: 150
                 gridRows: 1
                 gridColumns: 1
@@ -285,6 +285,12 @@ Page {
 //                }
                 onProcessRequested: function(polygons, rows, columns) {
                     pController.operateProcessData(polygons, rows, columns)
+                }
+                Connections {
+                    target: mapView.map
+                    function onBearingChanged() {
+                        mapGridOverlay.distance()
+                    }
                 }
              }
 
@@ -344,6 +350,8 @@ Page {
                      }
                  }
              }
+
+
 
              Dialog {
                  id: databaseSettingsDialog
@@ -446,6 +454,74 @@ Page {
                      }
                  }
              }
+
+
+             property var topLeft:     QtPositioning.coordinate(56.7626490954404, 37.219724674593664)
+             property var bottomRight: QtPositioning.coordinate(56.76088488383156, 37.2229433254102)
+             property var center: QtPositioning.coordinate(56.76176698963598, 37.22133400000193)
+             property int bearing: 0
+
+
+
+//             MapQuickItem {
+//                 id: topLeftMarker
+//                 parent: mapView.map
+//                 coordinate: topLeft
+//                 sourceItem: Item {
+//                     id: topLeftItem
+////                     anchors.centerIn: parent
+//                     width: 0
+//                     height: 0
+//                     rotation: bearing
+//                     Rectangle {
+//                         anchors.centerIn: parent
+//                         anchors.fill: parent
+//                         color: "red"
+//                         border.color: "white"
+//                         border.width: 1
+//                     }
+//                 }
+//                 Connections {
+//                     target: mapView.map
+//                     function onMapReadyChanged() {
+//                         if (mapView.map.mapReady) {
+//                             topLeftMarker.zoomLevel = mapView.map.zoomLevel
+//                             var tL = mapView.map.fromCoordinate(topLeft, false);
+//                             var bR = mapView.map.fromCoordinate(bottomRight, false);
+//                             console.log("width", bR.x - tL.x);
+//                             console.log("height", bR.y - tL.y);
+//                             console.log(topLeft.distanceTo(bottomRight) * Math.cos(Math.PI / 4.0))
+//                             topLeftItem.width = (bR.x - tL.x);
+//                             topLeftItem.height = (bR.y - tL.y);
+////                             topLeftItem.rotation = -bearing;
+//                         }
+//                     }
+
+//                 }
+//             }
+
+
+
+//             MapQuickItem {
+//                 id: bottomRightMarker
+//                 parent: mapView.map
+//                 coordinate: bottomRight
+//                 sourceItem: Item {
+//                     id: bottomRightItem
+//                     width: 20
+//                     height: 20
+//                     Rectangle {
+//                         anchors.centerIn: parent
+//                         anchors.fill: parent
+//                         color: "red"
+//                         border.color: "white"
+//                         border.width: 1
+//                         radius: 10
+//                     }
+
+//                 }
+
+//             }
         }
 
 

@@ -130,9 +130,9 @@ void ProcessingWorker::handleProcessData(QList<QVariantList> paths, int rows, in
 
     writeProcessingDataToCsv("processing_data.csv", processingData);
 
-    for (auto &pD : processingData) {
-        qDebug() << pD.rowIdx << pD.colIdx << pD.gps.count() << pD.gps;
-    }
+//    for (auto &pD : processingData) {
+//        qDebug() << pD.rowIdx << pD.colIdx << pD.gps.count() << pD.gps;
+//    }
 //    saveProcessingData("processing_data.bin", processingData);
 
     QList<QGeoPolygon> polygons(paths.count());

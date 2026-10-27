@@ -29,9 +29,9 @@ void Processing::processDataTest1(const QList<QVariantList> &paths)
         emit finished(p, pointsInPolygons.at(p));
     }
 
-    for (auto i{0}; i < pointsInPolygons.count(); ++i) {
-        qDebug() << i << pointsInPolygons.at(i);
-    }
+//    for (auto i{0}; i < pointsInPolygons.count(); ++i) {
+//        qDebug() << i << pointsInPolygons.at(i);
+//    }
 }
 
 void Processing::addData(const QList<QVariantHash> &data)

@@ -109,7 +109,7 @@ void MarkerModel::processData(QGeoCoordinate topLeft, QGeoCoordinate bottomRight
     pointsInCells.resize(cells.count());
 
     for (auto c{0}; c < cells.count(); ++c) {
-        qDebug() << cells.at(c).topLeft.latitude();
+//        qDebug() << cells.at(c).topLeft.latitude();
         for (auto i{0}; i < data.count(); ++i) {
             if (data.at(i).contains("gps_lat") && data.at(i).contains("gps_lon")) {
 
