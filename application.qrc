@@ -27,5 +27,6 @@
         <file>assets/icons/settings.svg</file>
         <file>assets/icons/chevron_left.svg</file>
         <file>assets/icons/chevron_right.svg</file>
+        <file>assets/icons/date_range.svg</file>
     </qresource>
 </RCC>

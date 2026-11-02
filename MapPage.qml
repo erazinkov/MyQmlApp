@@ -227,6 +227,9 @@ Page {
                     onSearchDatabaseClicked: {
                         databaseController.operateSelectForTable("", {})
                     }
+                    onSearchSettingsDatabaseClicked: {
+                        databaseSearchSettingsDialog.open();
+                    }
                     onConnectDatabaseClicked: {
                         databaseController.operateConnectDatabase(
                                     databaseSettingsDialog.current.connectionName,
@@ -313,7 +316,7 @@ Page {
                          mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
                      }
                  }
-                 databaseSearchSettingsDialog.open();
+
              }
 
              Popup {

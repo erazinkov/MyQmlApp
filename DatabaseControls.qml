@@ -9,6 +9,7 @@ ColumnLayout {
 //    readonly property alias uploadDatabaseChecked: uploadDatabaseButton.checked
 
     signal searchDatabaseClicked()
+    signal searchSettingsDatabaseClicked()
     signal connectDatabaseClicked()
     signal disconnectDatabaseClicked()
     signal settingsDatabaseClicked()
@@ -51,6 +52,21 @@ ColumnLayout {
             padding: 0
 
             onClicked: root.searchDatabaseClicked()
+        }
+        Button {
+            id: searchSettingsDatabaseButton
+            visible: connectionState
+            enabled: connectionState
+            icon.source: "qrc:/assets/icons/date_range.svg"
+            icon.color: "black"
+            icon.width: 24
+            icon.height: 24
+            display: AbstractButton.IconOnly
+            implicitWidth: 32
+            implicitHeight: 32
+            padding: 0
+
+            onClicked: root.searchSettingsDatabaseClicked()
         }
         Button {
             id: connectDatabaseButton
