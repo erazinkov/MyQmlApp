@@ -16,7 +16,20 @@ Dialog {
     property int displayYear: fromDate.getFullYear()
     property int displayMonth: fromDate.getMonth()
 
+
+    Item {
+            // This item sizes itself to the ColumnLayout via implicit size
+            implicitWidth: columnLayout.implicitWidth
+            implicitHeight: columnLayout.implicitHeight
+
+            MouseArea {
+                anchors.fill: parent
+                propagateComposedEvents: false
+                onPressed: (mouse) => mouse.accepted = true
+            }
+
     ColumnLayout {
+        id: columnLayout
         anchors.fill: parent
         spacing: 5
 
@@ -166,6 +179,7 @@ Dialog {
 
                 MouseArea {
                     anchors.fill: parent
+                    onPressed: (mouse) => mouse.accepted = true
                     onClicked: {
                         const picked = new Date(model.year, model.month, model.day)
                         if (root.activeSelector === "from") {
@@ -185,6 +199,7 @@ Dialog {
                 }
             }
         }
+    }
     }
     footer: DialogButtonBox {
         Button {
