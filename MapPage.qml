@@ -8,6 +8,8 @@ import QtQuick.Layouts
 
 import QtQuick.Shapes
 
+
+
 import markerModel
 
 Page {
@@ -311,6 +313,7 @@ Page {
                          mapTypesModel.append({ index: i, mapTypeName: mapView.map.supportedMapTypes[i].description });
                      }
                  }
+                 databaseSearchSettingsDialog.open();
              }
 
              Popup {
@@ -358,7 +361,7 @@ Page {
 
              Dialog {
                  id: databaseSettingsDialog
-                 title: "Database Settings"
+                 title: qsTr("Database Settings")
                  modal: true
                  focus: true
                  anchors.centerIn: parent
@@ -458,6 +461,15 @@ Page {
                  }
              }
 
+             DatabaseSearchDialog {
+                 id: databaseSearchSettingsDialog
+                 onAccepted: {
+                     console.log("Selected:",
+                                 Qt.formatDate(databaseSearchSettingsDialog.fromDate, "yyyy-MM-dd"),
+                                 "→",
+                                 Qt.formatDate(databaseSearchSettingsDialog.toDate, "yyyy-MM-dd"))
+                 }
+            }
 
              //44.98123315320525 42.008523822560335
              //150.8

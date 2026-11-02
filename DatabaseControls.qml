@@ -14,7 +14,6 @@ ColumnLayout {
     signal settingsDatabaseClicked()
     signal uploadDatabaseToggled(bool checked)
 
-    spacing: 5
 
     RowLayout {
         Layout.alignment: Qt.AlignRight
@@ -81,6 +80,5 @@ ColumnLayout {
 
             onClicked: root.settingsDatabaseClicked()
         }
-
     }
 }

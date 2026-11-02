@@ -25,5 +25,7 @@
         <file>assets/icons/database_search.svg</file>
         <file>assets/icons/database_upload.svg</file>
         <file>assets/icons/settings.svg</file>
+        <file>assets/icons/chevron_left.svg</file>
+        <file>assets/icons/chevron_right.svg</file>
     </qresource>
 </RCC>
