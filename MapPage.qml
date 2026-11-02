@@ -142,6 +142,7 @@ Page {
                 }
                 map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
+
             }
 
             MapPolyline {

@@ -70,8 +70,10 @@ void ProcessingWorker::handleProcessData(QList<QVariantList> paths, int rows, in
         }
 
         for (const ProcessingData &processingDataItem : processingData) {
+            if (processingDataItem.gps.size() < 500) {
+                continue;
+            }
             ofs << processingDataItem.rowIdx << ',' << processingDataItem.colIdx << ',';
-
 
             for (int i = 0; i < processingDataItem.gps.size(); ++i) {
                 if (i > 0) {

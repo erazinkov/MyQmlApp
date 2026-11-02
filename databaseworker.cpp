@@ -158,10 +158,19 @@ void DatabaseWorker::handleSelectForTable1(const QString &/*queryString*/, const
 //        QDateTime d_1{QDate{2025, 06, 18}, QTime{19, 19, 0}};
 //        QDateTime d_0{QDate{2025, 06, 18}, QTime{19, 00, 0}};
 //        QDateTime d_1{QDate{2025, 06, 18}, QTime{19, 20, 0}};
-        QDateTime d_0{QDate{2025, 06, 17}, QTime{10, 00, 0}};
-        QDateTime d_1{QDate{2025, 06, 18}, QTime{19, 30, 0}};
-        queryString.append(QString("%1 >= '%2' AND %1 <= '%3'").arg(keys.at(0)).arg(d_0.toString("yyyy-MM-dd HH:mm:ss")).arg(d_1.toString("yyyy-MM-dd HH:mm:ss")));
+        QDateTime d_0{QDate{2025, 06, 18}, QTime{17, 19, 0}};
+        QDateTime d_1{QDate{2025, 06, 18}, QTime{17, 35, 0}};
+        queryString.append(QString("(%1 >= '%2' AND %1 <= '%3')").arg(keys.at(0), d_0.toString("yyyy-MM-dd HH:mm:ss"), d_1.toString("yyyy-MM-dd HH:mm:ss")));
 
+        queryString.append(" OR ");
+        QDateTime d_2{QDate{2025, 06, 18}, QTime{16, 06, 0}};
+        QDateTime d_3{QDate{2025, 06, 18}, QTime{16, 22, 0}};
+        queryString.append(QString("(%1 >= '%2' AND %1 <= '%3')").arg(keys.at(0), d_2.toString("yyyy-MM-dd HH:mm:ss"), d_3.toString("yyyy-MM-dd HH:mm:ss")));
+//        queryString.append(" OR ");
+//        QDateTime d_4{QDate{2025, 06, 17}, QTime{13, 34, 0}};
+//        QDateTime d_5{QDate{2025, 06, 17}, QTime{13, 50, 0}};
+//        queryString.append(QString("(%1 >= '%2' AND %1 <= '%3')").arg(keys.at(0), d_4.toString("yyyy-MM-dd HH:mm:ss"), d_5.toString("yyyy-MM-dd HH:mm:ss")));
+        queryString.append(" ORDER BY dt");
 
 //        QDate d_0{2025, 06, 15};
 //        QDate d_1{2025, 06, 21};
