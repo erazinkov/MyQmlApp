@@ -360,8 +360,6 @@ Page {
                  }
              }
 
-
-
              Dialog {
                  id: databaseSettingsDialog
                  title: qsTr("Database Settings")
@@ -375,8 +373,7 @@ Page {
                     hostName:       "localhost",
                     databaseName:   "napdb",
                     userName:       "testuser",
-                    password:       "Dubna@123"
-                 })
+                    password:       "Dubna@123"})
 
                  property var current: ({})
 
@@ -402,42 +399,95 @@ Page {
                     return current
                  }
 
-                 Component.onCompleted: loadValues(defaults)
-                 onOpened: loadValues(current)
+                 property var defaultsDateTime: ({
+                    dateFrom: "2025-06-17 09:00:00",
+                    dateTo: "2025-06-17 19:00:00"})
 
-                 GridLayout {
-                     columns: 2
+                 property var currentDateTime: ({})
+
+                 function loadValuesDateTime(values) {
+                    currentDateTime = Object.assign({}, defaultsDateTime, values || {})
+                    fromDateTimeTextField.text = currentDateTime.dateFrom
+                    toDateTimeTextField.text = currentDateTime.dateTo
+                 }
+
+                 function saveValuesDateTime() {
+                    currentDateTime = {
+                        dateFrom: fromDateTimeTextField.text,
+                        dateTo:   toDateTimeTextField.text
+                    }
+                    return current
+                 }
+
+                 Component.onCompleted: {
+                     loadValues(defaults)
+                     loadValuesDateTime(defaultsDateTime)
+                 }
+                 onOpened: {
+                     loadValues(current)
+                     loadValuesDateTime(currentDateTime)
+                 }
+
+                 ColumnLayout {
                      anchors.fill: parent
-                     rowSpacing: 5
-                     columnSpacing: 5
-
-                     Label { text: qsTr("Connection\'s name:") }
-                     TextField { id: connectionNameTextField; Layout.fillWidth: true }
-
-                     Label { text: qsTr("Driver:") }
-                     ComboBox {
-                         id: driverComboBox
+                     spacing: 5
+                     GridLayout {
                          Layout.fillWidth: true
-                         model: ["QSQLITE", "QMYSQL", "QPSQL", "QODBC"]
+                         columns: 2
+                         rowSpacing: 5
+                         columnSpacing: 5
+
+                         Label { text: qsTr("Connection\'s name:") }
+                         TextField { id: connectionNameTextField; Layout.fillWidth: true }
+
+                         Label { text: qsTr("Driver:") }
+                         ComboBox {
+                             id: driverComboBox
+                             Layout.fillWidth: true
+                             model: ["QSQLITE", "QMYSQL", "QPSQL", "QODBC"]
+                         }
+
+                         Label { text: qsTr("Database Host:") }
+                         TextField { id: hostNameTextField; Layout.fillWidth: true }
+
+                         Label { text: qsTr("Database\'s name:") }
+                         TextField { id: databaseNameTextField; Layout.fillWidth: true }
+
+                         Label { text: qsTr("Database\'s user:") }
+                         TextField { id: userNameTextField; Layout.fillWidth: true }
+
+                         Label { text: qsTr("Password:") }
+                         TextField { id: passwordTextField; Layout.fillWidth: true; echoMode: TextInput.Password }
+                     }
+                     RowLayout {
+                         Layout.fillWidth: true
+                         spacing: 5
+
+                         TextField {
+                             id: fromDateTimeTextField;
+                             Layout.fillWidth: true;
+                             placeholderText: "yyyy-MM-dd HH:mm:ss"
+                             validator: RegularExpressionValidator {
+                                 regularExpression: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/
+                             }
+                         }
+                         TextField {
+                             id: toDateTimeTextField;
+                             Layout.fillWidth: true;
+                             placeholderText: "yyyy-MM-dd HH:mm:ss"
+                             validator: RegularExpressionValidator {
+                                 regularExpression: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/
+                             }
+                         }
                      }
 
-                     Label { text: qsTr("Database Host:") }
-                     TextField { id: hostNameTextField; Layout.fillWidth: true }
-
-                     Label { text: qsTr("Database\'s name:") }
-                     TextField { id: databaseNameTextField; Layout.fillWidth: true }
-
-                     Label { text: qsTr("Database\'s user:") }
-                     TextField { id: userNameTextField; Layout.fillWidth: true }
-
-                     Label { text: qsTr("Password:") }
-                     TextField { id: passwordTextField; Layout.fillWidth: true; echoMode: TextInput.Password }
                  }
                  footer: DialogButtonBox {
                      Button {
                         text: qsTr("Reset")
                         onClicked: {
                             databaseSettingsDialog.loadValues(databaseSettingsDialog.defaults)
+                            databaseSettingsDialog.loadValuesDateTime(databaseSettingsDialog.defaultsDateTime)
                         }
                      }
                      Button {
@@ -452,6 +502,7 @@ Page {
                         DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
                         onClicked: {
                             var s = databaseSettingsDialog.saveValues()
+                            var sDateTime = databaseSettingsDialog.saveValuesDateTime()
                             databaseSettingsDialog.accept()
                         }
                      }
