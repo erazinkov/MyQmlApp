@@ -25,7 +25,7 @@ public slots:
     void handleSelectTables();
     void handleSelectForTable(const QString &queryString, const QStringList &keysAs);
 
-    void handleSelectForTable1(const QString &queryString, const QStringList &keysAs);
+    void handleSelectForTable1(const QString &fromDateTime, const QString &toDateTime);
 
     void onInsertData(int n,
                     const QString &dt,

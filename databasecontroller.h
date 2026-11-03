@@ -38,7 +38,7 @@ signals:
     void operateQuery(const QString &queryString);
 
     void operateSelectTables();
-    void operateSelectForTable(const QString &queryString, const QStringList &keysAs);
+    void operateSelectForTable(const QString &fromDateTime, const QString &toDateTime);
 
     void operateSelectForTableWithCoordinate(const QGeoCoordinate &topLeft,
                                             const QGeoCoordinate &bottomRight,

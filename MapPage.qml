@@ -225,7 +225,9 @@ Page {
                         databaseSettingsDialog.open()
                     }
                     onSearchDatabaseClicked: {
-                        databaseController.operateSelectForTable("", {})
+                        databaseController.operateSelectForTable(
+                                    databaseSettingsDialog.currentDateTime.fromDateTime,
+                                    databaseSettingsDialog.currentDateTime.toDateTime)
                     }
                     onSearchSettingsDatabaseClicked: {
                         databaseSearchSettingsDialog.open();
@@ -400,21 +402,21 @@ Page {
                  }
 
                  property var defaultsDateTime: ({
-                    dateFrom: "2025-06-17 09:00:00",
-                    dateTo: "2025-06-17 19:00:00"})
+                    fromDateTime: "2025-06-17 09:00:00",
+                    toDateTime: "2025-06-17 19:00:00"})
 
                  property var currentDateTime: ({})
 
                  function loadValuesDateTime(values) {
                     currentDateTime = Object.assign({}, defaultsDateTime, values || {})
-                    fromDateTimeTextField.text = currentDateTime.dateFrom
-                    toDateTimeTextField.text = currentDateTime.dateTo
+                    fromDateTimeTextField.text = currentDateTime.fromDateTime
+                    toDateTimeTextField.text = currentDateTime.toDateTime
                  }
 
                  function saveValuesDateTime() {
                     currentDateTime = {
-                        dateFrom: fromDateTimeTextField.text,
-                        dateTo:   toDateTimeTextField.text
+                        fromDateTime: fromDateTimeTextField.text,
+                        toDateTime:   toDateTimeTextField.text
                     }
                     return current
                  }
