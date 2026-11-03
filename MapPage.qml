@@ -225,6 +225,7 @@ Page {
                         databaseSettingsDialog.open()
                     }
                     onSearchDatabaseClicked: {
+                        onDelete();
                         databaseController.operateSelectForTable(
                                     databaseSettingsDialog.currentDateTime.fromDateTime,
                                     databaseSettingsDialog.currentDateTime.toDateTime)
