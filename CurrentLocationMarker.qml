@@ -60,7 +60,7 @@ MapQuickItem {
             Label {
                 padding: 5
                 text: (root.positionSource && root.positionSource.position.speedValid)
-                      ? root.positionSource.position.speed.toFixed(1)
+                      ? root.positionSource.position.speed.toFixed(1) + qsTr("m/s")
                       : "..."
                 color: "white"
                 background: Rectangle {
