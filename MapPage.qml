@@ -403,8 +403,8 @@ Page {
                  }
 
                  property var defaultsDateTime: ({
-                    fromDateTime: "2025-06-17 09:00:00",
-                    toDateTime: "2025-06-17 19:00:00"})
+                    fromDateTime: "2025-06-17 10:00:00",
+                    toDateTime: "2025-06-17 11:00:00"})
 
                  property var currentDateTime: ({})
 
@@ -545,7 +545,7 @@ Page {
 
                      sourceItem: Image {
                          id: densityImage
-                         source: "file:///home/egor/MyQmlApp/matrix_hist.png"
+                         source: "file:///home/egor/MyQmlApp/matrix_hist_1.png"
                          antialiasing: true
                          mipmap: true
                          width: 100
