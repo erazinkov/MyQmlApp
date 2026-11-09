@@ -68,17 +68,18 @@ MapQuickItem {
                     radius: 5
                 }
             }
-//            Label {
-//                padding: 5
-//                text: (root.positionSource && root.positionSource.position.directionValid)
-//                      ? root.positionSource.position.direction.toFixed(1)
-//                      : "..."
-//                color: "white"
-//                background: Rectangle {
-//                    color: "black"
-//                    radius: 5
-//                }
-//            }
+            Label {
+//                visible: root.positionSource && root.positionSource.position.directionValid
+                padding: 5
+                text: (root.positionSource && root.positionSource.position.directionValid)
+                      ? root.positionSource.position.direction.toFixed(1)
+                      : "..."
+                color: "white"
+                background: Rectangle {
+                    color: "black"
+                    radius: 5
+                }
+            }
         }
 
     }

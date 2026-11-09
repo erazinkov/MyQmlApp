@@ -144,6 +144,8 @@ Page {
                 }
                 map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
+//                map.bearing: (positionSource && positionSource.position.directionValid)
+//                             ? positionSource.position.direction.toFixed(1) : 0.0
 
             }
 
