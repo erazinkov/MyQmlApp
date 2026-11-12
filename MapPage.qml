@@ -22,7 +22,7 @@ Page {
                 markerModel.deleteData();
             }
 
-            property bool nearMeActive: false
+            property int followMeState: 0
             property bool uploadDatabaseActive: false
             property bool initialPositionSourceHandled: true
 
@@ -118,9 +118,21 @@ Page {
                             pathMapPolyLine.path = pts
                         }
                     }
-
-                    if (nearMeActive) {
-                        mapView.map.center = p
+                    switch (followMeState) {
+                        case 0:
+                        break
+                        case 1:
+                            mapView.map.center = p
+                            mapView.map.tilt = 0
+                        break
+                        case 2:
+                            mapView.map.center = p
+                            mapView.map.bearing =  positionSource.position.directionValid
+                                    ? positionSource.position.direction : 0
+                            var cap = mapView.map.activeMapType.cameraCapabilities
+                            var max = cap.maximumTilt
+                            mapView.map.tilt = max > 0 ? Math.min(45, max) : 0
+                        break
                     }
 
                     if (uploadDatabaseActive) {
@@ -144,10 +156,11 @@ Page {
                 }
                 map.center: startLocation.coordinate
                 map.zoomLevel: (maximumZoomLevel - minimumZoomLevel) / 1.25
-//                map.bearing: (positionSource && positionSource.position.directionValid)
-//                             ? positionSource.position.direction.toFixed(1) : 0.0
+
 
             }
+
+
 
             MapPolyline {
                 id: pathMapPolyLine
@@ -193,9 +206,10 @@ Page {
                         placesDialog.x = pt.x - placesDialog.width
                         placesDialog.y = pt.y
                     }
-                    onNearMeToggled: function(checked) {
-                        nearMeActive = checked
-                        if (checked) {
+
+                    onFollowMeStateChanged: function(currentState) {
+                        followMeState = currentState
+                        if (currentState !== 0) {
                             var c = positionSource.position.coordinate
                             if (c.isValid) {
                                 mapView.map.center = c
@@ -547,7 +561,7 @@ Page {
 
                      sourceItem: Image {
                          id: densityImage
-                         source: "file:///home/egor/MyQmlApp/matrix_hist_1.png"
+                         source: "file:///home/egor/MyQmlApp/matrix_hist.png"
                          antialiasing: true
                          mipmap: true
                          width: 100
@@ -594,165 +608,15 @@ Page {
 
                  }
 
-
-//             MapQuickItem {
-//                 id: densityMapQuickItem
-//                     // Known geographic anchor center
-//                     parent: mapView.map
-//                     coordinate: center_
-
-//                     // Match the center point of your item to the coordinate
-//                     anchorPoint: Qt.point(densityRectangle.width / 2, densityRectangle.height / 2)
-
-//                     sourceItem: Rectangle {
-//                         id: densityRectangle
-//                         width: 100  // Dimensions in screen pixels
-//                         height: 100
-//                         color: "blue"
-//                         border.color: "white"
-//                         border.width: 1
-
-//                         // Rotate the screen item around its exact center
-//                         transform: Rotation {
-//                             origin.x: densityRectangle.width / 2
-//                             origin.y: densityRectangle.height / 2
-//                             angle: bearing_
-//                         }
-//                     }
-//                     function updateSize() {
-//                         if (!mapView.map.mapReady) {
-//                             return
-//                         }
-//                         var lat = center_.latitude
-//                         var mpp = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, mapView.map.zoomLevel)
-//                         var sidePx = size_ / mpp
-//                         densityRectangle.width  = sidePx
-//                         densityRectangle.height = sidePx
-//                     }
-
-//                     Connections {
-//                         target: mapView.map
-//                         function onMapReadyChanged()   { densityMapQuickItem.updateSize() }
-//                         function onZoomLevelChanged()  { densityMapQuickItem.updateSize() }
-////                         function onCenterChanged()     { densityMapQuickItem.updateSize() }
-//                     }
-
-//                     Component.onCompleted: {
-//                         updateSize()
-////                         Qt.callLater(function() { bearing_ = 45 })
-//                     }
-
-//                 }
-
-//             MapQuickItem {
-//                     id: densityMapQuickItem
-//                     parent: mapView.map
-//                     coordinate: center_
-////                     anchorPoint.x: densityMapQuickItem.sourceItem ? densityMapQuickItem.sourceItem.width  / 2 : 0
-////                     anchorPoint.y: densityMapQuickItem.sourceItem ? densityMapQuickItem.sourceItem.height / 2 : 0
-
-//                     sourceItem: Item {
-//                         id: densityItem
-//                         width: 10
-//                         height: 10
-////                         anchors.centerIn: parent
-//                         rotation: bearing_          // rotates around Item.Center by default
-//                         transformOrigin: Item.Center
-
-//                         Rectangle {
-//                             anchors.fill: parent
-//                             color: "blue"
-//                             border.color: "black"
-//                             border.width: 1
-//                         }
-//                     }
-
-//                     function updateSize() {
-//                         if (!mapView.map.mapReady) {
-//                             return
-//                         }
-//                         var lat = center_.latitude
-//                         var mpp = 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, mapView.map.zoomLevel)
-//                         var sidePx = size_ / mpp
-//                         console.log("sidePx", sidePx)
-//                         densityItem.width  = sidePx
-//                         densityItem.height = sidePx
-//                         densityMapQuickItem.anchorPoint.x = densityItem ? densityItem.width  / 2 : 0
-//                         densityMapQuickItem.anchorPoint.y = densityItem ? densityItem.height  / 2 : 0
-
-//                     }
-
-//                     Connections {
-//                         target: mapView.map
-//                         function onMapReadyChanged()   { densityMapQuickItem.updateSize() }
-//                         function onZoomLevelChanged()  { densityMapQuickItem.updateSize() }
-////                         function onCenterChanged()     { densityMapQuickItem.updateSize() }
-//                     }
-
-//                     Component.onCompleted: {
-//                         updateSize()
-//                         // Rotate 45° after everything is laid out
-//                         Qt.callLater(function() { bearing_ = 45 })
-//                     }
-//                 }
-//             MapQuickItem {
-//                 id: topLeftMarker
-//                 parent: mapView.map
-//                 coordinate: center
-//                 sourceItem: Item {
-//                     id: topLeftItem
-//                     anchors.centerIn: parent
-//                     width: 0
-//                     height: 0
-//                     Rectangle {
-//                         anchors.centerIn: parent
-//                         anchors.fill: parent
-//                         color: "red"
-//                         border.color: "white"
-//                         border.width: 1
-//                     }
-//                 }
-//                 Connections {
-//                     target: mapView.map
-//                     function onMapReadyChanged() {
-//                         if (mapView.map.mapReady) {
-//                             topLeftMarker.zoomLevel = mapView.map.zoomLevel
-//                             var tL = mapView.map.fromCoordinate(topLeft, false);
-//                             var bR = mapView.map.fromCoordinate(bottomRight, false);
-//                             console.log("width", bR.x - tL.x);
-//                             console.log("height", bR.y - tL.y);
-//                             console.log(topLeft.distanceTo(bottomRight) * Math.cos(Math.PI / 4.0))
-//                             topLeftItem.width = (bR.x - tL.x);
-//                             topLeftItem.height = (bR.y - tL.y);
-//                             topLeftItem.rotation = bearing;
-//                         }
-//                     }
-
-//                 }
-//             }
-
-
-
-//             MapQuickItem {
-//                 id: bottomRightMarker
-//                 parent: mapView.map
-//                 coordinate: bottomRight
-//                 sourceItem: Item {
-//                     id: bottomRightItem
-//                     width: 20
-//                     height: 20
-//                     Rectangle {
-//                         anchors.centerIn: parent
-//                         anchors.fill: parent
-//                         color: "red"
-//                         border.color: "white"
-//                         border.width: 1
-//                         radius: 10
-//                     }
-
-//                 }
-
-//             }
         }
-
-
+//NumberAnimation {
+//    id: bearingNumberAnimation
+//    target: mapView.map
+//    property: "bearing"
+//    duration: 300
+//    easing.type: Easing.InOutQuad
+//}
+//bearingNumberAnimation.stop()
+//bearingNumberAnimation.from = mapView.map.bearing
+//bearingNumberAnimation.to = (mapView.map.bearing + 1) % 360
+//bearingNumberAnimation.start()

@@ -11,9 +11,12 @@ ColumnLayout {
     signal mapTypeClicked()
     signal placesClicked()
     signal myLocationClicked()
-    signal nearMeToggled(bool checked)
+
+    signal followMeStateChanged(int currentState)
 
     spacing: 5
+
+
 
     Button {
         id: mapTypeButton
@@ -66,6 +69,7 @@ ColumnLayout {
 
             enabled: root.map !== null
             onClicked: root.map.bearing = (root.map.bearing + 1) % 360
+
         }
 
         Button {
@@ -189,12 +193,22 @@ ColumnLayout {
     }
 
     Button {
-        id: nearMeButton
+        id: followMeButton
+
+        property int currentState: 0
+
+        onCurrentStateChanged: {
+            root.followMeStateChanged(currentState)
+        }
+
+        onClicked: currentState  = (currentState + 1) % 3
+
         Layout.alignment: Qt.AlignRight
-        checkable: true
-        checked: false
-        icon.source: checked ? "qrc:/assets/icons/near_me.svg"
-                             : "qrc:/assets/icons/near_me_disabled.svg"
+        icon.source: [
+            "qrc:/assets/icons/follow_me_disabled.svg",
+            "qrc:/assets/icons/follow_me_flat.svg",
+            "qrc:/assets/icons/follow_me.svg"
+            ][followMeButton.currentState]
         icon.color: "black"
         icon.width: 24
         icon.height: 24
@@ -202,8 +216,6 @@ ColumnLayout {
         implicitWidth: 32
         implicitHeight: 32
         padding: 0
-
-        onToggled: root.nearMeToggled(checked)
     }
 
     Button {

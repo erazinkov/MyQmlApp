@@ -7,8 +7,8 @@
         <file>assets/icons/tilt.svg</file>
         <file>assets/icons/tilt_arrow_down.svg</file>
         <file>assets/icons/tilt_arrow_up.svg</file>
-        <file>assets/icons/near_me.svg</file>
-        <file>assets/icons/near_me_disabled.svg</file>
+        <file>assets/icons/follow_me_flat.svg</file>
+        <file>assets/icons/follow_me_disabled.svg</file>
         <file>assets/icons/rotate_left.svg</file>
         <file>assets/icons/rotate_right.svg</file>
         <file>assets/icons/zoom_in.svg</file>
@@ -28,5 +28,6 @@
         <file>assets/icons/chevron_left.svg</file>
         <file>assets/icons/chevron_right.svg</file>
         <file>assets/icons/date_range.svg</file>
+        <file>assets/icons/follow_me.svg</file>
     </qresource>
 </RCC>
