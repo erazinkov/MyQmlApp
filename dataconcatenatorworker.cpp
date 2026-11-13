@@ -92,6 +92,18 @@ bool DataConcatenatorWorker::appendBinaryWithRollback() {
         return false;
     }
 
+    if (m_lastCommittedSize <= 296) {
+        m_initialTargetPath = true;
+        return false;
+    }
+
+    if (m_initialTargetPath) {
+        m_initialTargetPath = false;
+        m_targetPath = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+        qDebug() << m_targetPath;
+    }
+
+
     QFile dst(m_targetPath);
     if (!dst.open(QIODevice::WriteOnly | QIODevice::Append)) {
         emit errorOccurred("Failed to open target file: " + dst.errorString());

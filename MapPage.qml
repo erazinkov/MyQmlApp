@@ -131,7 +131,7 @@ Page {
                         var cap = mapView.map.activeMapType.cameraCapabilities
                         var min = cap.minimumTilt
                         var max = cap.maximumTilt
-                        var maxTilt = max > 0 ? Math.min(45, max) : 0
+                        var maxTilt = max > 0 ? Math.min(15, max) : 0
                         var maxSpeed = 1.0
 //                        maxTilt = max > 0 ? Math.min(15, max) : 15
                         tiltNumberAnimation.stop()
@@ -156,7 +156,7 @@ Page {
 
             if (uploadDatabaseActive) {
                 var now = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss")
-                databaseController.operateInsertData(n, now, "test1", p.latitude, p.longitude, p)
+                databaseController.operateInsertData(n, now, "test1", p.latitude, p.longitude, "GPS")
                 n++;
             }
         }

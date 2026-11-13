@@ -36,6 +36,7 @@ private:
     bool m_pendingWrite = false;
     QDateTime m_pendingMod;
     qint64 m_pendingSize = -1;
+    bool m_initialTargetPath = true;
 
 
     QByteArray computeFileHash(const QString &path);
