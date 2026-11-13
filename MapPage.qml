@@ -97,14 +97,15 @@ Page {
         active: true
 
         onPositionChanged: {
+
             if (!positionSource.valid) {
                 return
             }
+
             var p = position.coordinate
             if (!p.isValid) {
                 return
             }
-
             if (initialPositionSourceHandled) {
                 startLocation.coordinate = p
                 initialPositionSourceHandled = false
@@ -126,17 +127,28 @@ Page {
                 break
                 case 2:
                     mapView.map.center = p
-
-                    var cap = mapView.map.activeMapType.cameraCapabilities
-                    var max = cap.maximumTilt
-                    mapView.map.tilt = max > 0 ? Math.min(45, max) : 0
+                    if (position.speedValid) {
+                        var cap = mapView.map.activeMapType.cameraCapabilities
+                        var min = cap.minimumTilt
+                        var max = cap.maximumTilt
+                        var maxTilt = max > 0 ? Math.min(45, max) : 0
+                        var maxSpeed = 1.0
+//                        maxTilt = max > 0 ? Math.min(15, max) : 15
+                        tiltNumberAnimation.stop()
+                        tiltNumberAnimation.from = mapView.map.tilt
+                        tiltNumberAnimation.to = position.speed / maxSpeed * maxTilt
+                        tiltNumberAnimation.start()
+                    } else {
+                        mapView.map.tilt = 0
+                    }
+//                    mapView.map.tilt = max > 0 ? Math.min(45, max) : 0
 
 //                    mapView.map.bearing =  positionSource.position.directionValid
 //                            ? positionSource.position.direction : 0
-                    if (positionSource.position.directionValid) {
+                    if (position.directionValid) {
                         bearingNumberAnimation.stop()
                         bearingNumberAnimation.from = mapView.map.bearing
-                        bearingNumberAnimation.to = positionSource.position.direction
+                        bearingNumberAnimation.to = position.direction
                         bearingNumberAnimation.start()
                     }
                 break
@@ -144,7 +156,7 @@ Page {
 
             if (uploadDatabaseActive) {
                 var now = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss")
-                databaseController.operateInsertData(n, now, "test1", p.latitude, p.longitude, "GPS")
+                databaseController.operateInsertData(n, now, "test1", p.latitude, p.longitude, p)
                 n++;
             }
         }
@@ -222,6 +234,8 @@ Page {
                         mapView.map.center = c
                     }
                 } else {
+                    bearingNumberAnimation.stop()
+                    tiltNumberAnimation.stop()
                     mapView.map.center = startLocation.coordinate
                     mapView.map.tilt = 0
                 }
@@ -616,7 +630,14 @@ Page {
         id: bearingNumberAnimation
         target: mapView.map
         property: "bearing"
-        duration: 500
+        duration: 1000
+        easing.type: Easing.InOutQuad
+    }
+    NumberAnimation {
+        id: tiltNumberAnimation
+        target: mapView.map
+        property: "tilt"
+        duration: 1000
         easing.type: Easing.InOutQuad
     }
 }
