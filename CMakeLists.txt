@@ -18,6 +18,8 @@ qt_add_executable(appMyQmlApp
     processing.h processing.cpp
     processingcontroller.h processingcontroller.cpp
     processingworker.h processingworker.cpp
+    dataconcatenatorcontroller.h dataconcatenatorcontroller.cpp
+    dataconcatenatorworker.h dataconcatenatorworker.cpp
 )
 
 qt_add_qml_module(appMyQmlApp

@@ -8,13 +8,14 @@
 
 #include <QQmlContext>
 
- #include "markermodel.h"
+#include "markermodel.h"
 
- #include "databasecontroller.h"
+#include "databasecontroller.h"
 
 //#include "processing.h"
 
- #include "processingcontroller.h"
+#include "processingcontroller.h"
+#include "dataconcatenatorcontroller.h"
 
 #include <QGeoServiceProvider>
 
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
 
      DatabaseController dbController;
      ProcessingController pController;
+     DataConcatenatorController dcController;
 
 //    Processing processing;
 
@@ -56,6 +58,7 @@ int main(int argc, char *argv[])
     // qmlRegisterType<Test>("test", 1, 0, "Test");
      qmlRegisterType<MarkerModel>("markerModel", 1, 0, "MarkerModel");
      qmlRegisterType<DatabaseController>("dbController", 1, 0, "DatabaseController");
+     qmlRegisterType<DataConcatenatorController>("dcController", 1, 0, "DataConcatenatorController");
 //     qmlRegisterType<ProcessingController>("pController", 1, 0, "ProcessingController");
      engine.rootContext()->setContextProperty("pController", &pController);
     engine.load(url);

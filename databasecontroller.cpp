@@ -2,7 +2,7 @@
 
 #include <QSqlQueryModel>
 
-DatabaseController::DatabaseController(QObject *parent) : QObject{parent}
+DatabaseController::DatabaseController(QObject *parent) : QObject(parent)
 {
     m_thread = new QThread(this);
     m_worker = new DatabaseWorker;

@@ -123,7 +123,7 @@ Page {
                         break
                         case 1:
                             mapView.map.center = p
-                            mapView.map.tilt = 0
+
                         break
                         case 2:
                             mapView.map.center = p
@@ -216,6 +216,7 @@ Page {
                             }
                         } else {
                             mapView.map.center = startLocation.coordinate
+                            mapView.map.tilt = 0
                         }
                     }
                 }

@@ -13,7 +13,7 @@ class DatabaseController : public QObject
 {
     Q_OBJECT
 public:
-    DatabaseController(QObject *parent = nullptr);
+    explicit DatabaseController(QObject *parent = nullptr);
     ~DatabaseController() override;
 signals:
     void connectionStateChanged(bool);
